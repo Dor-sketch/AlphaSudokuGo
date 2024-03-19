@@ -4,6 +4,10 @@
 #include <iostream>
 #include <random>
 
+sf::Color complementaryPurple(128, 0, 128); // A shade of purple
+sf::Color analogousCyan(0, 255, 255); // A shade of cyan
+sf::Color triadicYellow(255, 255, 0); // A shade of yellow
+
 // Load a font from a file. If the file cannot be loaded, print an error message
 // and exit the program.
 sf::Font load_font(const std::string &filepath) {
@@ -24,8 +28,114 @@ Sudoku::Sudoku() {
   std::cout << "Sudoku constructor finished" << std::endl;
 }
 
+void Sudoku::updateBoard(const std::vector<std::vector<char>> &board) {
+  std::cout << "Sudoku constructor called" << std::endl;
+  setBoard(board);
+  font = load_font("../VT323-Regular.ttf");
+  std::cout << "Sudoku constructor finished" << std::endl;
+
+  // Clear the RenderTexture with a transparent color
+  // Redraw the board
+  AImode();
+}
+
+void Sudoku::AImode() {
+  sf::RenderTexture renderTexture;
+
+  // Create a RenderTexture to draw on
+  if (!renderTexture.create(9 * cellSize, 9 * cellSize)) {
+    std::cerr << "Failed to create RenderTexture" << std::endl;
+    return;
+  }
+
+  renderTexture.clear(sf::Color::Transparent);
+
+  for (int i = 0; i < 9; i++) {
+    for (int j = 0; j < 9; j++) {
+      if (numbers[i][j] == 0) {
+        continue;
+      }
+      sf::Text text;
+      text.setFont(font);
+      // make bold
+      // text.setStyle(sf::Text::Bold);
+      text.setString(std::to_string(numbers[i][j]));
+      text.setCharacterSize(24);
+      text.setFillColor(sf::Color::Green);
+      text.setPosition(i * cellSize + 25, j * cellSize + 20);
+      renderTexture.draw(text);
+    }
+  }
+
+  // Draw the grid lines
+  for (int i = 1; i <= 9; i++) {
+    sf::RectangleShape line(sf::Vector2f(9 * cellSize, 1));
+    line.setPosition(i * cellSize, 0);
+    line.setFillColor(sf::Color::Black);
+    renderTexture.draw(line);
+
+    line.setSize(sf::Vector2f(1, 9 * cellSize));
+    line.setPosition(0, i * cellSize);
+    renderTexture.draw(line);
+  }
+
+  // add bold lines to the texture
+  for (int i = 0; i <= 9; i++) {
+    for (int j = 0; j <= 9; j++) {
+      if (i % 3 == 0 && j % 3 == 0) {
+        sf::RectangleShape line(
+            sf::Vector2f(cellSize * 3-1, 3-1)); // Horizontal line
+        line.setPosition(i * cellSize, j * cellSize);
+        // purple dark cool
+        line.setFillColor(analogousCyan);
+        renderTexture.draw(line);
+
+        line.setSize(sf::Vector2f(3, cellSize * 3)); // Vertical line
+        // make sure last line is drawn
+        if (i == 9) {
+          line.setSize(sf::Vector2f(3, cellSize * 3-1));
+        }
+        else if (j == 9) {
+          line.setSize(sf::Vector2f(cellSize * 3-1, 3));
+        }
+        else {
+          line.setSize(sf::Vector2f(3, cellSize * 3));
+        }
+        line.setFillColor(sf::Color(analogousCyan));
+        renderTexture.draw(line);
+      }
+    }
+  }
+
+  // draw closing lines around the board
+  sf::RectangleShape line(sf::Vector2f(9 * cellSize, 3));
+  line.setPosition(0, 9 * cellSize-1);
+  line.setFillColor(sf::Color::Green);
+  renderTexture.draw(line);
+  // same for vertical right
+  line.setSize(sf::Vector2f(3, 9 * cellSize));
+  line.setPosition(9 * cellSize-1, 0);
+  line.setFillColor(sf::Color::Green);
+  renderTexture.draw(line);
+
+
+  // We're done drawing to the texture
+  renderTexture.display();
+
+  // update gui
+
+
+  // // Now we can use the texture for drawing
+  // sf::Image board_image = renderTexture.getTexture().copyToImage();
+
+  // // generate name based on time make sure its monotonically increasing
+  // std::time_t result = std::time(nullptr);
+  // std::string filename = "board" + std::to_string(result) + ".png";
+  // board_image.saveToFile(filename);
+}
+
 // Get the current state of the Sudoku board.
-std::vector<std::vector<char>> Sudoku::getBoard() {
+const std::vector<std::vector<char>> Sudoku::getBoard() {
   std::vector<std::vector<char>> board;
   for (int i = 0; i < 9; i++) {
     std::vector<char> row;
@@ -43,6 +153,7 @@ std::vector<std::vector<char>> Sudoku::getBoard() {
 
 // Initialize the Sudoku grid.
 void Sudoku::initGrid() {
+
   for (int i = 0; i < 9; i++) {
     std::vector<sf::RectangleShape> row;
     for (int j = 0; j < 9; j++) {
@@ -54,6 +165,7 @@ void Sudoku::initGrid() {
     }
     grid.push_back(row);
   }
+
 
   for (int i = 0; i < 9; i++) {
     for (int j = 0; j < 9; j++) {
@@ -91,11 +203,16 @@ void Sudoku::draw(sf::RenderTarget &target, sf::RenderStates states) const {
         text.setString(std::to_string(numbers[i][j]));
         text.setCharacterSize(24);
         text.setFillColor(sf::Color::Black);
-        text.setPosition(i * cellSize + 20, j * cellSize + 10);
+        text.setPosition(i * cellSize + 25, j * cellSize + 20);
         target.draw(text); // Draw the numbers
       }
     }
   }
+  // // closing lines around the board
+  // sf::RectangleShape line(sf::Vector2f(9 * cellSize, 3));
+  // line.setPosition(0, 9 * cellSize-1);
+  // line.setFillColor(sf::Color::Green); // for 3d effect
+  // target.draw(line);
 }
 
 void Sudoku::fillGrid() {
@@ -121,7 +238,7 @@ void Sudoku::generatePuzzle() {
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_int_distribution<> dis(0, 8);
-  for (int i = 0; i < 40; i++) {
+  for (int i = 0; i < 50; i++) {
     // TODO: adjust the number of cells to remove based on difficulty
     int row = dis(gen);
     int col = dis(gen);
@@ -136,21 +253,21 @@ void Sudoku::handleClick(int x, int y, int mouseButton) {
   int cellY = y / cellSize;
   if (mouseButton == sf::Mouse::Right) {
     numbers[cellX][cellY] = 0;
-  } else if (mouseButton == sf::Mouse::Middle) {
-    // call solver
-    auto board = getBoard();
-    SudokuCSP solver(board);
-    solver.solve();
-    board = solver.getBoard();
-    std::cout << board[0][0] << std::endl;
-    setBoard(board);
-  } else {
+  }
+  // else if (mouseButton == sf::Mouse::Middle) {
+  //   // call solver
+  //   auto board = getBoard();
+  //   SudokuCSP solver(board, *this);
+  //   solver.solve();
+
+  // }
+  else {
     numbers[cellX][cellY] = (numbers[cellX][cellY] % 9) + 1;
   }
 }
 
 // Set the current state of the Sudoku board.
-void Sudoku::setBoard(std::vector<std::vector<char>> &newBoard) {
+void Sudoku::setBoard(const std::vector<std::vector<char>> &newBoard) {
   numbers = std::vector<std::vector<int>>(9, std::vector<int>(9, 0));
   for (int i = 0; i < 9; i++) {
     for (int j = 0; j < 9; j++) {

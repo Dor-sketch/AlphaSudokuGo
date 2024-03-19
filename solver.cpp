@@ -22,6 +22,7 @@ bool SudokuCSP::backtrack() {
   std::pair<int, int> var = {-1, -1};
   for (int row = 0; row < 9; ++row) {
     for (int col = 0; col < 9; ++col) {
+      sudoku.updateBoard(getBoard());
       if (board[row][col] == '.') {
         var = {row, col};
         std::cout << "Unassigned cell: " << row << " " << col << std::endl;
@@ -36,6 +37,8 @@ found_unassigned:
   for (int val : domains[var]) {
     if (is_consistent(var, val)) {
       board[var.first][var.second] = val + '0';
+      std::cout<<"saving screenshot"<<std::endl;
+      Sudoku(getBoard());
       if (backtrack())
         return true;
       board[var.first][var.second] = '.';
@@ -52,7 +55,7 @@ found_unassigned:
   return false;
 }
 
-SudokuCSP::SudokuCSP(std::vector<std::vector<char>> &board) : board(board) {
+SudokuCSP::SudokuCSP(std::vector<std::vector<char>> &board,Sudoku & sudoku) : board(board),sudoku(sudoku) {
   // check if the board is valid
   if (!isValidSudoku(board)) {
     std::cout << "Invalid Sudoku board" << std::endl;
@@ -74,7 +77,7 @@ void SudokuCSP::solve() {
   backtrack();
 }
 
-std::vector<std::vector<char>> SudokuCSP::getBoard() { return board; }
+const std::vector<std::vector<char>> SudokuCSP::getBoard() { return board; }
 
 // Check if the current state of the Sudoku board is valid.
 bool SudokuCSP::isValidSudoku(std::vector<std::vector<char>> &board) {

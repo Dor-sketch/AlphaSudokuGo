@@ -13,7 +13,7 @@ This project takes a Constraint Satisfaction Problem (CSP) approach, implementin
 - **CMake Build System**: Uses CMake to manage the build process, making it easy to compile and run the project. Works on Windows, macOS, and Linux.
 
 ## Getting Started
-
+![alt text](image.png)
 ### Prerequisites
 
 To compile and run AlphaSudokuGo, you will need:

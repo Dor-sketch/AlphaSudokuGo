@@ -1,8 +1,11 @@
+# pragma once
+
 #include <iostream>
 #include <queue>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include "sudoku.h"
 
 // Define a hash function for using pairs as keys in unordered_map
 struct pair_hash {
@@ -16,9 +19,10 @@ struct pair_hash {
 
 class SudokuCSP {
 public:
-  SudokuCSP(std::vector<std::vector<char>> &board);
-  std::vector<std::vector<char>> getBoard();
+  SudokuCSP(std::vector<std::vector<char>> &board, Sudoku & sudoku);
+  const std::vector<std::vector<char>> getBoard();
   void solve();
+  Sudoku sudoku;
 
 private:
   bool isValidSudoku(std::vector<std::vector<char>> &board);

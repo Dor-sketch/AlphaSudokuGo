@@ -1,19 +1,24 @@
+# pragma once
+
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
 
+
 class Sudoku : public sf::Drawable {
 public:
   Sudoku();
+  void updateBoard(const std::vector<std::vector<char>> &solverBoard);
   void initGrid();
   void handleClick(int x, int y, int mouseButton);
-  std::vector<std::vector<char>> getBoard();
-  void setBoard(std::vector<std::vector<char>> &newBoard);
+  const std::vector<std::vector<char>> getBoard();
+  void setBoard(const std::vector<std::vector<char>> &newBoard);
 
 protected:
   void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
 
 private:
+  void AImode();
   sf::Font font;   // Declare a font for the numbers
   void fillGrid(); // Fill the grid with numbers
   const int cellSize = 64;
