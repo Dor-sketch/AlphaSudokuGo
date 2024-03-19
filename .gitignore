@@ -1,0 +1,14 @@
+# ignore build directory and its contents
+/build/
+/build/*
+
+# ignore .vscode directory and its contents
+.vscode/
+.vscode/*
+
+# ignore python cache files
+__pycache__/
+__pycache__/*
+
+# ignore .DS_Store files
+.DS_Store
