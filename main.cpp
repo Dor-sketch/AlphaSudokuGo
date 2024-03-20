@@ -1,9 +1,9 @@
-#include "solver.h"
-#include "sudoku.h"
+#include "Sudoku.h"
+#include "SudokuCsp.h"
 #include <iostream>
-#include <vector>
 #include <string>
 #include <thread>
+#include <vector>
 
 void handleEvents(sf::RenderWindow &window, Sudoku &sudoku) {
   sf::Event event;
@@ -13,18 +13,9 @@ void handleEvents(sf::RenderWindow &window, Sudoku &sudoku) {
     }
     if (event.type == sf::Event::MouseButtonPressed) {
       int mouseButton = event.mouseButton.button;
-      if (mouseButton == sf::Mouse::Middle) {
-        // call solver new thread
-        auto board = sudoku.getBoard();
-        SudokuCSP solver(board, sudoku);
-        std::thread t1(&SudokuCSP::solve, &solver);
-        t1.detach();
-      }
-      else {
-        int x = event.mouseButton.x;
-        int y = event.mouseButton.y;
-        sudoku.handleClick(x, y, mouseButton);
-      }
+      int x = event.mouseButton.x;
+      int y = event.mouseButton.y;
+      sudoku.handleClick(x, y, mouseButton);
     }
   }
 }

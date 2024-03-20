@@ -20,12 +20,12 @@ find_package(SFML 2.6 COMPONENTS graphics audio REQUIRED)
 # Define your sources and headers. Add all relevant files.
 set(SOURCES
     main.cpp
-    sudoku.cpp
-    solver.cpp
+    Sudoku.cpp
+    SudokuCSP.cpp
 )
 set(HEADERS
-    sudoku.h
-    solver.h
+    Sudoku.h
+    SudokuCSP.h
 )
 
 # Define the executable and link it with the Qt5Widgets library.
