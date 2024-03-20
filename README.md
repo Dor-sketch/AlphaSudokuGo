@@ -1,72 +1,211 @@
 # AlphaSudokuGo
 
-AlphaSudokuGo is C++ program that solves Sudoku puzzles using a Constraint Satisfaction Problem (CSP) approach. It includes a graphical user interface (GUI) built with Qt5, allowing users to input their own puzzles and watch the solver in action. This project aim to demonstrate the power of Artificial Intelligence (AI) and Constraint Satisfaction Problems (CSP) in solving complex puzzles.
+AlphaSudokuGo is a C++ program designed to solve Sudoku puzzles using a `Constraint Satisfaction Problem` (CSP) approach. It features a graphical user interface (GUI) built with Qt5, which enables users to input their own puzzles and observe the solver in real-time. The primary goals of this project are to showcase the capabilities of Artificial Intelligence (AI) in tackling complex puzzles and to create cool visualizations of the search process.
 
-<p align="center">
-    <img src="./images/test10/output8.gif" alt="Sudoku puzzle" width="300">
+<p align = "center">
+  <img src="./images/test_fast/output_long.gif" alt="Sudoku puzzle" width="1000">
+  <br>
+  <i>The One</i>
+</p>
+
+- [Background 📚](#background-)
+- [Sudoku 🧩](#sudoku-)
+  - [Visualization](#visualization)
+- [Getting Started 🚀](#getting-started-)
+  - [Prerequisites](#prerequisites)
+  - [Compilation](#compilation)
+  - [Usage](#usage)
+  - [How to play](#how-to-play)
+  - [Additional Features](#additional-features)
+- [License](#license)
 
 ## Background 📚
 
-A constraint satisfaction problem (CSP) is a problem defined by a tuple $(X, D, C)$, where: $X$ is a set of variables, $D$ is a set of domains, and $C$ is a set of constraints. The goal is to assign a value to each variable such that the constraints are satisfied. CSPs are a special kind of problem that can be solved by search algorithms. They are used in many areas of artificial intelligence (AI), including scheduling, planning, and decision making.
+A Constraint Satisfaction Problem (CSP) is a mathematical problem defined by a set of variables $(X)$, their respective domains $(D)$, and a set of constraints $(C)$. The objective is to assign a value from the domain to each variable in a way that all constraints are met. CSPs are a unique category of problems that can be effectively solved using search algorithms. They find extensive applications in various fields of artificial intelligence (AI), including but not limited to scheduling, planning, and decision-making.
 
-A more simple example of a CSP is the Australian map-coloring problem. In this problem, the goal is to assign a color to each region of Australia such that no two adjacent regions have the same color. This problem can be represented as a CSP with four variables (one for each region) and three constraints (one for each pair of adjacent regions). The goal is to find an assignment of colors to the regions that satisfies all of the constraints.
+To illustrate, consider the Australian map-coloring problem, a simpler instance of a CSP. The task here is to color each region of Australia in such a way that no two neighboring regions share the same color. This problem can be modeled as a CSP with four variables, each representing a region, and three constraints, each corresponding to a pair of neighboring regions. The aim is to discover a color assignment for the regions that fulfills all the constraints.
 
 <p align="center">
-    <img src="./images/output/0.png" alt="Australian map-coloring problem" width="200">
-    <img src="./images/output/7.png" alt="Australian map-coloring problem" width="200">
+    <img src="./images/output/0.png" alt="Australian map-coloring problem" width="500">
+    <img src="./images/output/7.png" alt="Australian map-coloring problem" width="500">
     <br>
   <i>Australian map-coloring problem initial state (left) and a goal state (right)</i>
 </p>
 
-As can be implamented in the [examples.ipynb](./examples.ipynb) file, the CSP in this case consist of the following components:
+As demonstrated in the [examples.ipynb](examples.ipynb) file, the CSP in this context is composed of the following elements:
 
-- Variables: A set of variables, each of which represents a region of Australia ($X = \{WA, NT, Q, NSW, V, SA, T\}$).
-- Domains: A set of domains, each of which contains the possible colors that a region can be assigned ($D = \{red, green, blue\}$).
-- Constraints: A set of constraints, each of which specifies the allowable combinations of colors for a pair of adjacent regions ($C = \{(WA, NT), (WA, SA), (NT, SA), (NT, Q), (SA, Q), (SA, NSW), (SA, V), (NSW, Q), (NSW, V)\}$). Note that an unary constraint is also applied to each variable, which enforce that each region must be assigned a color.
+- Variables: These are a collection of variables, each representing a region of Australia ($X = {WA, NT, Q, NSW, V, SA, T}$).
 
-The basic idea of a CSP is to search for a solution that satisfies all of the constraints. The search space for a CSP is defined by the possible assignments of values to the variables. The search algorithms used to solve CSPs are designed to explore this search space in an efficient manner.
+- Domains: These are a collection of domains, each containing the potential colors that a region can be assigned ($D = {red, green, blue}$).
 
-The way the search is performed is by using a backtracking algorithm, which is a general algorithm for finding all (or some) solutions to some computational problems, notably constraint satisfaction problems, that incrementally builds candidates to the solutions, and abandons a candidate ("backtracks") as soon as it determines that the candidate cannot possibly be completed to a valid solution.
+- Constraints: These are a collection of constraints, each defining the permissible color combinations for a pair of adjacent regions ($C = {(WA, NT), (WA, SA), (NT, SA), (NT, Q), (SA, Q), (SA, NSW), (SA, V), (NSW, Q), (NSW, V)}$). It's important to note that a unary constraint is also applied to each variable, enforcing that each region must be assigned a color.
 
-If at any point the algorithm finds that a variable has no possible values left in its domain, the algorithm backtracks to the most recent variable that has a value that can be changed. This process continues until a solution is found or it is determined that no solution exists.
+The fundamental concept of a CSP is to seek a solution that satisfies all constraints. The search space for a CSP is determined by the possible value assignments to the variables. The search algorithms employed to solve CSPs are designed to efficiently navigate this search space.
+
+The search is conducted using a backtracking algorithm, a general-purpose algorithm for finding all (or some) solutions to certain computational problems, notably CSPs. This algorithm incrementally constructs solution candidates and discards a candidate ("backtracks") as soon as it determines that the candidate cannot possibly be extended to a valid solution.
+
+If the algorithm identifies a variable with no remaining possible values in its domain at any point, it backtracks to the most recent variable that has a changeable value. This process repeats until a solution is discovered or it is determined that no solution is possible.
 
 <p align="center">
-    <img src="./images/output/animation_map.gif" alt="Sudoku puzzle" width="300">
+    <img src="./images/output/map_2.gif" alt="Sudoku puzzle" width="564">
     <br>
   <i>Backtracking with AC-3 Algorithm</i>
 </p>
 
-There are couple of ways to improve the backtracking algorithm, one of them is to use the AC-3 algorithm, which is a simple and widely used algorithm for enforcing arc consistency in a CSP. The basic idea of the AC-3 algorithm is to iteratively remove values from the domains of the variables in a CSP until the CSP is arc consistent. This is done by checking each constraint in the CSP and removing values from the domains of the variables that do not satisfy the constraint. The AC-3 algorithm is used to preprocess the CSP before the backtracking algorithm is applied, in order to reduce the size of the search space and improve the efficiency of the backtracking algorithm.
+There are several strategies to enhance the backtracking algorithm, one of which is the AC-3 algorithm. This simple yet widely used algorithm enforces arc consistency in a CSP. The fundamental concept of the AC-3 algorithm is to iteratively eliminate values from the domains of the variables in a CSP until it becomes arc consistent. This is achieved by examining each constraint in the CSP and discarding values from the domains of the variables that fail to satisfy the constraint. The AC-3 algorithm is utilized to preprocess the CSP before applying the backtracking algorithm, thereby reducing the search space and enhancing the efficiency of the backtracking algorithm.
 
-## Sudoku
+For more information on CSP you can read on the [Wikipedia page](https://en.wikipedia.org/wiki/Constraint_satisfaction_problem).
 
-The Sudoku puzzle is a classic example of a CSP. It consists of a 9x9 grid of cells, where each cell can contain a value from 1 to 9. The goal is to fill in the grid such that each row, column, and 3x3 subgrid contains the numbers 1 to 9 without any repeats. This can be represented as a CSP with 81 variables (one for each cell), 81 domains (each containing the numbers 1 to 9), and 27 constraints (9 for the rows, 9 for the columns, and 9 for the subgrids).
+---
 
-I first encounter the Sudoku puzzle in the LeetCode problem [Sudoku Solver](https://leetcode.com/problems/sudoku-solver/), which is considered as 'Hard' problem. The problem is to write a program to solve a Sudoku puzzle by filling the empty cells. A sudoku solution must satisfy all of the rules we mentioned above.
+## Sudoku 🧩
 
-## Features 🔢
+The Sudoku puzzle serves as a classic instance of a CSP. It comprises a 9x9 grid of cells, each capable of holding a value from 1 to 9. The objective is to populate the grid so that each row, column, and 3x3 subgrid contains the numbers 1 to 9 with no repetitions. This can be modeled as a CSP with 81 variables (one for each cell), 81 domains (each containing the numbers 1 to 9), and 27 constraints (9 for the rows, 9 for the columns, and 9 for the subgrids).
 
-- **Constraint Satisfaction Problem (CSP) Solver**: Leverages the CSP approach for solving puzzles, ensuring that all constraints are met before moving forward. Includes consistency checks to ensure that the puzzle is solvable.
-- **Backtracking Algorithm**: Implements a backtracking algorithm to navigate through the puzzle, making intelligent decisions at each step.
-- **Efficient Puzzle Solving**: Designed to solve puzzles of varying difficulty levels, from simple to diabolically hard.
-- **Qt5 GUI**: Provides a graphical user interface for users to interact with the solver and input their own puzzles.
-- **CMake Build System**: Uses CMake to manage the build process, making it easy to compile and run the project. Works on Windows, macOS, and Linux.
+My first encounter with the Sudoku puzzle was through the LeetCode problem Sudoku Solver, which is classified as a 'Hard' problem (see [Sudoku Solver](https://leetcode.com/problems/sudoku-solver/)). The challenge is to develop a program that solves a Sudoku puzzle by filling the empty cells. A Sudoku solution must adhere to all the rules previously mentioned.
 
-## Getting Started
-![alt text](image.png)
+To represent the Sudoku puzzle as a CSP, I utilized the following components:
+
+- Variables: A collection of variables, each representing a cell in the Sudoku grid ($X = {x_{11}, x_{12}, \ldots, x_{99}}$).
+
+- Domains: A collection of domains, each containing the numbers 1 to 9 ($D = {1, 2, \ldots, 9}$).
+
+- Constraints: A collection of constraints, each defining the permissible combinations of numbers for a pair of cells ($C = {rows, columns, subgrids}$).
+
+To abstract the Sudoku puzzle grid, I created a hash table to store the available domains for each cell.
+
+```c++
+struct pair_hash {
+  template <class T1, class T2>
+  std::size_t operator()(const std::pair<T1, T2> &pair) const {
+    auto hash1 = std::hash<T1>{}(pair.first);
+    auto hash2 = std::hash<T2>{}(pair.second);
+    return hash1 ^ hash2;
+  }
+};
+```
+
+The `pair_hash` is then used inside an `unordered_map` to hold the available domains in the member variable `domains` of the class `SudokuCSP`.
+
+```c++
+class SudokuCSP {
+public:
+  void solve();  // Solve the Sudoku puzzle
+  // ...
+private:
+  std::vector<std::vector<char>> board;
+  std::unordered_map<std::pair<int, int>, std::unordered_set<int>, pair_hash>
+      domains;
+  bool isValidSudoku(std::vector<std::vector<char>> &board);
+  bool is_consistent(std::pair<int, int> var, int value);
+  bool backtrack();
+};
+```
+
+The `backtrack` method carries out the backtracking process. This recursive function navigates the search space of the Sudoku puzzle by assigning values to the variables and verifying the satisfaction of constraints. If the algorithm encounters a variable with no remaining possible values in its domain at any point, it reverts to the most recent variable with a modifiable value. This procedure persists until a solution is identified or it is established that no solution is feasible.
+
+```c++
+bool SudokuCSP::backtrack() {
+  std::pair<int, int> var = {-1, -1};
+  for (int row = 0; row < 9; ++row) {
+    for (int col = 0; col < 9; ++col) {
+      if (board[row][col] == '.') {
+        var = {row, col};
+        goto found_unassigned;
+      }
+    }
+  }
+found_unassigned:
+  if (var.first == -1)
+    return true; // Puzzle solved
+
+  for (int val : domains[var]) {
+    if (is_consistent(var, val)) {
+      board[var.first][var.second] = val + '0';
+      if (backtrack())
+        return true;
+      board[var.first][var.second] = '.';
+    }
+  }
+  return false;
+}
+```
+
+Please note that no `forward checking` or other `interface` was incorporated into the `SudokuCSP` class. The primary objective of this project is to showcase the capabilities of AI and CSP in resolving complex puzzles and to generate engaging visualizations of the search process. A more effective approach to backtracking in this scenario would also involve selecting the order of the variables and the values to be assigned to the variables, which can be accomplished using the `Minimum Remaining Values` (MRV) and `Least Constraining Value` (LCV) heuristics. However, this would interfere with the proper functioning of the Cool Matrix visualization, as the visualization relies on the order of the variables and the values to be assigned to the variables.
+
+### Visualization
+
+The program includes a graphical user interface (GUI) constructed with `Qt5`, which allows users to input their own puzzles and watch the solver in real-time. The GUI is designed to be user-friendly and interactive, enabling users to alter the puzzle and observe the solver in action. The primary aim of the GUI is to offer an engaging and informative experience for users. The GUI employs advanced features of Qt5 and C++ to create a visually attractive and interactive environment for users. Here are some of the main features of the GUI.
+
+```c++
+// Draw the Sudoku grid and numbers.
+void Sudoku::draw(sf::RenderTarget &target, sf::RenderStates states) const {
+  auto glowingColor = GlowingColor(Utility::analogousCyan).getShade();
+  auto glowingBrighterColor =
+      GlowingColor(Utility::analogousCyan).getBrighterShade();
+  Utility::drawBackround(target, backgroundColor);
+  Utility::drawLines(target, glowingColor, cellSize);
+  Utility::drawNumbers(target, numbers, font, numberColor, cellSize);
+  Utility::drawClosingLines(target, glowingBrighterColor, cellSize);
+  saveScreenshot(target);
+}
+
+sf::Color GlowingColor::getBrighterShade() {
+    float shadeFactorR = (std::sin(time) + 1) / 2; // Oscillates between 0 and 1
+    float shadeFactorG = (std::sin(time + 1) + 1) / 2; // Phase shift of 1
+    float shadeFactorB = (std::sin(time * 2) + 1) / 2; // Frequency of 2
+    time += 0.001; // static variable to keep function state
+    sf::Color shadedColor;
+    shadedColor.r = std::min(static_cast<int>(baseColor.r * shadeFactorR + 50), 255);
+    shadedColor.g = std::min(static_cast<int>(baseColor.g * shadeFactorG + 50), 255);
+    shadedColor.b = std::min(static_cast<int>(baseColor.b * shadeFactorB + 50), 255);
+    shadedColor.a = baseColor.a; // Keep the same alpha value
+    return shadedColor;
+}
+```
+
+The GUI supports moving-like animations, using the `GlowingColor` class to create a glowing effect on the numbers and the grid. The `draw` method is invoked every frame to update the screen and generate the animation. The GUI also supports screenshots, which can be saved using the `saveScreenshot` method, and adheres to best coding practices, such as `clean code`, `SOLID` principles, and the `DRY` principle.
+
+The main thread of the program is tasked with managing the GUI and the user input. When the user clicks the middle mouse button, the program flow continues to update the window by passing a reference to the `window` to the `draw` method of the `SudokuCSP` class. The `draw` method is responsible for drawing the Sudoku grid and numbers, and the `GlowingColor` class is responsible for creating the glowing effect on the numbers and the grid.
+
+Therefore, the main logic can be easily understood by reading the main loop of the program:
+
+```c++
+while (window.isOpen()) {
+  handleEvents(window, sudoku);
+  drawSudoku(window, sudoku);
+}
+```
+
+---
+
+## Getting Started 🚀
+
 ### Prerequisites
 
-To compile and run AlphaSudokuGo, you will need:
+To compile and execute AlphaSudokuGo, you will require:
 
 - A C++ compiler that supports C++11 or later.
-- A clone of this repository.
+
+- A clone of this repository (it is recommended to exclude the images folder due to its large size).
+
 - Qt5 (optional, for the GUI).
+
 - CMake (optional, for building the project).
+
 - A terminal or command prompt.
+
+For the interactive Jupyter notebook, you will require:
+
+- Jupyter Notebook
+
+- Python 3
+
+- Matplotlib
 
 ### Compilation
 
-Navigate to the project directory and compile the project using the following commands:
+Navigate to the project directory and compile the project using the appropriate commands:
 
 ```bash
 mkdir build && cd build
@@ -79,3 +218,68 @@ Than you can run the project using the following command:
 ```bash
 ./SudokuGame
 ```
+
+### Usage
+
+The program initiates in a game mode with a randomly generated solvable Sudoku puzzle. You can modify the puzzle's level using the command line flag `--difficulty`, followed by the number of missing cells you want in the puzzle.
+
+```bash
+./SudokuGame --difficulty <number of missing cells>
+```
+
+<p align="center">
+  <img src="./images/20_missing.gif" alt="Sudoku puzzle" width="400" style="padding:10px; margin:10px;">
+  <img src="./images/90_missing.gif" alt="Sudoku puzzle" width="400" style="padding:10px; margin:10px;">
+  <br>
+  <i>Sudoku puzzle with 1 missing cells (left) and 90 missing cells (right)</i>
+</p>
+
+You can also use the GUI to input your own puzzle and watch the solver in action. To run the GUI, use the following command:
+
+```bash
+./SudokuGame --open <path to sudoku puzzle>
+```
+
+Note that you can combine the `--difficulty` and `--open` flags to open the GUI with a puzzle of a specific difficulty level.
+
+```bash
+./SudokuGame --difficulty <number of missing cells> --open <path to sudoku puzzle>
+```
+
+### How to play
+
+Click on the cell you wish to modify, each click will increment the cell value by 1. To erase a cell value, just right-click on the cell. To solve the puzzle in AI mode, press the middle mouse button (scroll wheel), and watch the solution unfold.
+
+<p align = "center">
+  <img src="./images/usage.gif" alt="Sudoku puzzle" width="500">
+  <img src="./images/90_solved/90_solution.gif" alt="Sudoku puzzle" width="500">
+  <br>
+  <i>Usage</i>
+</p>
+
+### Additional Features
+
+You can change the theme of the game, including fonts and styles.
+
+<p align = "center">
+  <img src="./images/animation3.gif" alt="Sudoku puzzle" width="500">
+  <img src="./images/test2/animation_green.gif" alt="Sudoku puzzle" width="500">
+  <br>
+  <i>Light mode</i>
+  <br>
+  <img src = "/images/test9/output9.gif" alt="Sudoku puzzle" width="500">
+  <img src="./images/test10/output8.gif" alt="Sudoku puzzle" width="500">
+  <br>
+  <i>Dark mode</i>
+  <br>
+  <img src="./images/glowing1/glowing.gif" alt="Sudoku puzzle" width="500">
+  <img src="./images/glowing2/glowing2.gif" alt="Sudoku puzzle" width="500">
+  <img src="./images/glowing2/glowing3.gif" alt="Sudoku puzzle" width="500">
+  <img src="./images/glowing2/glowing5.gif" alt="Sudoku puzzle" width="500">
+  <br>
+  <i>Glowing mode</i>
+</p>
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

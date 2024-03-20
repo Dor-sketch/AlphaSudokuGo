@@ -1,11 +1,12 @@
-#include "SudokuCsp.h"
+#include "SudokuCSP.h"
 #include "Sudoku.h"
 
 const bool storeScreenshot = false;
 
-SudokuCSP::SudokuCSP(std::vector<std::vector<char>> &board)
-    : board(board) {
+SudokuCSP::SudokuCSP(sf::RenderWindow &window, Sudoku &sudoku)
+    : sudoku(sudoku), window(window) {
   // check if the board is valid
+  board = sudoku.getBoard();
   if (!isValidSudoku(board)) {
     std::cout << "Invalid Sudoku board" << std::endl;
     return;
@@ -39,15 +40,26 @@ bool SudokuCSP::is_consistent(std::pair<int, int> var, int value) {
   return true;
 }
 
+void updateBoard(std::vector<std::vector<char>> &board, std::pair<int, int> var,
+                 int value) {
+  board[var.first][var.second] = value + '0';
+}
+
+void updateWindow(sf::RenderWindow &window, Sudoku &sudoku,
+                  std::vector<std::vector<char>> &board) {
+  sudoku.setBoard(board);
+  window.clear();
+  window.draw(sudoku);
+  window.display();
+  // option to store a screenshot of the window
+}
+
 bool SudokuCSP::backtrack() {
   std::pair<int, int> var = {-1, -1};
   for (int row = 0; row < 9; ++row) {
     for (int col = 0; col < 9; ++col) {
-      if (storeScreenshot) {
-        auto board = getBoard();
-        Sudoku sudoku(board);
-      }
-      Sudoku sudoku(board);
+      auto board = getBoard();
+      updateWindow(window, sudoku, board);
       if (board[row][col] == '.') {
         var = {row, col};
         std::cout << "Unassigned cell: " << row << " " << col << std::endl;
@@ -70,9 +82,7 @@ found_unassigned:
   return false;
 }
 
-void SudokuCSP::solve() {
-  backtrack();
-}
+void SudokuCSP::solve() { backtrack(); }
 
 const std::vector<std::vector<char>> SudokuCSP::getBoard() { return board; }
 

@@ -26,6 +26,7 @@ set(SOURCES
 set(HEADERS
     Sudoku.h
     SudokuCSP.h
+    GlowingColor.h
 )
 
 # Define the executable and link it with the Qt5Widgets library.
