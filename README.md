@@ -5,7 +5,7 @@ AlphaSudokuGo is a C++ program designed to solve Sudoku puzzles using a `Constra
 <p align = "center">
   <img src="./images/test_fast/output_long.gif" alt="Sudoku puzzle" width="600" style="padding:10px; margin:10px;">
   <br>
-  <i>The One</i>
+  <i>Scroll down for more animations or <a href="#interacting-with-the-gui">jump to Interacting with the GUI</a></i>
 </p>
 
 - [Background](#background)
@@ -24,21 +24,31 @@ AlphaSudokuGo is a C++ program designed to solve Sudoku puzzles using a `Constra
 
 CSP is a paradigm for representing and solving problems in a declarative manner. The type of problem that CSP is designed to solve is known as a `Constraint Satisfaction Problem`, which is a problem that involves finding a solution to a set of variables subject to constraints. Well known examples of CSPs include the `N-Queens Problem`, `Map Coloring`, and `Sudoku`. Even psychometric tests utilize CSPs, in questions such as:
 
-$Let \ A \ and \ B \ and \ C \ be \ digits \ from \ 1 \ to \ 9. \\ If \ A \ is \ greater \ than \ B, \ what \ is \ the \ value \ of \ C \ in \ the \ following \ equation: \\ \frac{AAA}{BB} = C$
+$$Let \ A \ and \ B \ and \ C \ be \ digits \ from \ 1 \ to \ 9.$$
+
+$$If A \ is \ greater \ than \ B, \ What \ is \ the \ value \ of \ C \ in \ the \ following \ equation:$$
+
+$$\frac{AAA}{BB} = C$$
 
 or:
 
-Dana doesn't want to live next to a person who has a dog.
-Dor has a dog.
-Eva doesn't want to live next to a person who has a cat.
-Fay has a cat.
-Order the people from left to right in a way that satisfies all the conditions.
+$$Dana \ doesn't \ want \ to \ live next \ to \ a \ person \ who \ has \ a \ dog.$$
+
+$$Dor \ has \ a \ dog.$$
+
+$$Eva \ doesn't \ want \ to \ live \ next \ to \ a \ person \ who \ has \ a \ cat.$$
+
+$$Fay \ has \ a \ cat.$$
+
+$$Order \ the \ people \ from \ left \ to \ right \ in \ a \ way \ that \ satisfies \ all \ the \ conditions.$$
 
 or:
 
-$If \ A \ is \ the \ father \ of \ B, \ B \ is \ the \ father \ of \ C, \ and \ C \ is \ the \ father \ of \ D, \ who \ is \ the \ father \ of \ D?$
+$$If \ A \ is \ the \ father \ of \ B, \ B \ is \ the \ father \ of \ C, \ and \ C \ is \ the \ father \ of \ D,$$$
 
-Formaly, CSP is a mathematical problem defined by the tuple $ (X, D, C) $. It consists of a set of variables $(X)$, their respective domains $(D)$, and a set of constraints $(C)$. The objective is to assign a value from the domain to each variable in a way that all constraints are met. CSPs are a unique category of problems that can be effectively solved using search algorithms. They find extensive applications in various fields of artificial intelligence (AI), including but not limited to scheduling, planning, and decision-making.
+$$who \ is \ the \ father \ of \ D?$$
+
+Formaly, CSP is a mathematical problem defined by the tuple $(X, D, C)$. It consists of a set of variables $(X)$, their respective domains $(D)$, and a set of constraints $(C)$. The objective is to assign a value from the domain to each variable in a way that all constraints are met. CSPs are a unique category of problems that can be effectively solved using search algorithms. They find extensive applications in various fields of artificial intelligence (AI), including but not limited to scheduling, planning, and decision-making.
 
 To illustrate, consider the Australian map-coloring problem, a simpler instance of a CSP (see [Map Coloring](https://en.wikipedia.org/wiki/Four_color_theorem)). The task here is to color each region of Australia in such a way that no two neighboring regions share the same color. This problem can be modeled as a CSP with four variables, each representing a region, and three constraints, each corresponding to a pair of neighboring regions. The aim is to discover a color assignment for the regions that fulfills all the constraints.
 
@@ -51,9 +61,19 @@ To illustrate, consider the Australian map-coloring problem, a simpler instance 
 
 As demonstrated in the [examples.ipynb](examples.ipynb) file, the CSP in this context is composed of the following elements:
 
-- **Variables:** These are a collection of variables, each representing a region of Australia ($X = {WA, NT, Q, NSW, V, SA, T}$).
-- **Domains:** These are a collection of domains, each containing the potential colors that a region can be assigned ($D = {red, green, blue}$).
-- **Constraints:** These are a collection of constraints, each defining the permissible color combinations for a pair of adjacent regions ($C = {(WA, NT), (WA, SA), (NT, SA), (NT, Q), (SA, Q), (SA, NSW), (SA, V), (NSW, Q), (NSW, V)}$). It's important to note that a unary constraint is also applied to each variable, enforcing that each region must be assigned a color.
+- **Variables:** These are a collection of variables, each representing a region of Australia.
+
+  ($X = {WA, NT, Q, NSW, V, SA, T}$).
+
+- **Domains:** These are a collection of domains, each containing the potential colors that a region can be assigned.
+
+  ($D = {red, green, blue}$).
+
+- **Constraints:** These are a collection of constraints, each defining the permissible color combinations for a pair of adjacent regions.
+
+  ($C = {(WA, NT), (WA, SA), (NT, SA), (NT, Q), (SA, Q), (SA, NSW), (SA, V), (NSW, Q), (NSW, V)}$).
+
+  It's important to note that a unary constraint is also applied to each variable, enforcing that each region must be assigned a color.
 
 The fundamental concept of a CSP is to seek a solution that satisfies all constraints. The search space for a CSP is determined by the possible value assignments to the variables. The search algorithms employed to solve CSPs are designed to efficiently navigate this search space. There are many search algorithms that can be used to solve CSPs, including `backtracking`, `local search`, and `constraint propagation`. In this project, the `backtracking algorithm` is utilized to solve the Sudoku puzzle.
 
@@ -85,7 +105,9 @@ To represent the Sudoku puzzle as a CSP, I utilized the following components:
 
 - Domains: A collection of domains, each containing the numbers 1 to 9 ($D = {1, 2, \ldots, 9}$).
 
-- Constraints: A collection of constraints, each defining the permissible combinations of numbers for a pair of cells ($C = {rows, columns, subgrids}$).
+- Constraints: A collection of constraints, each defining the permissible combinations of numbers for a pair of cells
+
+  ($C = {rows, columns, subgrids}$).
 
 ### Technical Details
 
@@ -280,22 +302,22 @@ Click on the cell you wish to modify, each click will increment the cell value b
 You can also change the theme of the game, including fonts and styles. In order to change font you will need to download a `.ttf` file and place it in the program directory. Than you can change the font by modifying the `font` variable in the `Sudoku.cpp` file.To change the style of the game, you can modify the `backgroundColor`, `numberColor`, and `cellSize` variables in the `Sudoku.cpp` file. Here are some examples of the different themes:
 
 <p align = "center">
+  <i>Light mode</i>
+  <br>
   <img src="./images/animation3.gif"            alt="Sudoku puzzle Light mode" width="400" style="padding:10px; margin:10px;">
   <img src="./images/test2/animation_green.gif" alt="Sudoku puzzle Light mode" width="400" style="padding:10px; margin:10px;">
   <br>
-  <i>Light mode</i>
+  <i>Glowing mode</i>
   <br>
   <img src="./images/glowing1/glowing.gif"  alt="Sudoku puzzle Glowing mode" width="400" style="padding:10px; margin:10px;">
   <img src="./images/glowing2/glowing2.gif" alt="Sudoku puzzle Glowing mode" width="400" style="padding:10px; margin:10px;">
   <img src="./images/glowing2/glowing3.gif" alt="Sudoku puzzle Glowing mode" width="400" style="padding:10px; margin:10px;">
   <img src="./images/glowing2/glowing5.gif" alt="Sudoku puzzle Glowing mode" width="400" style="padding:10px; margin:10px;">
   <br>
-  <i>Glowing mode</i>
+  <i>Dark mode</i>
   <br>
   <img src = "/images/test9/output9.gif" alt="Sudoku puzzle Dark mod" width="400" style="padding:10px; margin:10px;">
   <img src="./images/test10/output8.gif" alt="Sudoku puzzle Dark mod" width="400" style="padding:10px; margin:10px;">
-  <br>
-  <i>Dark mode</i>
 </p>
 
 ## Contributing
