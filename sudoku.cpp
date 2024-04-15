@@ -3,8 +3,12 @@
 #include <iostream>
 #include <random>
 # include <fstream>
+#include "Parser.h"
 
 const int cellSize = 64;
+const char *fontPath = "../VT323-Regular.ttf";
+
+extern std::vector<std::vector<char>> boardsFactory(const std::string &filename);
 
 namespace Utility {
 sf::Color complementaryPurple(128, 0, 128); // A shade of purple
@@ -67,14 +71,14 @@ void drawLines(sf::RenderTarget &target, sf::Color color, int cellSize) {
 }
 
 void drawNumbers(sf::RenderTarget &target,
-                 const std::vector<std::vector<int>> &numbers, sf::Font font,
+                 const std::vector<std::vector<char>> &numbers, sf::Font font,
                  sf::Color numberColor, int cellSize) {
   for (int i = 0; i < 9; i++) {
     for (int j = 0; j < 9; j++) {
-      if (numbers[i][j] != 0) {
+      if (numbers[i][j] != '.') {
         sf::Text text;
         text.setFont(font);
-        text.setString(std::to_string(numbers[i][j]));
+        text.setString(numbers[i][j]);
         text.setCharacterSize(24);
         text.setFillColor(numberColor);
         text.setPosition(i * cellSize + 25, j * cellSize + 20);
@@ -104,14 +108,17 @@ void drawClosingLines(sf::RenderTarget &target, sf::Color color, int cellSize) {
 Sudoku::Sudoku() {
   initGrid();
   generatePuzzle("");
-  font = Utility::loadFont("../Lacquer-Regular.ttf");
+  font = Utility::loadFont(fontPath);
 }
 
 Sudoku::Sudoku(const std::string &difficulty, const std::string &filename) {
   initGrid();
-  font = Utility::loadFont("../Lacquer-Regular.ttf");
+  font = Utility::loadFont(fontPath);
   if (filename.empty()) {
     generatePuzzle(difficulty);
+  } // check if ends with .png
+  else if (filename.find(".png")) {
+    setBoard(boardsFactory("empty"));
   } else {
     // parse the file chars into a 2d vector of chars
     std::ifstream file(filename);
@@ -135,21 +142,15 @@ void Sudoku::setDarkTheme() {
   gridColor = Utility::analogousCyan;
 }
 
+void Sudoku::setLightTheme() {
+  backgroundColor = sf::Color::White;
+  numberColor = sf::Color::Black;
+  gridColor = sf::Color::Blue;
+}
+
 // Get the current state of the Sudoku board.
 const std::vector<std::vector<char>> Sudoku::getBoard() {
-  std::vector<std::vector<char>> board;
-  for (int i = 0; i < 9; i++) {
-    std::vector<char> row;
-    for (int j = 0; j < 9; j++) {
-      if (numbers[i][j] == 0) {
-        row.push_back('.');
-      } else {
-        row.push_back(numbers[i][j] + '0');
-      }
-    }
-    board.push_back(row);
-  }
-  return board;
+  return numbers;
 }
 
 // Initialize the Sudoku grid.
@@ -172,7 +173,7 @@ void Sudoku::initGrid() {
     }
   }
 
-  numbers = std::vector<std::vector<int>>(9, std::vector<int>(9, 0));
+  numbers = std::vector<std::vector<char>>(9, std::vector<char>(9, '.'));
 }
 
 void Sudoku::saveScreenshot(sf::RenderTarget &target) const {
@@ -220,8 +221,9 @@ void Sudoku::fillGrid() {
 
   for (int i = 0; i < 9; i++) {
     for (int j = 0; j < 9; j++) {
+      char c = (i * 3 + i / 3 + j) % 9 + '1';
       numbers[i][j] =
-          nums[(i * 3 + i / 3 + j) % 9]; // Fill the grid with numbers in a way
+          c; // Fill the grid with numbers in a way
                                          // that forms a valid Sudoku solution
     }
   }
@@ -242,7 +244,7 @@ void Sudoku::generatePuzzle(const std::string &difficulty) {
   for (int i = 0; i < difficultyLevel; i++) {
     int row = dis(gen);
     int col = dis(gen);
-    numbers[row][col] = 0;
+    numbers[row][col] = '.';
     grid[row][col].setFillColor(backgroundColor);
   }
 }
@@ -252,28 +254,20 @@ void Sudoku::handleClick(int x, int y, int mouseButton) {
   int cellX = x / cellSize;
   int cellY = y / cellSize;
   if (mouseButton == sf::Mouse::Right) {
-    numbers[cellX][cellY] = 0;
+    numbers[cellX][cellY] = '.';
   } else {
-    numbers[cellX][cellY] = (numbers[cellX][cellY] % 9) + 1;
+  char c = numbers[cellX][cellY];
+  if (c == '.') {
+    c = '1';
+  } else {
+
+  c = (c - '0' + 1) % 10 + '0';
+  }
+    numbers[cellX][cellY] = c;
   }
 }
 
 // Set the current state of the Sudoku board.
 void Sudoku::setBoard(const std::vector<std::vector<char>> &newBoard) {
-  numbers = std::vector<std::vector<int>>(9, std::vector<int>(9, 0));
-  for (int i = 0; i < 9; i++) {
-    for (int j = 0; j < 9; j++) {
-      if (newBoard[i][j] != '.') {
-        numbers[i][j] = newBoard[i][j] - '0';
-      }
-    }
-  }
-
-  // show on the grid
-  for (int i = 0; i < 9; i++) {
-    for (int j = 0; j < 9; j++) {
-      std::cout << newBoard[i][j] << " ";
-    }
-    std::cout << std::endl;
-  }
+  numbers = newBoard;
 }

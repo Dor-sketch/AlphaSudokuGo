@@ -2,6 +2,8 @@
 
 AlphaSudokuGo is a C++ program designed to solve Sudoku puzzles using a `Constraint Satisfaction Problem` (CSP) approach. It features a graphical user interface (GUI) built with Qt5, which enables users to input their own puzzles and observe the solver in real-time. The primary goals of this project are to showcase the capabilities of Artificial Intelligence (AI) in tackling complex puzzles and to create cool visualizations of the search process.
 
+**BIG NEWS**: The project now includes image processing capabilities, allowing users to input their own puzzles by uploading an image of the Sudoku puzzle - or even take a screenshot of a puzzle on their screen! The program is currently capable of recognizing most of the Sudoku puzzles, and can solve them in real-time.
+
 <p align = "center">
   <img src="./images/test_fast/output_long.gif" alt="Sudoku puzzle" width="600" style="padding:10px; margin:10px;">
   <br>
@@ -298,8 +300,8 @@ Click on the cell you wish to modify, each click will increment the cell value b
   <br>
   <i>Click on the cell you wish to modify (left) and watch the solution unfold (right)</i>
 </p>
-
-You can also change the theme of the game, including fonts and styles. In order to change font you will need to download a `.ttf` file and place it in the program directory. Than you can change the font by modifying the `font` variable in the `Sudoku.cpp` file.To change the style of the game, you can modify the `backgroundColor`, `numberColor`, and `cellSize` variables in the `Sudoku.cpp` file. Here are some examples of the different themes:
+![alt text](image.png)
+You can also change the theme of the game, including fonts and styles. In order to change font you will need to download a `.ttf` file and place it in the program directory. Than you can change the font by modifying the `font` variable in the [`Sudoku.cpp`](Sudoku.cpp) file. To change the style of the game, you can modify the `backgroundColor`, `numberColor`, and `cellSize` variables in the `Sudoku.cpp` file. Here are some examples of the different themes:
 
 <p align = "center">
   <i>Light mode</i>

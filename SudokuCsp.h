@@ -24,6 +24,8 @@ public:
   void solve();  // Solve the Sudoku puzzle
 
 private:
+  void AC3();
+  bool isArcConsistent(std::pair<int, int> var);
   sf::RenderWindow &window;
   Sudoku &sudoku;
   bool isValidSudoku(std::vector<std::vector<char>> &board);

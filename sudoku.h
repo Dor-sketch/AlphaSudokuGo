@@ -16,9 +16,9 @@ public:
   const std::vector<std::vector<char>> getBoard();
   void saveScreenshot(sf::RenderTarget &target) const;
   void setDarkTheme();
+  void setLightTheme();
 protected:
   void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
-
 private:
   sf::Color numberColor = sf::Color::Black;
   sf::Color backgroundColor = sf::Color::White;
@@ -32,5 +32,5 @@ private:
       grid; // Declare grid as a 2D vector of sf::RectangleShape
   std::vector<sf::RectangleShape>
       cells; // Declare cells as a vector of sf::RectangleShape
-  std::vector<std::vector<int>> numbers; // Declare numbers as a 2D vector
+  std::vector<std::vector<char>> numbers; // Declare numbers as a 2D vector
 };
