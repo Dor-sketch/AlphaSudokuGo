@@ -1,6 +1,8 @@
 #include "Particals.h"
 #include "GlowingColor.h"
 
+
+
 unsigned int howManyCellsDrawn(const std::vector<std::vector<char>> &numbers) {
   unsigned int count = 0;
   for (int i = 0; i < 9; i++) {
@@ -159,14 +161,17 @@ void DotsParticleSystem::draw(sf::RenderTarget &target,
 }
 
 void DotsParticleSystem::resetParticle(std::size_t index) {
+  if (index >= m_particles.size() || index >= m_vertices.getVertexCount()) {
+    std::cerr << "Invalid index in resetParticle: " << index << std::endl;
+    return;
+  }
+
   // give a random velocity and lifetime to the particle
   float angle = (std::rand() % 360) * 3.14159f / 180;
   float speed = (std::rand() % 3) + 50.f;
   m_particles[index].velocity =
       sf::Vector2f(std::cos(angle) * speed, std::sin(angle) * speed);
-  m_particles[index].lifetime = sf::milliseconds((std::rand() % 2000) + 1000);
-  m_vertices[index].position =
-      sf::Vector2f(std::rand() % m_windowWidth, std::rand() % m_windowHeight);
+  m_particles[index].lifetime = sf::milliseconds((std::rand() % 20) + 10);
 }
 
 void DotsParticleSystem::setMovingDirectionEffect(const sf::Vector2f &center) {
@@ -203,19 +208,6 @@ void SmokeParticleSystem::spawnParticles(unsigned int count) {
   }
 }
 
-// void resetParticle(std::size_t index) {
-//     // give a random velocity and lifetime to the particle
-//     float angle = (std::rand() % 360) * 3.14f / 180.f;
-//     float speed = (std::rand() % 50) + 50.f;
-//     m_particles[index].velocity =
-//         sf::Vector2f(std::cos(angle) * speed, std::sin(angle) * speed);
-//     m_particles[index].lifetime = sf::milliseconds((std::rand() % 2000) +
-//     1000);
-
-//     // reset the position of the corresponding vertex
-//     m_vertices[index].position = m_emitter;
-// }
-
 SmokeParticleSystem::SmokeParticleSystem(unsigned int count,
                                          unsigned int windowWidth,
                                          unsigned int windowHeight)
@@ -223,6 +215,8 @@ SmokeParticleSystem::SmokeParticleSystem(unsigned int count,
                      windowHeight), // Call the ParticleSystem constructor
       m_vertices(sf::Points, count), m_lifetime(sf::seconds(3)),
       m_emitter(0, 0) {
+      m_particles.resize(count);
+
   // Initialize m_windowWidth and m_windowHeight
   this->m_windowWidth = windowWidth;
   this->m_windowHeight = windowHeight;
@@ -287,15 +281,21 @@ void SmokeParticleSystem::changeColor(sf::Color color) {
 }
 
 void SmokeParticleSystem::resetParticle(std::size_t index) {
-  // give a random velocity and lifetime to the particle
-  float angle = (std::rand() % 360) * 3.14f / 180.f;
-  float speed = (std::rand() % 50) + 50.f;
-  m_particles[index].velocity =
-      sf::Vector2f(std::cos(angle) * speed, std::sin(angle) * speed);
-  m_particles[index].lifetime = sf::milliseconds((std::rand() % 2000) + 1000);
+if (index >= m_particles.size() || index >= m_vertices.getVertexCount()) {
+    std::cerr << "Invalid index in resetParticle: " << index << std::endl;
+    return;
+  }
+  // refactoring
+    float angle = (std::rand() % 360) * 3.14159f / 180;
+    float speed = (std::rand() % 2) + 4.f; // increased speed for larger "hall"
+    m_particles[index].velocity =
+        sf::Vector2f(std::cos(angle) * speed, std::sin(angle) * speed);
 
-  // reset the position of the corresponding vertex
-  m_vertices[index].position = m_emitter;
+    // calculate the maximum distance a particle could need to travel (diagonal
+    // across the screen)
+    float maxDistance = std::sqrt(m_windowWidth * m_windowWidth +
+                                  m_windowHeight * m_windowHeight);
+
 }
 
 void drawMovingBackgroundSpace(sf::RenderTarget &target, sf::Clock &clock,
@@ -386,60 +386,6 @@ void drawMovingBackgroundSmoke(sf::RenderTarget &target, sf::Clock &clock,
                             // appears on top
 }
 
-void drawAllAround(sf::RenderTarget &target, sf::Clock clock,
-                   unsigned int count,
-                   const std::vector<std::vector<char>> &numbers) {
-  //     static ParticleSystem particles(100, target.getSize().x,
-  //     target.getSize().y); static sf::Clock spawnClock;
-
-  //     // // Spawn new particles every 100 milliseconds
-  //     // if (spawnClock.getElapsedTime() > sf::milliseconds(1000)) {
-  //     //     particles.spawnParticles(10); // Spawn 10 new particles
-  //     //     spawnClock.restart();
-  //     // }
-
-  //     particles.update(clock.restart());
-  //         particles.setMovingDirectionEffect(sf::Vector2f(target.getSize().x
-  //         / 2, target.getSize().y / 2));
-  // particles. setEmitter(sf::Vector2f(target.getSize().x / 4,
-  // target.getSize().y / 4));
-  //     target.draw(particles);
-
-  static DotsParticleSystem dots(100000, target.getSize().x,
-                                 target.getSize().y);
-  static sf::Clock dotsSpawnClock;
-  std::cout << "dotsSpawnClock.getElapsedTime() "
-            << dotsSpawnClock.getElapsedTime().asMilliseconds() << std::endl;
-
-  // Spawn new particles every 100 milliseconds
-  if (dotsSpawnClock.getElapsedTime() > sf::milliseconds(100)) {
-    dots.spawnParticles(10); // Spawn 10 new particles
-    dotsSpawnClock.restart();
-  }
-
-  dots.update(clock.restart());
-  dots.setEmitter(sf::Vector2f(target.getSize().x / 2, target.getSize().y / 2));
-  auto direction = sf::Vector2f(target.getSize().x / 2, target.getSize().y / 2);
-  dots.setMovingDirectionEffect(direction);
-  static GlowingColor glowingColor(analogousCyan);
-  dots.changeColor(glowingColor.getShade());
-
-  // target.draw(dots);
-
-  static SmokeParticleSystem smoke(1000, target.getSize().x,
-                                   target.getSize().y);
-  static sf::Clock smokeSpawnClock;
-  smoke.setEmitter(
-      sf::Vector2f(target.getSize().x / 2, target.getSize().y / 2));
-  // Spawn new particles every 100 milliseconds
-  if (smokeSpawnClock.getElapsedTime() > sf::milliseconds(100)) {
-    smoke.spawnParticles(10); // Spawn 10 new particles
-    smokeSpawnClock.restart();
-  }
-
-  smoke.update(clock.restart());
-  target.draw(smoke);
-}
 
 void drawSmoke(sf::RenderTarget &target, sf::Clock &clock) {
   static ParticleSystem particles(1000, target.getSize().x, target.getSize().y);
@@ -454,6 +400,53 @@ void drawSmoke(sf::RenderTarget &target, sf::Clock &clock) {
   particles.update(clock.restart());
   target.draw(particles);
 }
+
+
+void drawAllAround(sf::RenderTarget &target, sf::Clock clock,
+                   unsigned int count,
+                   const std::vector<std::vector<char>> &numbers) {
+  static GlowingColor glowingColor(analogousCyan);
+  auto direction = sf::Vector2f(target.getSize().x / 2, target.getSize().y / 2);
+
+//   static ParticleSystem particles(100, target.getSize().x, target.getSize().y);
+//   static sf::Clock spawnClock;
+//   // Spawn new particles every 100 milliseconds
+//   if (spawnClock.getElapsedTime() > sf::milliseconds(1000)) {
+//     particles.spawnParticles(10); // Spawn 10 new particles
+//     spawnClock.restart();
+//   }
+
+//   particles.update(clock.restart());
+//   particles.setMovingDirectionEffect(
+//       sf::Vector2f(target.getSize().x / 2, target.getSize().y / 2));
+//   particles.setEmitter(
+//       sf::Vector2f(target.getSize().x / 4, target.getSize().y / 4));
+//   particles.setMovingDirectionEffect(direction);
+//   particles.changeColor(glowingColor.getShade());
+//   particles.setEmitter(
+//       sf::Vector2f(target.getSize().x / 2, target.getSize().y / 2));
+//   particles.update(clock.restart());
+//   target.draw(particles);
+
+//   static DotsParticleSystem dots(100000, target.getSize().x,
+//                                  target.getSize().y);
+//   static sf::Clock dotsSpawnClock;
+//   std::cout << "dotsSpawnClock.getElapsedTime() "
+//             << dotsSpawnClock.getElapsedTime().asMilliseconds() << std::endl;
+
+//   // Spawn new particles every 100 milliseconds
+//   if (dotsSpawnClock.getElapsedTime() > sf::milliseconds(1000)) {
+//     dots.spawnParticles(10); // Spawn 10 new particles
+//     // dotsSpawnClock.restart();
+//   }
+//   dots.update(clock.restart());
+//   dots.setEmitter(sf::Vector2f(target.getSize().x / 2, target.getSize().y / 2));
+//   dots.setMovingDirectionEffect(direction);
+//   dots.changeColor(glowingColor.getShade());
+//   target.draw(dots);
+drawMovingBackgroundSpace(target, clock, count, numbers);
+}
+
 void draw_creativity(sf::RenderTarget &target, sf::Clock &clock,
                      unsigned int count,
                      const std::vector<std::vector<char>> &numbers) {
@@ -530,7 +523,7 @@ void Effects::apply(const int effect_type,
     drawAllAround(target, clock, count, numbers);
     break;
   default:
-    draw_creativity(target, clock, count, numbers);
+    drawAllAround(target, clock, count, numbers);
     break;
   }
 }

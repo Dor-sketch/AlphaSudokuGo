@@ -60,6 +60,7 @@ public:
   sf::Vector2f m_emitter;
   unsigned int m_windowWidth;
   unsigned int m_windowHeight;
+  
 };
 
 class SmokeParticleSystem : public ParticleSystem {
