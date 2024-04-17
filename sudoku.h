@@ -3,7 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
-
+#include "Particals.h"
 
 
 class Sudoku : public sf::Drawable {
@@ -17,6 +17,7 @@ public:
   void saveScreenshot(sf::RenderTarget &target) const;
   void setDarkTheme();
   void setLightTheme();
+  unsigned int particleCount = 10;
 protected:
   void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
 private:

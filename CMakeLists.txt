@@ -15,12 +15,17 @@ set(SOURCES
     main.cpp
     Sudoku.cpp
     SudokuCSP.cpp
+    Particals.cpp
+    GlowingColor.cpp
+    Utility.cpp
 )
 set(HEADERS
     Parser.h
     GlowingColor.h
     Sudoku.h
     SudokuCSP.h
+    Particals.h
+    Utility.h
 )
 
 link_directories(/usr/local/Cellar/opencv/4.9.0_7.reinstall/lib /usr/local/Cellar/tesseract/5.3.4_1/lib /usr/local/Cellar/leptonica/1.84.1/lib)

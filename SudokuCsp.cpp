@@ -42,7 +42,7 @@ bool SudokuCSP::is_consistent(std::pair<int, int> var, int value) {
   return true;
 }
 
-void SudokuCSP::AC3(){
+void SudokuCSP::AC3() {
   std::queue<std::pair<int, int>> q;
   for (int i = 0; i < 9; ++i) {
     for (int j = 0; j < 9; ++j) {
@@ -99,7 +99,7 @@ void updateWindow(sf::RenderWindow &window, Sudoku &sudoku,
   // option to store a screenshot of the window
 }
 
-bool SudokuCSP:: isArcConsistent(std::pair<int, int> var) {
+bool SudokuCSP::isArcConsistent(std::pair<int, int> var) {
   std::queue<std::pair<int, int>> q;
   for (int i = 0; i < 9; ++i) {
     if (i != var.first)
@@ -107,7 +107,8 @@ bool SudokuCSP:: isArcConsistent(std::pair<int, int> var) {
     if (i != var.second)
       q.push({var.first, i});
   }
-  int startRow = var.first - var.first % 3, startCol = var.second - var.second % 3;
+  int startRow = var.first - var.first % 3,
+      startCol = var.second - var.second % 3;
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
       int row = startRow + i, col = startCol + j;
@@ -138,10 +139,10 @@ bool SudokuCSP:: isArcConsistent(std::pair<int, int> var) {
 
 bool SudokuCSP::backtrack() {
   std::pair<int, int> var = {-1, -1};
-  // sort the variables based on the number of constraints - most constrained variable
-  // select the variable with the least number of values in its domain
-  auto oldDomains = domains;
-  AC3();
+  // sort the variables based on the number of constraints - most constrained
+  // variable select the variable with the least number of values in its domain
+  // auto oldDomains = domains;
+  // AC3();
   for (auto &[cell, domain] : domains) {
     if (board[cell.first][cell.second] == '.') {
       if (var.first == -1 || domain.size() < domains[var].size()) {
@@ -174,22 +175,20 @@ found_unassigned:
     sortedValues.push_back({count, val});
   }
   std::sort(sortedValues.begin(), sortedValues.end());
-  std::cout << "Values: ";
 
   for (auto [_, val] : sortedValues) {
     if (is_consistent(var, val)) {
       board[var.first][var.second] = val + '0';
       updateWindow(window, sudoku, board);
-        if (backtrack()) {
-          updateWindow(window, sudoku, board);
-          std::cout << "Done\n  ";
-          return true;
-        }
+      if (backtrack()) {
+        updateWindow(window, sudoku, board);
+        return true;
+      }
 
       board[var.first][var.second] = '.';
     }
   }
-  domains = oldDomains;
+  // domains = oldDomains;
   return false;
 }
 

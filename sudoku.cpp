@@ -1,119 +1,28 @@
 #include "Sudoku.h"
 #include "GlowingColor.h"
+#include "Parser.h"
+#include "Utility.h"
+#include <fstream>
 #include <iostream>
 #include <random>
-# include <fstream>
-#include "Parser.h"
-
 const int cellSize = 64;
 const char *fontPath = "../VT323-Regular.ttf";
+#include "Particals.h"
 
-extern std::vector<std::vector<char>> boardsFactory(const std::string &filename);
-
-namespace Utility {
-sf::Color complementaryPurple(128, 0, 128); // A shade of purple
-sf::Color analogousCyan(0, 255, 255);       // A shade of cyan
-sf::Color triadicYellow(255, 255, 0);       // A shade of yellow
-
-// Load a font from a file. If the file cannot be loaded, print an error
-// message and exit the program.
-sf::Font loadFont(const std::string &filepath) {
-  sf::Font font;
-  if (!font.loadFromFile(filepath)) {
-    std::cerr << "Failed to load font: " << filepath << std::endl;
-    exit(EXIT_FAILURE);
-  }
-  return font;
-}
-
-void drawBackround(sf::RenderTarget &target, sf::Color color) {
-  sf::RectangleShape background(
-      sf::Vector2f(target.getSize().x, target.getSize().y));
-  background.setFillColor(color);
-  target.draw(background);
-}
-
-void drawCellLines(sf::RenderTarget &target, sf::Color color, int cellSize) {
-  for (int i = 0; i <= 9; i++) {
-    for (int j = 0; j <= 9; j++) {
-      sf::RectangleShape cell(sf::Vector2f(cellSize, cellSize));
-      cell.setOutlineThickness(1);
-      cell.setOutlineColor(color);
-      cell.setPosition(i * cellSize, j * cellSize);
-      cell.setFillColor(sf::Color::Transparent);
-      target.draw(cell);
-    }
-  }
-}
-
-void drawBoldLines(sf::RenderTarget &target, sf::Color color, int cellSize) {
-  for (int i = 0; i <= 9; i++) {
-    for (int j = 0; j <= 9; j++) {
-      if (i % 3 == 0 && j % 3 == 0) {
-        sf::RectangleShape line(
-            sf::Vector2f(cellSize * 3, 3)); // Horizontal line
-        line.setPosition(i * cellSize, j * cellSize);
-        line.setFillColor(color);
-        target.draw(line);
-
-        line.setSize(sf::Vector2f(3, cellSize * 3)); // Vertical line
-        line.setPosition(i * cellSize, j * cellSize);
-        line.setFillColor(color);
-        target.draw(line);
-      }
-    }
-  }
-}
-void drawLines(sf::RenderTarget &target, sf::Color color, int cellSize) {
-  // draw cell lines
-  drawCellLines(target, color, cellSize);
-  drawBoldLines(target, color, cellSize);
-}
-
-void drawNumbers(sf::RenderTarget &target,
-                 const std::vector<std::vector<char>> &numbers, sf::Font font,
-                 sf::Color numberColor, int cellSize) {
-  for (int i = 0; i < 9; i++) {
-    for (int j = 0; j < 9; j++) {
-      if (numbers[i][j] != '.') {
-        sf::Text text;
-        text.setFont(font);
-        text.setString(numbers[i][j]);
-        text.setCharacterSize(24);
-        text.setFillColor(numberColor);
-        text.setPosition(i * cellSize + 25, j * cellSize + 20);
-        target.draw(text); // Draw the numbers
-      }
-    }
-  }
-}
-
-// The last lines are drawn outside the grid, this is an easy fix instead of
-// of adding offset to every line
-void drawClosingLines(sf::RenderTarget &target, sf::Color color, int cellSize) {
-  sf::RectangleShape line(sf::Vector2f(cellSize * 9 + 5, 5)); // Horizontal line
-  line.setPosition(0, cellSize * 9 - 5);
-  line.setFillColor(color);
-  target.draw(line);
-
-  line.setSize(sf::Vector2f(5, cellSize * 9 + 5)); // Vertical line
-  line.setPosition(cellSize * 9 - 3, 0);
-  line.setFillColor(color);
-  target.draw(line);
-}
-} // namespace Utility
+extern std::vector<std::vector<char>>
+boardsFactory(const std::string &filename);
 
 // Constructor for the Sudoku class. Initializes the Sudoku grid and generates
 // a puzzle.
 Sudoku::Sudoku() {
   initGrid();
   generatePuzzle("");
-  font = Utility::loadFont(fontPath);
+  font = loadFont(fontPath);
 }
 
 Sudoku::Sudoku(const std::string &difficulty, const std::string &filename) {
   initGrid();
-  font = Utility::loadFont(fontPath);
+  font = loadFont(fontPath);
   if (filename.empty()) {
     generatePuzzle(difficulty);
   } // check if ends with .png
@@ -139,7 +48,7 @@ Sudoku::Sudoku(const std::string &difficulty, const std::string &filename) {
 void Sudoku::setDarkTheme() {
   backgroundColor = sf::Color(0, 0, 0); // Black
   numberColor = sf::Color::Green;
-  gridColor = Utility::analogousCyan;
+  gridColor = complementaryPurple;
 }
 
 void Sudoku::setLightTheme() {
@@ -149,9 +58,7 @@ void Sudoku::setLightTheme() {
 }
 
 // Get the current state of the Sudoku board.
-const std::vector<std::vector<char>> Sudoku::getBoard() {
-  return numbers;
-}
+const std::vector<std::vector<char>> Sudoku::getBoard() { return numbers; }
 
 // Initialize the Sudoku grid.
 void Sudoku::initGrid() {
@@ -203,14 +110,17 @@ void Sudoku::saveScreenshot(sf::RenderTarget &target) const {
 }
 // Draw the Sudoku grid and numbers.
 void Sudoku::draw(sf::RenderTarget &target, sf::RenderStates states) const {
-  auto glowingColor = GlowingColor(Utility::analogousCyan).getShade();
-  auto glowingBrighterColor =
-      GlowingColor(Utility::analogousCyan).getBrighterShade();
-  Utility::drawBackround(target, backgroundColor);
-  Utility::drawLines(target, glowingColor, cellSize);
-  Utility::drawNumbers(target, numbers, font, numberColor, cellSize);
-  Utility::drawClosingLines(target, glowingBrighterColor, cellSize);
-  saveScreenshot(target);
+  auto glowingColor = GlowingColor(analogousCyan).getShade();
+  auto glowingBrighterColor = GlowingColor(analogousCyan).getBrighterShade();
+  drawBackround(target, backgroundColor);
+  static sf::Clock clock; // Create a static sf::Clock object
+                          // drawMovingFigure(target, clock);
+  // drawMovingBackground(target, clock, particleCount, numbers, effect_type);
+  // drawAllAround(target, clock, cellSize, numbers);
+  drawLines(target, glowingColor, cellSize);
+  drawNumbers(target, numbers, font, numberColor, cellSize);
+  drawClosingLines(target, glowingBrighterColor, cellSize);
+  // saveScreenshot(target);
 }
 
 void Sudoku::fillGrid() {
@@ -222,9 +132,8 @@ void Sudoku::fillGrid() {
   for (int i = 0; i < 9; i++) {
     for (int j = 0; j < 9; j++) {
       char c = (i * 3 + i / 3 + j) % 9 + '1';
-      numbers[i][j] =
-          c; // Fill the grid with numbers in a way
-                                         // that forms a valid Sudoku solution
+      numbers[i][j] = c; // Fill the grid with numbers in a way
+                         // that forms a valid Sudoku solution
     }
   }
 }
@@ -256,18 +165,28 @@ void Sudoku::handleClick(int x, int y, int mouseButton) {
   if (mouseButton == sf::Mouse::Right) {
     numbers[cellX][cellY] = '.';
   } else {
-  char c = numbers[cellX][cellY];
-  if (c == '.') {
-    c = '1';
-  } else {
+    char c = numbers[cellX][cellY];
+    if (c == '.') {
+      c = '1';
+    } else {
 
-  c = (c - '0' + 1) % 10 + '0';
-  }
+      c = (c - '0' + 1) % 10 + '0';
+    }
     numbers[cellX][cellY] = c;
   }
 }
 
 // Set the current state of the Sudoku board.
 void Sudoku::setBoard(const std::vector<std::vector<char>> &newBoard) {
-  numbers = newBoard;
+  //        // if board is already empty, generate a new random puzzle
+  if (newBoard ==
+      std::vector<std::vector<char>>(9, std::vector<char>(9, '.'))) {
+    if (numbers != newBoard) {
+      numbers = newBoard;
+    } else {
+      generatePuzzle("");
+    }
+  } else {
+    numbers = newBoard;
+  }
 }

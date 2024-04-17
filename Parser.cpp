@@ -1,8 +1,8 @@
 #include "Parser.h"
 #include <iostream>
+#include <leptonica/allheaders.h>
 #include <opencv2/opencv.hpp>
 #include <tesseract/baseapi.h>
-#include <leptonica/allheaders.h>
 
 cv::Mat warpImage(const cv::Mat &image, const std::vector<cv::Point> &contour) {
   auto rect = cv::minAreaRect(contour);
@@ -151,18 +151,15 @@ std::string getText(const cv::Mat &inputImage) {
   return parser.parse();
 }
 
-
-
 cv::Mat parseImg(const std::string &filePath) {
   if (filePath == "" or filePath == "sudoku.jpg") {
-      std::cout << "Please capture the Sudoku board." << std::endl;
-        system("screencapture -i sudoku.jpg");
-        // Load the captured image
-        return cv::imread("sudoku.jpg", cv::IMREAD_GRAYSCALE);
+    std::cout << "Please capture the Sudoku board." << std::endl;
+    system("screencapture -i sudoku.jpg");
+    // Load the captured image
+    return cv::imread("sudoku.jpg", cv::IMREAD_GRAYSCALE);
   }
   return cv::imread(filePath, cv::IMREAD_GRAYSCALE);
 }
-
 
 int parseCells(const cv::Mat &inputImage, int board[9][9]) {
   tesseract::TessBaseAPI *api = new tesseract::TessBaseAPI();
@@ -235,12 +232,12 @@ std::vector<std::vector<char>> getEmptyBoard() {
   return std::vector<std::vector<char>>(9, std::vector<char>(9, '.'));
 }
 
-
 // check for image path in the main function
-std::vector<std::vector<char>> boardsFactory(const std::string &inputImage_path) {
-    if (inputImage_path == "empty") {
+std::vector<std::vector<char>>
+boardsFactory(const std::string &inputImage_path) {
+  if (inputImage_path == "empty") {
     return getEmptyBoard();
-    }
+  }
   int board[9][9] = {0};
   cv::Mat inputImage = parseImg(inputImage_path);
   extractBoard(inputImage);
@@ -256,8 +253,6 @@ std::vector<std::vector<char>> boardsFactory(const std::string &inputImage_path)
 
   return ret;
 }
-
-
 
 // int main() {
 //   std::string inputImage_path = "sudoku.jpg";

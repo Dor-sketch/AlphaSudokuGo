@@ -1,27 +1,28 @@
-# pragma once
+#pragma once
 
+#include "Sudoku.h"
+#include <SFML/Graphics.hpp>
 #include <iostream>
 #include <queue>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-# include <SFML/Graphics.hpp>
-#include "Sudoku.h"
 // Define a hash function for using pairs as keys in unordered_map
 struct pair_hash {
   template <class T1, class T2>
   std::size_t operator()(const std::pair<T1, T2> &pair) const {
     auto hash1 = std::hash<T1>{}(pair.first);
     auto hash2 = std::hash<T2>{}(pair.second);
-    return hash1 ^ hash2;
+    return hash1 + hash2 * 8; // Copilot: "8 is a random prime number"
+    // Me: "8 is beacuse we have 9*9=81 cells in the sudoku board, 0-indexed"
   }
 };
 
 class SudokuCSP {
 public:
   SudokuCSP(sf::RenderWindow &window, Sudoku &sudoku);
-  const std::vector<std::vector<char>> getBoard();  // Get the Sudoku board
-  void solve();  // Solve the Sudoku puzzle
+  const std::vector<std::vector<char>> getBoard(); // Get the Sudoku board
+  void solve();                                    // Solve the Sudoku puzzle
 
 private:
   void AC3();
