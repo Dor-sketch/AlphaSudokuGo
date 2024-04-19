@@ -1,15 +1,17 @@
 #include "SudokuCSP.h"
 #include "Sudoku.h"
+#include "Particals.h"
 
 const bool storeScreenshot = false;
-
-SudokuCSP::SudokuCSP(sf::RenderWindow &window, Sudoku &sudoku)
-    : sudoku(sudoku), window(window) {
+  static int effect_type = 0;
+bool found = false;
+SudokuCSP::SudokuCSP(sf::RenderWindow &window, Sudoku &sudoku, Effects &effects)
+    : sudoku(sudoku), window(window) , effects(effects) {
   // check if the board is valid
   board = sudoku.getBoard();
   if (!isValidSudoku(board)) {
     std::cout << "Invalid Sudoku board" << std::endl;
-    return;
+    throw std::invalid_argument("Invalid Sudoku board");
   }
   // Initialize the domains for each unassigned cell
   for (int row = 0; row < 9; ++row) {
@@ -89,14 +91,19 @@ void updateBoard(std::vector<std::vector<char>> &board, std::pair<int, int> var,
                  int value) {
   board[var.first][var.second] = value + '0';
 }
-
 void updateWindow(sf::RenderWindow &window, Sudoku &sudoku,
-                  std::vector<std::vector<char>> &board) {
+                  std::vector<std::vector<char>> &board, Effects &effects) {
   sudoku.setBoard(board);
   window.clear();
   window.draw(sudoku);
+  effects.apply(effect_type, board);
   window.display();
   // option to store a screenshot of the window
+
+  // Change effect_type when 'n' is pressed
+  if (sf::Keyboard::isKeyPressed(sf::Keyboard::O)) {
+    effect_type = (effect_type + 1) % 11; // Cycle through available effects
+  }
 }
 
 bool SudokuCSP::isArcConsistent(std::pair<int, int> var) {
@@ -141,8 +148,8 @@ bool SudokuCSP::backtrack() {
   std::pair<int, int> var = {-1, -1};
   // sort the variables based on the number of constraints - most constrained
   // variable select the variable with the least number of values in its domain
-  // auto oldDomains = domains;
-  // AC3();
+  auto oldDomains = domains;
+  AC3();
   for (auto &[cell, domain] : domains) {
     if (board[cell.first][cell.second] == '.') {
       if (var.first == -1 || domain.size() < domains[var].size()) {
@@ -154,7 +161,7 @@ bool SudokuCSP::backtrack() {
   for (int i = 0; i < 9; ++i) {
     for (int j = 0; j < 9; ++j) {
       if (board[i][j] == '.') {
-        updateWindow(window, sudoku, board);
+        updateWindow(window, sudoku, board, effects);
         goto found_unassigned;
       }
     }
@@ -179,20 +186,20 @@ found_unassigned:
   for (auto [_, val] : sortedValues) {
     if (is_consistent(var, val)) {
       board[var.first][var.second] = val + '0';
-      updateWindow(window, sudoku, board);
+      updateWindow(window, sudoku, board, effects);
       if (backtrack()) {
-        updateWindow(window, sudoku, board);
+        updateWindow(window, sudoku, board, effects);
         return true;
       }
 
       board[var.first][var.second] = '.';
     }
   }
-  // domains = oldDomains;
+  domains = oldDomains;
   return false;
 }
 
-void SudokuCSP::solve() { backtrack(); }
+bool SudokuCSP::solve() { return backtrack(); }
 
 const std::vector<std::vector<char>> SudokuCSP::getBoard() { return board; }
 

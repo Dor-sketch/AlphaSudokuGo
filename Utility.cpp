@@ -9,6 +9,8 @@ sf::Font loadFont(const std::string &fontPath) {
     std::cerr << "Failed to load font: " << fontPath << std::endl;
     exit(EXIT_FAILURE);
   }
+  //set font size
+  font.setSmooth(true);
   return font;
 }
 void drawMovingBall(sf::RenderTarget &target, sf::Clock &clock) {
@@ -82,11 +84,24 @@ void drawNumbers(sf::RenderTarget &target,
       if (numbers[i][j] != '.') {
         sf::Text text;
         text.setFont(font);
+        // set font size
+        auto textBounds = text.getLocalBounds();
+        text.setOrigin(textBounds.left + textBounds.width / 2.0f,
+                       textBounds.top + textBounds.height / 2.0f);
+        auto charSize = text.getCharacterSize();
+        float ratio = 8.0f / 3.0f;
+        unsigned int fontSize = static_cast<unsigned int>(cellSize / ratio);
+        text.setCharacterSize(fontSize);
         text.setString(numbers[i][j]);
         text.setCharacterSize(24);
         text.setFillColor(numberColor);
-        text.setPosition(i * cellSize + 25, j * cellSize + 20);
-        target.draw(text); // Draw the numbers
+        float ratioX = 64.0f / 25.0f;
+        float ratioY = 64.0f / 20.0f;
+
+        float offsetX = cellSize / ratioX;
+        float offsetY = cellSize / ratioY;
+
+        text.setPosition(i * cellSize + offsetX, j * cellSize + offsetY);        target.draw(text); // Draw the numbers
       }
     }
   }

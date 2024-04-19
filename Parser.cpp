@@ -111,7 +111,7 @@ std::vector<std::vector<char>> itochar(int board[9][9]) {
   return board_char;
 }
 
-void extractBoard(cv::Mat &inputImage) {
+void BoardsFactory::extractBoard( cv::Mat &inputImage) {
   // Apply Gaussian blur
   cv::GaussianBlur(inputImage, inputImage, cv::Size(5, 5), 0);
 
@@ -151,17 +151,41 @@ std::string getText(const cv::Mat &inputImage) {
   return parser.parse();
 }
 
-cv::Mat parseImg(const std::string &filePath) {
-  if (filePath == "" or filePath == "sudoku.jpg") {
-    std::cout << "Please capture the Sudoku board." << std::endl;
-    system("screencapture -i sudoku.jpg");
-    // Load the captured image
-    return cv::imread("sudoku.jpg", cv::IMREAD_GRAYSCALE);
-  }
+cv::Mat BoardsFactory::parseImg(const std::string &filePath) {
   return cv::imread(filePath, cv::IMREAD_GRAYSCALE);
 }
 
-int parseCells(const cv::Mat &inputImage, int board[9][9]) {
+std::string BoardsFactory::getScreenShot() {
+  std::cout << "Please capture the Sudoku board." << std::endl;
+  screen_x = 0;
+  screen_y = 0;
+
+  system("screencapture -i sudoku.jpg");
+  // calculate the screen size from the captured image
+  cv::Mat screen = cv::imread("sudoku.jpg", cv::IMREAD_GRAYSCALE);
+  screen_x = screen.cols;
+  screen_y = screen.rows;
+  cell_size = static_cast<int>(screen_x / 9);
+  std::cout << "screen_x: " << screen_x << " screen_y: " << screen_y
+            << " cell_size: " << cell_size << std::endl;
+  return "sudoku.jpg";
+}
+
+std::string BoardsFactory::exec(const char* cmd) {
+  std::array<char, 128> buffer;
+  std::string result;
+  std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
+  if (!pipe) {
+    throw std::runtime_error("popen() failed!");
+  }
+  while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
+    result += buffer.data();
+  }
+  std::cout<<"result: "<<result<<std::endl;
+  return result;
+}
+
+void BoardsFactory::parseCells(const cv::Mat &inputImage, int board[9][9]) {
   tesseract::TessBaseAPI *api = new tesseract::TessBaseAPI();
   if (api->Init(NULL, "eng")) {
     fprintf(stderr, "Could not initialize tesseract.\n");
@@ -203,7 +227,7 @@ int parseCells(const cv::Mat &inputImage, int board[9][9]) {
   api->End();
 }
 
-void rotateBoard(std::vector<std::vector<char>> &board) {
+void BoardsFactory::rotateBoard() {
   std::vector<std::vector<char>> rotatedBoard(9, std::vector<char>(9));
   for (int i = 0; i < 9; i++) {
     for (int j = 0; j < 9; j++) {
@@ -213,7 +237,7 @@ void rotateBoard(std::vector<std::vector<char>> &board) {
   board = rotatedBoard;
 }
 
-void mirrorBoard(std::vector<std::vector<char>> &board) {
+void BoardsFactory::mirrorBoard() {
   std::vector<std::vector<char>> mirroredBoard(9, std::vector<char>(9));
   for (int i = 0; i < 9; i++) {
     for (int j = 0; j < 9; j++) {
@@ -223,36 +247,45 @@ void mirrorBoard(std::vector<std::vector<char>> &board) {
   board = mirroredBoard;
 }
 
-void rotate_CounterClockwise(std::vector<std::vector<char>> &board) {
-  rotateBoard(board);
-  mirrorBoard(board);
+void BoardsFactory::rotate_CounterClockwise() {
+  rotateBoard();
+  mirrorBoard();
 }
 
-std::vector<std::vector<char>> getEmptyBoard() {
+std::vector<std::vector<char>> BoardsFactory::getEmptyBoard() {
   return std::vector<std::vector<char>>(9, std::vector<char>(9, '.'));
 }
+BoardsFactory::BoardsFactory() {
+  auto path = getScreenShot();
+  inputImage_path = path;
+  setBoard();
+}
 
-// check for image path in the main function
-std::vector<std::vector<char>>
-boardsFactory(const std::string &inputImage_path) {
-  if (inputImage_path == "empty") {
-    return getEmptyBoard();
-  }
-  int board[9][9] = {0};
+int BoardsFactory::getScreen_x() { return screen_x; }
+int BoardsFactory::getScreen_y() { return screen_y; }
+int BoardsFactory::getCell_size() { return cell_size; }
+
+void BoardsFactory::setBoard(){
+int int_board[9][9] = {0};
   cv::Mat inputImage = parseImg(inputImage_path);
   extractBoard(inputImage);
-  parseCells(inputImage, board);
-  auto ret = itochar(board);
+  parseCells(inputImage, int_board);
+  board = itochar(int_board);
   for (int i = 0; i < 9; i++) {
     for (int j = 0; j < 9; j++) {
-      std::cout << ret[i][j] << " ";
+      std::cout << board[i][j] << " ";
     }
     std::cout << std::endl;
   }
-  rotate_CounterClockwise(ret);
-
-  return ret;
+  rotate_CounterClockwise();
 }
+
+// check for image path in the main function
+BoardsFactory::BoardsFactory(const std::string &inputImage_path) : inputImage_path(inputImage_path) {
+  setBoard();
+}
+
+std::vector<std::vector<char>> BoardsFactory::getBoard() { return board; }
 
 // int main() {
 //   std::string inputImage_path = "sudoku.jpg";

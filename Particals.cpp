@@ -1,8 +1,6 @@
 #include "Particals.h"
 #include "GlowingColor.h"
 
-
-
 unsigned int howManyCellsDrawn(const std::vector<std::vector<char>> &numbers) {
   unsigned int count = 0;
   for (int i = 0; i < 9; i++) {
@@ -16,14 +14,27 @@ unsigned int howManyCellsDrawn(const std::vector<std::vector<char>> &numbers) {
 }
 
 ParticleSystem::ParticleSystem(unsigned int count, unsigned int windowWidth,
-                               unsigned int windowHeight)
-    : m_particles(count),
-      m_vertices(sf::Lines, count * 2), // two vertices per particle
+                               unsigned int windowHeight,
+                               sf::PrimitiveType type)
+    : count(count), m_particles(count), m_vertices(type, count * 2),
       m_lifetime(sf::seconds(3)), m_emitter(0, 0), m_windowWidth(windowWidth),
-      m_windowHeight(windowHeight){};
+      m_windowHeight(windowHeight), m_type(type) {}
+
+ParticleSystem::ParticleSystem(unsigned int count, unsigned int windowWidth,
+                               unsigned int windowHeight, sf::PrimitiveType type,
+                               sf::Color color1, float base_speed,
+                               float rand_speed)
+    : count(count), m_particles(count), m_vertices(type, count * 2),
+      m_lifetime(sf::seconds(1)), m_emitter(0, 0), m_windowWidth(windowWidth),
+      m_windowHeight(windowHeight), m_type(type), base_speed(base_speed),
+      rand_speed(rand_speed) {
+  for (std::size_t i = 0; i < m_particles.size(); ++i) {
+    m_vertices[i * 2].color = color1;
+    m_vertices[i * 2 + 1].color = color1;
+  }
+}
 
 void ParticleSystem::setEmitter(sf::Vector2f position) { m_emitter = position; }
-
 void ParticleSystem::draw(sf::RenderTarget &target,
                           sf::RenderStates states) const {
   states.transform *= getTransform();
@@ -38,7 +49,8 @@ void ParticleSystem::setMovingDirectionEffect(const sf::Vector2f &center) {
     if (length != 0) {     // avoid division by zero
       direction /= length; // normalize the direction vector
     }
-    float speed = (std::rand() % 10) + 5.f; // increased speed
+    // Make the speed proportional to the distance from the center
+    float speed = length / 100.0f; // Adjust the divisor to control the speed
     m_particles[i].velocity = direction * speed;
   }
 }
@@ -73,7 +85,7 @@ void ParticleSystem::spawnParticles(unsigned int count) {
 void ParticleSystem::resetParticle(std::size_t index) {
   // give a random velocity and lifetime to the particle
   float angle = (std::rand() % 360) * 3.14159f / 180;
-  float speed = (std::rand() % 2) + 4.f; // increased speed for larger "hall"
+  float speed = (std::rand() % static_cast<int>(rand_speed)) + base_speed;
   m_particles[index].velocity =
       sf::Vector2f(std::cos(angle) * speed, std::sin(angle) * speed);
 
@@ -86,10 +98,11 @@ void ParticleSystem::resetParticle(std::size_t index) {
   // at its current speed
   sf::Time maxLifetime = sf::seconds(maxDistance / speed);
 
-  // set the particle's lifetime to a random value between 1000 milliseconds and
-  // the calculated maximum
+  // set the particle's lifetime to a random value between std::rand() % 100 + 1
+  // milliseconds and the calculated maximum
   m_particles[index].lifetime = sf::milliseconds(
-      (std::rand() % static_cast<int>(maxLifetime.asMilliseconds())) + 1000);
+      (std::rand() % static_cast<int>(maxLifetime.asMilliseconds())) +
+      std::rand() % 100 + 1);
 
   // reset the position of the corresponding vertices
   m_vertices[index * 2].position =
@@ -107,288 +120,15 @@ void ParticleSystem::resetParticle(std::size_t index) {
   m_particles[index].velocity = direction * speed;
 }
 
-void ParticleSystem::changeColor(sf::Color color) {
+void ParticleSystem::changeColor(sf::Color color1, sf::Color color2) {
   for (std::size_t i = 0; i < m_particles.size(); ++i) {
-    m_vertices[i * 2].color = color;
-    m_vertices[i * 2 + 1].color = color;
+    m_vertices[i * 2].color = color1;
+    m_vertices[i * 2 + 1].color = color2;
   }
 }
-
-DotsParticleSystem::DotsParticleSystem(unsigned int count,
-                                       unsigned int windowWidth,
-                                       unsigned int windowHeight)
-    : ParticleSystem(count, windowWidth,
-                     windowHeight), // Call the ParticleSystem constructor
-      m_vertices(sf::Points, count), m_lifetime(sf::seconds(3)),
-      m_emitter(0, 0) {
-  // Initialize m_windowWidth and m_windowHeight
-  this->m_windowWidth = windowWidth;
-  this->m_windowHeight = windowHeight;
-}
-
-void DotsParticleSystem::spawnParticles(unsigned int count) {
-  for (unsigned int i = 0; i < count; ++i) {
-    resetParticle(i);
-  }
-}
-void DotsParticleSystem::setEmitter(sf::Vector2f position) {
-  m_emitter = position;
-}
-
-void DotsParticleSystem::update(sf::Time elapsed) {
-  for (std::size_t i = 0; i < m_particles.size(); ++i) {
-    // update the particle lifetime
-    Particle &p = m_particles[i];
-    p.lifetime -= elapsed;
-
-    // if the particle is dead, respawn it
-    if (p.lifetime <= sf::Time::Zero)
-      resetParticle(i);
-
-    // update the position of the corresponding vertex
-    m_vertices[i].position += p.velocity * elapsed.asSeconds();
-
-    // update the alpha (transparency) of the particle according to its lifetime
-    float ratio = p.lifetime.asSeconds() / m_lifetime.asSeconds();
-    m_vertices[i].color.a = static_cast<sf::Uint8>(ratio * 255);
-  }
-}
-void DotsParticleSystem::draw(sf::RenderTarget &target,
-                              sf::RenderStates states) const {
-  states.transform *= getTransform();
-  states.texture = NULL;
-  target.draw(m_vertices, states);
-}
-
-void DotsParticleSystem::resetParticle(std::size_t index) {
-  if (index >= m_particles.size() || index >= m_vertices.getVertexCount()) {
-    std::cerr << "Invalid index in resetParticle: " << index << std::endl;
-    return;
-  }
-
-  // give a random velocity and lifetime to the particle
-  float angle = (std::rand() % 360) * 3.14159f / 180;
-  float speed = (std::rand() % 3) + 50.f;
-  m_particles[index].velocity =
-      sf::Vector2f(std::cos(angle) * speed, std::sin(angle) * speed);
-  m_particles[index].lifetime = sf::milliseconds((std::rand() % 20) + 10);
-}
-
-void DotsParticleSystem::setMovingDirectionEffect(const sf::Vector2f &center) {
-  for (std::size_t i = 0; i < m_particles.size(); ++i) {
-    sf::Vector2f direction = m_vertices[i].position - center;
-    float length =
-        std::sqrt(direction.x * direction.x + direction.y * direction.y);
-    if (length != 0) {     // avoid division by zero
-      direction /= length; // normalize the direction vector
-    }
-    float speed = (std::rand() % 50) + 50.f; // random speed
-    m_particles[i].velocity = direction * speed;
-  }
-}
-
-void DotsParticleSystem::setMovingDirectionEffect() {
-  for (std::size_t i = 0; i < m_particles.size(); ++i) {
-    float angle = (std::rand() % 360) * 3.14159f / 180;
-    float speed = (std::rand() % 50) + 50.f;
-    m_particles[i].velocity =
-        sf::Vector2f(std::cos(angle) * speed, std::sin(angle) * speed);
-  }
-}
-
-void DotsParticleSystem::changeColor(sf::Color color) {
-  for (std::size_t i = 0; i < m_particles.size(); ++i) {
-    m_vertices[i].color = color;
-  }
-}
-
-void SmokeParticleSystem::spawnParticles(unsigned int count) {
-  for (unsigned int i = 0; i < count; ++i) {
-    resetParticle(i);
-  }
-}
-
-SmokeParticleSystem::SmokeParticleSystem(unsigned int count,
-                                         unsigned int windowWidth,
-                                         unsigned int windowHeight)
-    : ParticleSystem(count, windowWidth,
-                     windowHeight), // Call the ParticleSystem constructor
-      m_vertices(sf::Points, count), m_lifetime(sf::seconds(3)),
-      m_emitter(0, 0) {
-      m_particles.resize(count);
-
-  // Initialize m_windowWidth and m_windowHeight
-  this->m_windowWidth = windowWidth;
-  this->m_windowHeight = windowHeight;
-}
-
-void SmokeParticleSystem::setEmitter(sf::Vector2f position) {
-  m_emitter = position;
-}
-
-void SmokeParticleSystem::update(sf::Time elapsed) {
-  for (std::size_t i = 0; i < m_particles.size(); ++i) {
-    // update the particle lifetime
-    Particle &p = m_particles[i];
-    p.lifetime -= elapsed;
-
-    // if the particle is dead, respawn it
-    if (p.lifetime <= sf::Time::Zero)
-      resetParticle(i);
-
-    // update the position of the corresponding vertex
-    m_vertices[i].position += p.velocity * elapsed.asSeconds();
-
-    // update the alpha (transparency) of the particle according to its
-    // lifetime
-    float ratio = p.lifetime.asSeconds() / m_lifetime.asSeconds();
-    m_vertices[i].color.a = static_cast<sf::Uint8>(
-        ratio * count / 4); // big number means bigger sphere
-  }
-}
-void SmokeParticleSystem::draw(sf::RenderTarget &target,
-                               sf::RenderStates states) const {
-  states.transform *= getTransform();
-  states.texture = NULL;
-  target.draw(m_vertices, states);
-}
-void SmokeParticleSystem::setMovingDirectionEffect(const sf::Vector2f &center) {
-  for (std::size_t i = 0; i < m_particles.size(); ++i) {
-    sf::Vector2f direction = m_vertices[i].position - center;
-    float length =
-        std::sqrt(direction.x * direction.x + direction.y * direction.y);
-    if (length != 0) {     // avoid division by zero
-      direction /= length; // normalize the direction vector
-    }
-    float speed = (std::rand() % 50) + 50.f; // random speed
-    m_particles[i].velocity = direction * speed;
-  }
-}
-
-void SmokeParticleSystem::setMovingDirectionEffect() {
-  for (std::size_t i = 0; i < m_particles.size(); ++i) {
-    float angle = (std::rand() % 360) * 3.14159f / 180;
-    float speed = (std::rand() % 50) + 50.f;
-    m_particles[i].velocity =
-        sf::Vector2f(std::cos(angle) * speed, std::sin(angle) * speed);
-  }
-}
-
-void SmokeParticleSystem::changeColor(sf::Color color) {
-  for (std::size_t i = 0; i < m_particles.size(); ++i) {
-    m_vertices[i].color = color;
-  }
-}
-
-void SmokeParticleSystem::resetParticle(std::size_t index) {
-if (index >= m_particles.size() || index >= m_vertices.getVertexCount()) {
-    std::cerr << "Invalid index in resetParticle: " << index << std::endl;
-    return;
-  }
-  // refactoring
-    float angle = (std::rand() % 360) * 3.14159f / 180;
-    float speed = (std::rand() % 2) + 4.f; // increased speed for larger "hall"
-    m_particles[index].velocity =
-        sf::Vector2f(std::cos(angle) * speed, std::sin(angle) * speed);
-
-    // calculate the maximum distance a particle could need to travel (diagonal
-    // across the screen)
-    float maxDistance = std::sqrt(m_windowWidth * m_windowWidth +
-                                  m_windowHeight * m_windowHeight);
-
-}
-
-void drawMovingBackgroundSpace(sf::RenderTarget &target, sf::Clock &clock,
-                               unsigned int count,
-                               const std::vector<std::vector<char>> &numbers) {
-  static sf::Vector2f direction(0, 0);
-  direction.x = std::sin(clock.getElapsedTime().asSeconds());
-  direction.y = std::cos(clock.getElapsedTime().asSeconds());
-  unsigned int cellsDrawn = howManyCellsDrawn(numbers);
-  static ParticleSystem particles(cellsDrawn * count, target.getSize().x,
-                                  target.getSize().y);
-  // add glow effect to the particles
-  auto glowingColor = GlowingColor(analogousCyan).getShade();
-  auto glowingBrighterColor = GlowingColor(analogousCyan).getBrighterShade();
-  for (std::size_t i = 0; i < particles.m_particles.size(); ++i) {
-    particles.m_vertices[i * 2].color = glowingColor;
-    particles.m_vertices[i * 2 + 1].color = glowingBrighterColor;
-  }
-
-  // calculate the offset based on a sine function of time
-  float offsetMagnitude =
-      50.0f; // adjust this value to change the magnitude of the offset
-  sf::Vector2f offset(
-      offsetMagnitude * std::sin(clock.getElapsedTime().asSeconds()), 0);
-
-  // add the offset to the center position
-  sf::Vector2f center(target.getSize().x / 2 + offset.x,
-                      target.getSize().y / 2 + offset.y);
-
-  particles.setEmitter(center);
-  particles.update(clock.restart());
-
-  // draw a small black circle at the center position
-  sf::CircleShape blackCenter(
-      25); // adjust this value to change the size of the black center
-  blackCenter.setFillColor(sf::Color::Black);
-  blackCenter.setPosition(
-      center - sf::Vector2f(25, 25)); // adjust the position so the center of
-                                      // the circle is at the center position
-  // particles.setMovingDirectionEffect(center);
-
-  target.draw(particles);
-  target.draw(blackCenter); // draw the black center after the particles so it
-                            // appears on top
-}
-
-void drawMovingBackgroundSmoke(sf::RenderTarget &target, sf::Clock &clock,
-                               unsigned int count,
-                               const std::vector<std::vector<char>> &numbers) {
-  static sf::Vector2f direction(0, 0);
-  direction.x = std::sin(clock.getElapsedTime().asSeconds());
-  direction.y = std::cos(clock.getElapsedTime().asSeconds());
-  unsigned int cellsDrawn = howManyCellsDrawn(numbers);
-  static SmokeParticleSystem particles(cellsDrawn * count, target.getSize().x,
-                                       target.getSize().y);
-  // add glow effect to the particles
-  auto glowingColor = GlowingColor(analogousCyan).getShade();
-  auto glowingBrighterColor = GlowingColor(analogousCyan).getBrighterShade();
-  for (std::size_t i = 0; i < particles.m_particles.size(); ++i) {
-    particles.m_vertices[i * 2].color = glowingColor;
-    particles.m_vertices[i * 2 + 1].color = glowingBrighterColor;
-  }
-
-  // calculate the offset based on a sine function of time
-  float offsetMagnitude =
-      50.0f; // adjust this value to change the magnitude of the offset
-  sf::Vector2f offset(
-      offsetMagnitude * std::sin(clock.getElapsedTime().asSeconds()), 0);
-
-  // add the offset to the center position
-  sf::Vector2f center(target.getSize().x / 2 + offset.x,
-                      target.getSize().y / 2 + offset.y);
-
-  particles.setEmitter(center);
-  particles.update(clock.restart());
-
-  // draw a small black circle at the center position
-  sf::CircleShape blackCenter(
-      25); // adjust this value to change the size of the black center
-  blackCenter.setFillColor(sf::Color::Black);
-  blackCenter.setPosition(
-      center - sf::Vector2f(25, 25)); // adjust the position so the center of
-                                      // the circle is at the center position
-  // particles.setMovingDirectionEffect(center);
-
-  target.draw(particles);
-  target.draw(blackCenter); // draw the black center after the particles so it
-                            // appears on top
-}
-
-
-void drawSmoke(sf::RenderTarget &target, sf::Clock &clock) {
-  static ParticleSystem particles(1000, target.getSize().x, target.getSize().y);
+void drawStars(sf::RenderTarget &target, sf::Clock &clock) {
+  static ParticleSystem particles(1000, target.getSize().x, target.getSize().y,
+                                  sf::Points);
   static sf::Clock spawnClock;
 
   // Spawn new particles every 100 milliseconds
@@ -397,133 +137,493 @@ void drawSmoke(sf::RenderTarget &target, sf::Clock &clock) {
     spawnClock.restart();
   }
 
+  // Update particles
+  sf::Time elapsed = clock.restart();
+  particles.update(elapsed);
+
+  // Modify particle velocities using sine and cosine functions
+  for (size_t i = 0; i < particles.m_particles.size(); ++i) {
+    ParticleSystem::Particle &p = particles.m_particles[i];
+    p.velocity.x = std::cos(elapsed.asSeconds() + i) * 100;
+    p.velocity.y = std::sin(elapsed.asSeconds() + i) * 100;
+  }
+
+  target.draw(particles);
+}
+void MetShower(sf::RenderTarget &target, sf::Clock &clock) {
+  static ParticleSystem particles(std::rand() % 100 + 1, target.getSize().x,
+                                  target.getSize().y, sf::Lines);
+  static sf::Clock spawnClock;
+
+  // Spawn new particles at random intervals
+  if (spawnClock.getElapsedTime() > sf::milliseconds(rand() % 200 + 50)) {
+    particles.spawnParticles(rand() % 5 + 1); // Spawn a random number of particles
+    spawnClock.restart();
+  }
+
+  // Update particles
+  sf::Time elapsed = clock.restart();
+  particles.update(elapsed);
+
+  // Modify particle velocities and colors
+  for (std::size_t i = 0; i < particles.m_vertices.getVertexCount(); ++i) {
+    sf::Vertex &particle = particles.m_vertices[i];
+    particle.position += particles.m_particles[i / 2].velocity * elapsed.asSeconds();
+    particle.color.a = static_cast<sf::Uint8>(particle.color.a * 0.99f);
+    particle.color.r = static_cast<sf::Uint8>(particle.color.r * 0.99f);
+    particle.color.g = static_cast<sf::Uint8>(particle.color.g * 0.99f);
+    particle.color.b = static_cast<sf::Uint8>(particle.color.b * 0.99f);
+
+    // If the particle is out of the screen, reset its position to the center
+    if (particle.position.x < 0 || particle.position.x > target.getSize().x ||
+        particle.position.y < 0 || particle.position.y > target.getSize().y) {
+      particle.position = particles.m_emitter;
+    }
+
+    // If the particle is too dim, reset its color to white
+    if (particle.color.a < 10) {
+      particle.color = sf::Color::White;
+    }
+
+    // If the particle is too dim, reset its color to white
+  }
+
+  target.draw(particles);
+}
+void drawGalaxy(sf::RenderTarget &target, sf::Clock &clock) {
+  static ParticleSystem particles(1000, target.getSize().x, target.getSize().y,
+                                  sf::Lines);
+  static ParticleSystem particles2(1000, target.getSize().x,
+                                   target.getSize().y, sf::Points);
+  static sf::Clock spawnClock;
+  static sf::Clock spawnClock2;
+
+  // Spawn new particles at random intervals
+  if (spawnClock.getElapsedTime() > sf::milliseconds(rand() % 1000 + 50)) {
+    particles.spawnParticles(rand() % 1000 + 5); // Spawn a random number of particles
+    spawnClock.restart();
+  }
+  if (spawnClock2.getElapsedTime() > sf::milliseconds(rand() % 200 + 50)) {
+    particles2.spawnParticles(rand() % 20 + 5); // Spawn a random number of particles
+    spawnClock2.restart();
+  }
+
+  // Update particles
+  sf::Time elapsed = clock.restart();
+  particles.update(elapsed);
+  particles2.update(elapsed);
+
+  // Modify particle velocities to create a circular motion
+  for (std::size_t i = 0; i < particles.m_particles.size(); ++i) {
+    ParticleSystem::Particle &p = particles.m_particles[i];
+    float time = elapsed.asSeconds();
+    p.velocity.x = std::cos(time) * 100.0f;
+    p.velocity.y = std::sin(time) * 100.0f;
+  }
+  for (std::size_t i = 0; i < particles2.m_particles.size(); ++i) {
+    ParticleSystem::Particle &p = particles2.m_particles[i];
+    float time = elapsed.asSeconds();
+    p.velocity.x = std::cos(time) * 100.0f;
+    p.velocity.y = std::sin(time) * 100.0f;
+  }
+  particles.changeColor(GlowingColor(triadicYellow).getShade(),
+                        GlowingColor(triadicYellow).getBrighterShade());
+
+                        particles2.changeColor(GlowingColor(triadicYellow).getShade(),
+                        GlowingColor(triadicYellow).getBrighterShade());
+
+  particles.setEmitter(sf::Vector2f(target.getSize().x / 2, target.getSize().y / 2));
+  particles2.setEmitter(sf::Vector2f(target.getSize().x / 2, target.getSize().y / 2));
+
+// adjust alpha value of the particles so that the lines will be transparent when they are far from the center
+for (std::size_t i = 0; i < particles.m_vertices.getVertexCount(); ++i) {
+    sf::Vertex &particle = particles.m_vertices[i];
+    auto direction = particle.position - particles.m_emitter;
+    float length =
+        std::sqrt(direction.x * direction.x + direction.y * direction.y);
+    direction /= length;
+    particle.position += direction * 2.f; // Slow down the speed by reducing the factor
+
+    // Update the alpha (transparency) of the particle according to its distance
+    // from the center
+    float ratio = length / std::max(target.getSize().x, target.getSize().y);
+    particle.color.a = static_cast<sf::Uint8>(
+        (std::sin(ratio * 3.14159f * 2) + 1) / 2 *
+        255); // Use a sine function to create a pulsating effect
+
+    // If the particle is out of the screen, reset its position to the center
+    if (particle.position.x < 0 || particle.position.x > target.getSize().x ||
+        particle.position.y < 0 || particle.position.y > target.getSize().y) {
+      particle.position = particles.m_emitter;
+    }
+  }
+
+
+
+  target.draw(particles);
+  target.draw(particles2);
+}
+
+void drawShootingStar(sf::RenderTarget &target, sf::Clock &clock) {
+  static ParticleSystem particles(10000, target.getSize().x, target.getSize().y,
+                                  sf::Lines);
+  static sf::Clock spawnClock;
+
+  // Spawn new particles every 100 milliseconds
+  if (spawnClock.getElapsedTime() > sf::milliseconds(1000)) {
+    particles.spawnParticles(1); // Spawn 1 new particle
+    spawnClock.restart();
+  }
+  auto emit = sf::Vector2f(target.getSize().x / 2, target.getSize().y / 2);
+  auto direction = sf::Vector2f(target.getSize().x / 2, target.getSize().y / 2);
   particles.update(clock.restart());
+  particles.setEmitter(emit);
+  particles.setMovingDirectionEffect(direction);
+
+  for (std::size_t i = 0; i < particles.m_particles.size(); ++i) {
+    ParticleSystem::Particle &p = particles.m_particles[i];
+    p.velocity.x = std::rand() % 100 - 50;
+    p.velocity.y = std::rand() % 100 - 50;
+  }
+
+  for (std::size_t i = 0; i < particles.m_vertices.getVertexCount(); ++i) {
+    sf::Vertex &particle = particles.m_vertices[i];
+    auto direction = particle.position - particles.m_emitter;
+    float length =
+        std::sqrt(direction.x * direction.x + direction.y * direction.y);
+    direction /= length;
+    particle.position += direction * 2.f; // Slow down the speed by reducing the factor
+
+    // Update the alpha (transparency) of the particle according to its distance
+    // from the center
+    float ratio = length / std::max(target.getSize().x, target.getSize().y);
+    particle.color.a = static_cast<sf::Uint8>(
+        (std::sin(ratio * 3.14159f * 2) + 1) / 2 *
+        255); // Use a sine function to create a pulsating effect
+
+    // If the particle is out of the screen, reset its position to the center
+    if (particle.position.x < 0 || particle.position.x > target.getSize().x ||
+        particle.position.y < 0 || particle.position.y > target.getSize().y) {
+      particle.position = particles.m_emitter;
+    }
+  }
+
+  particles.changeColor(GlowingColor(triadicYellow).getShade(),
+                        GlowingColor(triadicYellow).getBrighterShade());
+
+  target.draw(particles);
+}
+void drawSmoke(sf::RenderTarget &target, sf::Clock &clock) {
+  static ParticleSystem particles(1000, target.getSize().x, target.getSize().y,
+                                  sf::Points, sf::Color::White, 100, 10);
+  static sf::Clock spawnClock;
+
+  // Spawn new particles at random intervals
+  if (spawnClock.getElapsedTime() > sf::milliseconds(rand() % 200 + 50)) {
+    particles.spawnParticles(rand() % 20 + 5); // Spawn a random number of particles
+    spawnClock.restart();
+  }
+
+  // Update particles
+  sf::Time elapsed = clock.restart();
+  particles.update(elapsed);
+
+  // Modify particle velocities and colors
+  for (size_t i = 0; i < particles.m_vertices.getVertexCount(); ++i) {
+    sf::Vertex &particle = particles.m_vertices[i];
+    particle.position += particles.m_particles[i / 2].velocity * elapsed.asSeconds();
+    particle.color.a = static_cast<sf::Uint8>(particle.color.a * 0.99f);
+  }
+
+  for (std::size_t i = 0; i < particles.m_particles.size(); ++i) {
+    ParticleSystem::Particle &p = particles.m_particles[i];
+    p.velocity.x = std::rand() % 100 - 50;
+    p.velocity.y = std::rand() % 100 - 50;
+  }
   target.draw(particles);
 }
 
 
-void drawAllAround(sf::RenderTarget &target, sf::Clock clock,
-                   unsigned int count,
-                   const std::vector<std::vector<char>> &numbers) {
-  static GlowingColor glowingColor(analogousCyan);
-  auto direction = sf::Vector2f(target.getSize().x / 2, target.getSize().y / 2);
-
-//   static ParticleSystem particles(100, target.getSize().x, target.getSize().y);
-//   static sf::Clock spawnClock;
-//   // Spawn new particles every 100 milliseconds
-//   if (spawnClock.getElapsedTime() > sf::milliseconds(1000)) {
-//     particles.spawnParticles(10); // Spawn 10 new particles
-//     spawnClock.restart();
-//   }
-
-//   particles.update(clock.restart());
-//   particles.setMovingDirectionEffect(
-//       sf::Vector2f(target.getSize().x / 2, target.getSize().y / 2));
-//   particles.setEmitter(
-//       sf::Vector2f(target.getSize().x / 4, target.getSize().y / 4));
-//   particles.setMovingDirectionEffect(direction);
-//   particles.changeColor(glowingColor.getShade());
-//   particles.setEmitter(
-//       sf::Vector2f(target.getSize().x / 2, target.getSize().y / 2));
-//   particles.update(clock.restart());
-//   target.draw(particles);
-
-//   static DotsParticleSystem dots(100000, target.getSize().x,
-//                                  target.getSize().y);
-//   static sf::Clock dotsSpawnClock;
-//   std::cout << "dotsSpawnClock.getElapsedTime() "
-//             << dotsSpawnClock.getElapsedTime().asMilliseconds() << std::endl;
-
-//   // Spawn new particles every 100 milliseconds
-//   if (dotsSpawnClock.getElapsedTime() > sf::milliseconds(1000)) {
-//     dots.spawnParticles(10); // Spawn 10 new particles
-//     // dotsSpawnClock.restart();
-//   }
-//   dots.update(clock.restart());
-//   dots.setEmitter(sf::Vector2f(target.getSize().x / 2, target.getSize().y / 2));
-//   dots.setMovingDirectionEffect(direction);
-//   dots.changeColor(glowingColor.getShade());
-//   target.draw(dots);
-drawMovingBackgroundSpace(target, clock, count, numbers);
-}
-
-void draw_creativity(sf::RenderTarget &target, sf::Clock &clock,
-                     unsigned int count,
-                     const std::vector<std::vector<char>> &numbers) {
-  static std::vector<std::unique_ptr<ParticleSystem>> particleSystems;
+void drawFire(sf::RenderTarget &target, sf::Clock &clock) {
+  static ParticleSystem particles1(10000, target.getSize().x, target.getSize().y,
+                                  sf::Points, sf::Color::Red, 200, 20);
+  static ParticleSystem particles2(10000, target.getSize().x, target.getSize().y,
+                                  sf::Points, sf::Color::Yellow, 200, 20);
   static sf::Clock spawnClock;
-  static sf::Clock changeClock;
 
-  // Initialize particle systems// Initialize particle systems
-  // Initialize particle systems
-  if (particleSystems.empty()) {
-    for (int i = 0; i < 5; ++i) {
-      int type = rand() % 3; // Assuming there are 3 types of particle systems
-      switch (type) {
-      case 0:
-        particleSystems.push_back(
-            std::unique_ptr<ParticleSystem>(new SmokeParticleSystem(
-                200 * (i + 1), target.getSize().x, target.getSize().y)));
-        break;
-      case 1:
-        particleSystems.push_back(std::make_unique<ParticleSystem>(
-            200 * (i + 1), target.getSize().x, target.getSize().y));
-        break;
-      case 2:
-        particleSystems.push_back(
-            std::unique_ptr<ParticleSystem>(new DotsParticleSystem(
-                200 * (i + 1), target.getSize().x, target.getSize().y)));
-        break;
-      }
+  if (spawnClock.getElapsedTime() > sf::milliseconds(100000)) {
+    particles1.spawnParticles(10);
+    particles2.spawnParticles(10);
+    spawnClock.restart();
+  }
+  particles1.setSpeed(100, 300);
+  particles2.setSpeed(100, 300);
+  particles1.changeColor(sf::Color::Red, sf::Color::Yellow);
+  particles2.changeColor(sf::Color::Yellow, sf::Color::Red);
+  particles1.setEmitter(sf::Vector2f(target.getSize().x / 2, target.getSize().y));
+  particles2.setEmitter(sf::Vector2f(target.getSize().x / 2, target.getSize().y));
+  particles1.setMovingDirectionEffect(sf::Vector2f(0, -1));
+  particles2.setMovingDirectionEffect(sf::Vector2f(0, -1));
+
+  particles1.update(clock.restart());
+  particles2.update(clock.restart());
+  // add dynamic effect to the particles add organic movement
+  for (std::size_t i = 0; i < particles1.m_vertices.getVertexCount(); ++i) {
+    sf::Vertex &particle = particles1.m_vertices[i];
+    auto direction = particle.position - particles1.m_emitter;
+    float length =
+        std::sqrt(direction.x * direction.x + direction.y * direction.y);
+    direction /= length;
+    particle.position += direction * 2.f; // Slow down the speed by reducing the factor
+
+    // Update the alpha (transparency) of the particle according to its distance
+    // from the center
+    float ratio = length / std::max(target.getSize().x, target.getSize().y);
+    particle.color.a = static_cast<sf::Uint8>(
+        (std::sin(ratio * 3.14159f * 2) + 1) / 2 *
+        255); // Use a sine function to create a pulsating effect
+
+    // If the particle is out of the screen, reset its position to the center
+    if (particle.position.x < 0 || particle.position.x > target.getSize().x ||
+        particle.position.y < 0 || particle.position.y > target.getSize().y) {
+      particle.position = particles1.m_emitter;
     }
   }
-  // Spawn new particles every 100 milliseconds
+
+  target.draw(particles1);
+  target.draw(particles2);
+}
+void drawRain(sf::RenderTarget &target, sf::Clock &clock) {
+  static ParticleSystem particles(1000, target.getSize().x, target.getSize().y,
+                                  sf::Lines, sf::Color::Blue, 100, 50);
+  static sf::Clock spawnClock;
+
   if (spawnClock.getElapsedTime() > sf::milliseconds(100)) {
-    for (auto &particles : particleSystems) {
-      particles->spawnParticles(
-          rand() % 20 + 1); // Spawn a random number of new particles per system
-    }
+    particles.spawnParticles(10);
+    spawnClock.restart();
+  }
+  particles.setMovingDirectionEffect(sf::Vector2f(0, target.getSize().y));
+  particles.setEmitter(sf::Vector2f(target.getSize().x / 2, 0));
+  particles.update(clock.restart());
+  target.draw(particles);
+}
+void drawAllAround(sf::RenderTarget &target, sf::Clock &clock, int cellSize,
+                   const std::vector<std::vector<char>> &numbers) {
+  static ParticleSystem particles(1000, target.getSize().x, target.getSize().y,
+                                  sf::Lines, sf::Color::Green, 150, 30);
+  static ParticleSystem particles2(1000, target.getSize().x, target.getSize().y,
+                                   sf::Lines, sf::Color::Blue, 150, 30);
+  static ParticleSystem particles3(1000, target.getSize().x, target.getSize().y,
+                                    sf::Lines, sf::Color::Red, 150, 30);
+  static sf::Clock spawnClock;
+
+  if (spawnClock.getElapsedTime() > sf::milliseconds(100)) {
+    particles.spawnParticles(rand() % 10 + 1);
+    particles2.spawnParticles(rand() % 10 + 1);
+    particles3.spawnParticles(rand() % 10 + 1);
     spawnClock.restart();
   }
 
-  // Change particle properties every second
-  if (changeClock.getElapsedTime() > sf::seconds(1)) {
-    for (auto &particles : particleSystems) {
-      // Generate random color
-      sf::Color color(rand() % 256, rand() % 256, rand() % 256);
+  particles.setEmitter(sf::Vector2f(rand() % target.getSize().x, rand() % target.getSize().y));
+  particles2.setEmitter(sf::Vector2f(rand() % target.getSize().x, rand() % target.getSize().y));
+  particles3.setEmitter(sf::Vector2f(rand() % target.getSize().x, rand() % target.getSize().y));
 
-      // Generate random direction
-      sf::Vector2f direction(rand() % 100 - 50, rand() % 100 - 50);
+  particles.update(clock.restart());
+  particles2.update(clock.restart());
+  particles3.update(clock.restart());
+  target.draw(particles);
+  target.draw(particles2);
+  target.draw(particles3);
+}
 
-      particles->changeColor(color);
-      particles->setMovingDirectionEffect(direction);
-    }
-    changeClock.restart();
+void colorsMode(sf::RenderTarget &target, sf::Clock &clock) {
+  static ParticleSystem particles(1000, target.getSize().x, target.getSize().y,
+                                  sf::Lines, sf::Color::Magenta, 2000, 400);
+  static sf::Clock spawnClock;
+
+  if (spawnClock.getElapsedTime() > sf::milliseconds(100)) {
+    particles.spawnParticles(10);
+    spawnClock.restart();
   }
 
-  for (auto &particles : particleSystems) {
-    particles->update(clock.restart());
-    target.draw(*particles);
+  particles.update(clock.restart());
+  target.draw(particles);
+}
+
+void drawColoredSkies(sf::RenderTarget &target, sf::Clock &clock) {
+  auto num_of_particles = []() -> int { return std::rand() % 100 + 1; };
+  static ParticleSystem particles(num_of_particles(), target.getSize().x,
+                                  target.getSize().y, sf::Lines);
+  static ParticleSystem particles2(10000, target.getSize().x,
+                                   target.getSize().y, sf::Points);
+  static ParticleSystem particles3(num_of_particles(), target.getSize().x,
+                                   target.getSize().y, sf::Lines);
+  auto glowingColor = GlowingColor(analogousCyan).getShade();
+  auto glowingBrighterColor = GlowingColor(analogousCyan).getBrighterShade();
+  static sf::Clock spawnClock;
+
+  // Spawn new particles every 100 milliseconds
+  if (spawnClock.getElapsedTime() > sf::milliseconds(100)) {
+    particles.spawnParticles(1);  // Spawn 1 new particle
+    particles2.spawnParticles(1); // Spawn 1 new particle
+    particles3.spawnParticles(1); // Spawn 1 new particle
+    spawnClock.restart();
+  }
+  particles.update(clock.restart());
+  particles2.update(clock.restart());
+  particles3.update(clock.restart());
+  particles.changeColor(glowingColor, glowingBrighterColor);
+  particles2.changeColor(glowingColor, glowingBrighterColor);
+  particles2.setEmitter(
+      sf::Vector2f(target.getSize().x / 2, target.getSize().y / 2));
+  // particles3.changeColor(glowingColor, glowingBrighterColor);
+  target.draw(particles);
+}
+
+void ParticleSystem::setSpeed(int base_speed, float rand_speed) {
+  this->base_speed = base_speed;
+  this->rand_speed = rand_speed;
+}
+
+void drawTunnel(sf::RenderTarget &target, sf::Clock &clock) {
+  static ParticleSystem particles(1000, target.getSize().x, target.getSize().y,
+                                  sf::Lines);
+  particles.setSpeed(100, 300);
+  static auto glowingColor = GlowingColor(complementaryPurple).getShade();
+  static auto glowingBrighterColor =
+      GlowingColor(complementaryPurple).getBrighterShade();
+  static sf::Clock spawnClock;
+  static sf::CircleShape circle(50);
+  circle.setFillColor(sf::Color::Black);
+  static sf::Vector2f center =
+      circle.getPosition() +
+      sf::Vector2f(50, 50); // Make center a static variable
+
+  if (spawnClock.getElapsedTime() > sf::milliseconds(10000)) {
+    particles.spawnParticles(1);
+    spawnClock.restart();
+  }
+
+  // add moving effect to the center
+  auto c = clock.restart();
+  float elapsed = c.asSeconds();
+  static auto movings = sf::Vector2f(std::sin(elapsed) * 0.8, std::cos(elapsed) * 0.5);
+  center += movings;
+
+  // Add some randomness to the movement direction and speed
+  movings.x += ((std::rand() % 200 - 100) / 100.0) * 0.2;
+  movings.y += ((std::rand() % 200 - 100) / 100.0) * 0.2;
+
+  // Keep the movement within the screen bounds
+  if (center.x < 0) {
+    center.x = 0;
+    movings.x = std::abs(movings.x);
+  } else if (center.x > target.getSize().x) {
+    center.x = target.getSize().x;
+    movings.x = -std::abs(movings.x);
+  }
+  if (center.y < 0) {
+    center.y = 0;
+    movings.y = std::abs(movings.y);
+  } else if (center.y > target.getSize().y) {
+    center.y = target.getSize().y;
+    movings.y = -std::abs(movings.y);
+  }
+  
+  center += movings; // Apply the possibly updated movings vector
+  particles.setEmitter(center);
+  particles.update(c);
+  particles.changeColor(glowingColor, glowingBrighterColor);
+  circle.setPosition(center - sf::Vector2f(50, 50));
+
+  target.draw(particles);
+  target.draw(circle);
+}
+void addAlpha(ParticleSystem &particles, sf::RenderTarget &target,
+              sf::Clock &clock, const sf::Vector2f &center) {
+
+  for (std::size_t i = 0; i < particles.m_vertices.getVertexCount(); ++i) {
+    sf::Vertex &particle = particles.m_vertices[i];
+    auto direction = particle.position - center;
+    float length =
+        std::sqrt(direction.x * direction.x + direction.y * direction.y);
+    direction /= length;
+    particle.position +=
+        direction * 2.f; // Slow down the speed by reducing the factor
+
+    // Update the alpha (transparency) of the particle according to its distance
+    // from the center
+    float ratio = length / std::max(target.getSize().x, target.getSize().y);
+    particle.color.a = static_cast<sf::Uint8>(
+        (std::sin(ratio * 3.14159f * 2) + 1) / 2 *
+        255); // Use a sine function to create a pulsating effect
+
+    // If the particle is out of the screen, reset its position to the center
+    if (particle.position.x < 0 || particle.position.x > target.getSize().x ||
+        particle.position.y < 0 || particle.position.y > target.getSize().y) {
+      particle.position = center;
+    }
   }
 }
 Effects::Effects(sf::RenderTarget &target, sf::Clock &clock, unsigned int count,
                  const std::vector<std::vector<char>> &numbers)
     : target(target), clock(clock), count(count), numbers(numbers) {}
 
+void Effects::next() { current_effect = (current_effect + 1) % 5; }
+
 void Effects::apply(const int effect_type,
                     const std::vector<std::vector<char>> &numbers) {
+
   switch (effect_type) {
   case 0:
-    drawMovingBackgroundSpace(target, clock, count, numbers);
+    drawStars(target, clock);
+    std::cout << "drawStars" << std::endl;
     break;
   case 1:
-    drawMovingBackgroundSmoke(target, clock, count, numbers);
+    drawGalaxy(target, clock);
+    std::cout << "drawGalaxy" << std::endl;
     break;
   case 2:
-    drawAllAround(target, clock, count, numbers);
+    MetShower(target, clock);
+    std::cout << "MetShower" << std::endl;
+    break;
+  case 3:
+    drawShootingStar(target, clock);
+    std::cout << "drawShootingStar" << std::endl;
+    break;
+  case 4:
+    drawTunnel(target, clock);
+    std::cout << "drawTunnel" << std::endl;
+    break;
+  case 5:
+    drawColoredSkies(target, clock);
+    std::cout << "drawColoredSkies" << std::endl;
+    break;
+  case 6:
+    drawSmoke(target, clock);
+    std::cout << "drawSmoke" << std::endl;
+    break;
+  case 7:
+    drawFire(target, clock);
+    std::cout << "drawFire" << std::endl;
+    break;
+  case 8:
+    drawRain(target, clock);
+    std::cout << "drawRain" << std::endl;
+    break;
+  case 9:
+    drawAllAround(target, clock, 50, numbers);
+    std::cout << "drawAllAround" << std::endl;
+    break;
+  case 10:
+    colorsMode(target, clock);
+    std::cout << "colorsMode" << std::endl;
     break;
   default:
-    drawAllAround(target, clock, count, numbers);
     break;
   }
+}
+
+void Effects::apply(const std::vector<std::vector<char>> &numbers) {
+  apply(current_effect, numbers);
 }

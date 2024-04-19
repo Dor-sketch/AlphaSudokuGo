@@ -8,9 +8,9 @@
 
 class Sudoku : public sf::Drawable {
 public:
-  Sudoku();
-  Sudoku(const std::string &difficulty, const std::string &filename);
-  Sudoku(const std::vector<std::vector<char>> &board);
+  Sudoku(const int cellSize);
+  // Sudoku(const std::string &difficulty, const std::string &filename);
+  Sudoku(const std::vector<std::vector<char>> &board, const int cellSize);
   void handleClick(int x, int y, int mouseButton);
   void setBoard(const std::vector<std::vector<char>> &newBoard);
   const std::vector<std::vector<char>> getBoard();
@@ -21,6 +21,7 @@ public:
 protected:
   void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
 private:
+ int cellSize = 50;
   sf::Color numberColor = sf::Color::Black;
   sf::Color backgroundColor = sf::Color::White;
   sf::Color gridColor = sf::Color::Blue;

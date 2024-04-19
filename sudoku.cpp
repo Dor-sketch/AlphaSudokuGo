@@ -5,45 +5,25 @@
 #include <fstream>
 #include <iostream>
 #include <random>
-const int cellSize = 64;
 const char *fontPath = "../VT323-Regular.ttf";
 #include "Particals.h"
 
-extern std::vector<std::vector<char>>
-boardsFactory(const std::string &filename);
 
 // Constructor for the Sudoku class. Initializes the Sudoku grid and generates
 // a puzzle.
-Sudoku::Sudoku() {
+Sudoku::Sudoku(const int cellSize) : cellSize(cellSize) {
   initGrid();
   generatePuzzle("");
   font = loadFont(fontPath);
 }
 
-Sudoku::Sudoku(const std::string &difficulty, const std::string &filename) {
+Sudoku::Sudoku(const std::vector<std::vector<char>> &board, const int cellSize)
+    : cellSize(cellSize) {
   initGrid();
+  setBoard(board);
   font = loadFont(fontPath);
-  if (filename.empty()) {
-    generatePuzzle(difficulty);
-  } // check if ends with .png
-  else if (filename.find(".png")) {
-    setBoard(boardsFactory("empty"));
-  } else {
-    // parse the file chars into a 2d vector of chars
-    std::ifstream file(filename);
-    if (!file.is_open()) {
-      std::cerr << "Failed to open file: " << filename << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    for (int i = 0; i < 9; i++) {
-      std::string line;
-      std::getline(file, line);
-      for (int j = 0; j < 9; j++) {
-        numbers[i][j] = line[j] - '0';
-      }
-    }
-  }
 }
+
 
 void Sudoku::setDarkTheme() {
   backgroundColor = sf::Color(0, 0, 0); // Black
@@ -62,6 +42,7 @@ const std::vector<std::vector<char>> Sudoku::getBoard() { return numbers; }
 
 // Initialize the Sudoku grid.
 void Sudoku::initGrid() {
+std::cout<<cellSize<<std::endl;
   for (int i = 0; i < 9; i++) {
     std::vector<sf::RectangleShape> row;
     for (int j = 0; j < 9; j++) {
@@ -90,6 +71,7 @@ void Sudoku::saveScreenshot(sf::RenderTarget &target) const {
   // Check if target is a RenderWindow
   if (sf::RenderWindow *window = dynamic_cast<sf::RenderWindow *>(&target)) {
     sf::Texture texture;
+    // set size of the texture to the size of the window
     texture.create(window->getSize().x, window->getSize().y);
     texture.update(*window);
     renderTexture.draw(sf::Sprite(texture));

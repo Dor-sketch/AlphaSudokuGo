@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include "Particals.h"
 // Define a hash function for using pairs as keys in unordered_map
 struct pair_hash {
   template <class T1, class T2>
@@ -20,11 +21,12 @@ struct pair_hash {
 
 class SudokuCSP {
 public:
-  SudokuCSP(sf::RenderWindow &window, Sudoku &sudoku);
+  SudokuCSP(sf::RenderWindow &window, Sudoku &sudoku, Effects &effects);
   const std::vector<std::vector<char>> getBoard(); // Get the Sudoku board
-  void solve();                                    // Solve the Sudoku puzzle
+  bool solve();                                    // Solve the Sudoku puzzle
 
 private:
+Effects &effects;
   void AC3();
   bool isArcConsistent(std::pair<int, int> var);
   sf::RenderWindow &window;
