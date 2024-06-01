@@ -1,14 +1,23 @@
-# AlphaSudokuGo
+<div align="center">
+  <img src="https://github.com/Dor-sketch/AlphaSudokuGo/assets/138825033/5a34bcb9-5216-4ac0-90a0-c2a072762cbe" alt="CrossFinder and Minesweeper Solver" width="500" style="display: block; margin-bottom: 0;"/>
+  <h1>AlphaSudokuGo:<br>Ultimate Soduku AI with Image Processing</h1>
+</div>
 
 AlphaSudokuGo is a C++ program designed to solve Sudoku puzzles using a `Constraint Satisfaction Problem` (CSP) approach. It features a graphical user interface (GUI) built with Qt5, which enables users to input their own puzzles and observe the solver in real-time. The primary goals of this project are to showcase the capabilities of Artificial Intelligence (AI) in tackling complex puzzles and to create cool visualizations of the search process.
 
 **BIG NEWS**: The project now includes image processing capabilities, allowing users to input their own puzzles by uploading an image of the Sudoku puzzle - or even take a screenshot of a puzzle on their screen! The program is currently capable of recognizing most of the Sudoku puzzles, and can solve them in real-time.
 
+In this video, not only is AlphaSudokuGo training on a Haaretz "hard" puzzle and tackling the hardest sudoku puzzle ever conceived, but you can also enjoy an original piece of music I composed and produced.
+
+https://github.com/Dor-sketch/AlphaSudokuGo/assets/138825033/8dc277b9-9e62-4ac8-9935-4cb13ed8f5b8
+
 <p align = "center">
-  <img src="./images/test_fast/output_long.gif" alt="Sudoku puzzle" width="600" style="padding:10px; margin:10px;">
+  <img src="https://github.com/Dor-sketch/AlphaSudokuGo/assets/138825033/b0ef538a-a4d6-4591-bfda-04655f8df33c" alt="Sudoku puzzle" width="600" style="padding:10px; margin:10px;">
   <br>
   <i>Scroll down for more animations or <a href="#interacting-with-the-gui">jump to Interacting with the GUI</a></i>
 </p>
+
+---
 
 - [Background](#background)
 - [Sudoku](#sudoku)
@@ -283,44 +292,22 @@ Than you can run the project using the following command,  with the optional fla
 
 Without the optional `--open`, the program will initiate in a game mode with a randomly generated solvable Sudoku puzzle. You can modify the puzzle's level using the command line flag `--difficulty`, followed by the number of missing cells you want in the puzzle. The default difficulty level is set to 40 missing cells.
 
-<p align="center">
-  <img src="./images/20_missing.gif" alt="Sudoku puzzle" width="400" style="padding:10px; margin:10px;">
-  <img src="./images/90_missing.gif" alt="Sudoku puzzle" width="400" style="padding:10px; margin:10px;">
-  <br>
-  <i>Sudoku puzzle with 1 missing cells (left) and 90 missing cells (right)</i>
-</p>
-
 ### Interacting with the GUI
 
 Click on the cell you wish to modify, each click will increment the cell value by 1. To erase a cell value, just right-click on the cell. To solve the puzzle in AI mode, press the middle mouse button (scroll wheel), and watch the solution unfold.
 
 <p align = "center">
-  <img src="./images/usage.gif" alt="Sudoku puzzle" width="400" style="padding:10px; margin:10px;">
-  <img src="./images/90_solved/90_solution.gif" alt="Sudoku puzzle" width="400" style="padding:10px; margin:10px;">
+  <img src="https://github.com/Dor-sketch/AlphaSudokuGo/assets/138825033/762605a7-b6a3-41e4-b3ec-5b11f4888d95" width="400" style="padding:10px; margin:10px;">
   <br>
-  <i>Click on the cell you wish to modify (left) and watch the solution unfold (right)</i>
+  <i>Click on the cell you wish to modify and watch the solution unfold </i>
 </p>
-![alt text](image.png)
-You can also change the theme of the game, including fonts and styles. In order to change font you will need to download a `.ttf` file and place it in the program directory. Than you can change the font by modifying the `font` variable in the [`Sudoku.cpp`](Sudoku.cpp) file. To change the style of the game, you can modify the `backgroundColor`, `numberColor`, and `cellSize` variables in the `Sudoku.cpp` file. Here are some examples of the different themes:
 
-<p align = "center">
-  <i>Light mode</i>
-  <br>
-  <img src="./images/animation3.gif"            alt="Sudoku puzzle Light mode" width="400" style="padding:10px; margin:10px;">
-  <img src="./images/test2/animation_green.gif" alt="Sudoku puzzle Light mode" width="400" style="padding:10px; margin:10px;">
-  <br>
-  <i>Glowing mode</i>
-  <br>
-  <img src="./images/glowing1/glowing.gif"  alt="Sudoku puzzle Glowing mode" width="400" style="padding:10px; margin:10px;">
-  <img src="./images/glowing2/glowing2.gif" alt="Sudoku puzzle Glowing mode" width="400" style="padding:10px; margin:10px;">
-  <img src="./images/glowing2/glowing3.gif" alt="Sudoku puzzle Glowing mode" width="400" style="padding:10px; margin:10px;">
-  <img src="./images/glowing2/glowing5.gif" alt="Sudoku puzzle Glowing mode" width="400" style="padding:10px; margin:10px;">
-  <br>
-  <i>Dark mode</i>
-  <br>
-  <img src = "/images/test9/output9.gif" alt="Sudoku puzzle Dark mod" width="400" style="padding:10px; margin:10px;">
-  <img src="./images/test10/output8.gif" alt="Sudoku puzzle Dark mod" width="400" style="padding:10px; margin:10px;">
-</p>
+You can also change the theme of the game, including fonts and styles. In order to change font you will need to download a `.ttf` file and place it in the program directory. Than you can change the font by modifying the `font` variable in the [`Sudoku.cpp`](Sudoku.cpp) file. To change the style of the game, you can modify the `backgroundColor`, `numberColor`, and `cellSize` variables in the `Sudoku.cpp` file.
+
+In the following video, you can see the usage on the left, and different `Space` theme options on the right.
+
+https://github.com/Dor-sketch/AlphaSudokuGo/assets/138825033/7b04a719-32d2-40fe-b353-90b4b5f16ec3
+
 
 ## Contributing
 
