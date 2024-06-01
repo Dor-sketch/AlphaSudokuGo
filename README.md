@@ -1,6 +1,6 @@
 <div align="center">
   <img src="https://github.com/Dor-sketch/AlphaSudokuGo/assets/138825033/5a34bcb9-5216-4ac0-90a0-c2a072762cbe" alt="CrossFinder and Minesweeper Solver" width="500" style="display: block; margin-bottom: 0;"/>
-  <h1>AlphaSudokuGo:<br>Ultimate Soduku AI with Image Processing</h1>
+  <h1>AlphaSudokuGo:<br>Ultimate Sudoku AI with Image Processing</h1>
 </div>
 
 AlphaSudokuGo is a C++ program designed to solve Sudoku puzzles using a `Constraint Satisfaction Problem` (CSP) approach. It features a graphical user interface (GUI) built with Qt5, which enables users to input their own puzzles and observe the solver in real-time. The primary goals of this project are to showcase the capabilities of Artificial Intelligence (AI) in tackling complex puzzles and to create cool visualizations of the search process.
