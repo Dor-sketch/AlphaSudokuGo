@@ -18,3 +18,8 @@ __pycache__/*
 *.mp3
 
 Parser
+
+*.gif
+*.pem
+.docs/serve.py
+serve.py
