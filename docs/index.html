@@ -15,505 +15,32 @@
     <title>Sudoku Solver</title>
     <meta name="author" content="Dor Pascal">
     <meta property="og:title" content="Sudoku Solver" />
-    <meta property="og:description"
-        content="Fastest Sudoku solver ever. Enter a board, click solve, and see the magic happen. Built by Dor." />
-    <meta property="og:image"
-        content="https://private-user-images.githubusercontent.com/138825033/335816222-762605a7-b6a3-41e4-b3ec-5b11f4888d95.gif?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MTkyNDkyODcsIm5iZiI6MTcxOTI0ODk4NywicGF0aCI6Ii8xMzg4MjUwMzMvMzM1ODE2MjIyLTc2MjYwNWE3LWI2YTMtNDFlNC1iM2VjLTViMTFmNDg4OGQ5NS5naWY_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjQwNjI0JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI0MDYyNFQxNzA5NDdaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT05MDc5ZjgzZWMwMTdkOTFjNzFiMTFhMTY3MGRmZTU2NWY4M2UxODRhNzRmMmQyYTI2YWU4Y2FjYTkyNGEyMDdiJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZhY3Rvcl9pZD0wJmtleV9pZD0wJnJlcG9faWQ9MCJ9.eiNF9HSZCfhXm07kT7wCR8Fsi2ypnbNPATxioNdzygg" />
+    <meta property="og:description" content="Fastest Sudoku solver ever. Enter a board, click solve, and see the magic happen. Built by Dor." />
     <meta property="og:url" content="https://dorpascal.com/AlphaSudokuGo/" />
     <meta property="og:type" content="website" />
     <link rel="icon" href="./favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" rel="stylesheet">
-    <style>
-        /* Improved layout with refined color scheme and responsive design adjustments */
-        :root {
-            --background-color: #FAFBFD;
-            /* Slightly lighter for a fresh feel */
-            --text-color: #1D1D1F;
-            /* Apple's almost black text color for high contrast */
-            --board-background-color: #F0F1F3;
-            /* Lighter shade for differentiation without stark contrast */
-            --cell-border-color: #D1D1D6;
-            /* Soft border color for subtle definition */
-            --cell-background-color: #FFFFFF;
-            /* Pure white for clarity and focus */
-            --cell-hover-background-color: #d3d3d3a2;
-            /* Very light gray for hover, enhancing user interaction */
-            --cell-focus-background-color: #AED4FA;
-            /* Lighter blue for focus, ensuring accessibility */
-            --cell-focus-shadow-color: #007AFF;
-            /* Apple's default blue for interactive elements */
-            --button-background-color: #007AFF;
-            /* Consistent with Apple's interactive element color */
-            --button-hover-background-color: #005ECB;
-            /* A darker shade of the button color for hover state */
-            --footer-background-color: #F2F2F7;
-            /* Lighter footer background for a less intrusive presence */
-            --footer-text-color: #6E6E73;
-            /* Muted text color for secondary information */
-            --primary-color: #007AFF;
-            /* Apple's blue for primary actions and highlights */
-            --font-stack: 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;            /* Apple's system font stack for better integration */
-        }
-
-        .dark-theme {
-            --background-color: #1C1C1E;
-            /* Dark mode background, deep gray for less strain */
-            --text-color: #F2F2F7;
-            /* High contrast text color for readability */
-            --board-background-color: #2C2C2E;
-            /* Slightly lighter than background for layering */
-            --cell-border-color: #3A3A3C;
-            /* Visible borders in dark mode for definition */
-            --cell-background-color: #2C2C2E;
-            /* Matching the board for consistency */
-            --cell-hover-background-color: #3A3A3C;
-            /* A shade lighter for hover state visibility */
-            --cell-focus-background-color: #5AC8FA;
-            /* Bright blue for focus, ensuring visibility */
-            --cell-focus-shadow-color: #0A84FF;
-            /* Brighter blue for shadows, adding depth */
-            --button-background-color: #0A84FF;
-            /* Consistent with focus color for interactive elements */
-            --button-hover-background-color: #007AFF;
-            /* Default blue for a familiar interactive experience */
-            --footer-background-color: #2C2C2E;
-            /* Matching the board for a cohesive look */
-            --footer-text-color: #8E8E93;
-            /* Muted text for secondary information, ensuring readability */
-        }
-
-        body {
-            font-family: var(--font-stack);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background-color: var(--background-color);
-            color: var(--text-color);
-        }
-
-        #sudoku-board {
-            display: grid;
-            grid-template-columns: repeat(9, 60px);
-            grid-template-rows: repeat(9, 60px);
-            gap: 1px;
-            background-color: var(--board-background-color);
-            padding: 10px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .cell {
-            width: 60px;
-            height: 60px;
-            text-align: center;
-            font-size: 24px;
-            line-height: 60px;
-            border: 1px solid var(--cell-border-color);
-            background-color: var(--cell-background-color);
-            outline: none;
-            border-radius: 5px;
-            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
-            transition: background-color 0.2s, box-shadow 0.2s;
-        }
-
-        .cell:hover {
-            background-color: var(--cell-hover-background-color);
-        }
-
-        .cell:focus {
-            background-color: var(--cell-focus-background-color);
-            box-shadow: 0 0 0 2px var(--cell-focus-shadow-color);
-        }
-
-        .actions {
-            /*stick under the board */
-            display: flex;
-            justify-content: center;
-            margin-top: 10px;
-        }
-
-        button,
-        #input-board {
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            margin: 8px;
-            border-radius: 5px;
-            background-color: var(--button-background-color);
-            color: #FFFFFF;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
-        }
-
-        button:hover,
-        #input-board:hover {
-            background-color: var(--button-hover-background-color);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
-        }
-
-        button:active,
-        #input-board:active {
-            transform: scale(0.98);
-        }
-
-        #input-board {
-            width: 300px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            text-align: left;
-            /*make semi transparent*/
-            background-color: rgba(0, 0, 0, 0.5);
-            /* also for safari */
-            backdrop-filter: blur(10px);
-            ;
-            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-            transition: background 0.3s;
-            padding-left: 3rem;
-            padding-right: 3rem;
-        }
-
-        .footer p {
-            margin: 0;
-            font-size: 14px;
-            color: var(--text-color);
-        }
-
-        .footer a {
-            color: #81E6D9;
-            text-decoration: none;
-        }
-
-        /* Highlighted input field */
-        #input-board {
-            border: 2px solid #CBD5E0;
-            transition: border 0.3s ease;
-        }
-
-        #input-board:focus {
-            border: 2px solid #2B6CB0;
-        }
-
-        .footer {
-            display: flex;
-            align-items: center;
-            /* Align items vertically in the center */
-            justify-content: space-between;
-            /* Optional: Distribute space between items */
-        }
-
-        .footer-item {
-            /* Ensure consistent margin, padding, and line-height for all items */
-            margin: 0 10px;
-            padding: 5px 10px;
-            line-height: 1.5;
-            text-align: center;
-            align-items: center;
-        }
-
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 0;
-            color: var(--primary-color);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 10px;
-            border-radius: 5px;
-            transition: background-color 0.2s, box-shadow 0.2s;
-            margin: 0 0 10px 0;
-        }
-
-        h2 {
-            font-size: 1.5rem;
-            margin: 0;
-            transition: background-color 0.2s, box-shadow 0.2s;
-        }
-
-        @media print {
-
-            body,
-            .actions,
-            .footer,
-            button,
-            #input-board {
-                display: none;
-            }
-        }
-
-        #sudoku-board {
-            display: grid;
-            grid-template-columns: repeat(9, 1fr);
-            grid-template-rows: repeat(9, 1fr);
-            width: 90%;
-            /* Make the board fill the container width */
-            max-width: 600px;
-            /* Optional: limit the maximum width */
-            height: auto;
-            /* Adjust height automatically */
-            aspect-ratio: 1;
-            /* Keep the aspect ratio of the board to be square */
-            margin: auto;
-            /* Center the board horizontally */
-            position: fixed;
-            /* Use fixed to keep it in view at all times */
-            top: 50%;
-            /* Start at the middle of the screen vertically */
-            left: 50%;
-            /* Start at the middle of the screen horizontally */
-            transform: translate(-50%, -50%);
-            /* Adjust the position to truly center the board */
-        }
-
-        .cell {
-            width: 100%;
-            /* Make cell fill the column */
-            height: 100%;
-            /* Make cell fill the row */
-            font-size: 4vw;
-            /* Adjust font size based on viewport width */
-            line-height: normal;
-            /* Adjust line height to normal */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .actions {
-            /*below the board  but above the footer */
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        @media screen and (max-width: 600px) {
-
-
-            h1 {
-                font-size: 1.5rem;
-                box-shadow: 0 0 0 rgba(0, 0, 0, 0.1);
-                padding: 0;
-                margin: 0 0 10px 0;
-
-            }
-
-            .actions {
-                position: fixed;
-                bottom: 0;
-                width: 100%;
-                /*semi transparent*/
-                background-color: rgba(0, 0, 0, 0.5);
-                /* also for safari */
-                backdrop-filter: blur(10px);
-                box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
-            }
-        }
-
-        .theme-toggle {
-            right: 0;
-            width: 60px;
-            height: 30px;
-            background-color: #ccc;
-            border-radius: 15px;
-            transform: translateX(-20%);
-        }
-
-        .toggle-inner {
-            position: absolute;
-            width: 25%;
-            height: 100%;
-            transition: transform 0.2s ease;
-        }
-
-        .toggle-handle {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 30px;
-            height: 30px;
-            background-color: #fff;
-            border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .toggle-on .toggle-inner {
-            transform: translateX(200%);
-        }
-
-        html,
-        body {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-            /* Prevent horizontal scrollbar */
-        }
-
-        .tutorial-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: var(--background-color);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            max-width: 90%;
-            width: 400px;
-            z-index: 1000;
-            transition: all 0.3s ease;
-            overflow-y: auto;
-            max-height: 80vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            /* Center content horizontally */
-            justify-content: center;
-            /* Center content vertically */
-        }
-
-        .tutorial-step {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .tutorial-step p,
-        .tutorial-step ul {
-            margin: 0 0 15px 0;
-            padding: 0;
-        }
-
-        .tutorial-step ul {
-            list-style: disc;
-            padding-left: 20px;
-            max-width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .copy-btn {
-            margin-left: 10px;
-            padding: 5px 10px;
-            background-color: var(--button-background-color);
-            color: var(--text-color);
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .copy-btn:hover {
-            background-color: var(--button-hover-background-color);
-        }
-
-        .next-btn,
-        .close-btn {
-            background-color: var(--button-background-color);
-            color: var(--text-color);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            margin-top: 10px;
-        }
-
-        .next-btn:hover,
-        .close-btn:hover {
-            background-color: var(--button-hover-background-color);
-        }
-
-        #help-btn {
-            bottom: 0;
-            right: 0;
-            background-color: var(--button-background-color);
-            color: var(--text-color);
-            border: none;
-            /* padding: 10px 20px; */
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        #help-btn:hover {
-            background-color: var(--button-hover-background-color);
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-
-        /* @media (max-width: 600px) { */
-        h1 {
-            font-size: 1.5rem;
-            margin: 0;
-            padding: 0;
-            margin-top: 1rem;
-        }
-
-        h2 {
-            display: none;
-        }
-
-        footer,
-        .footer {
-            font-size: 12px;
-            /* move top screen */
-            top: 0;
-            bottom: unset;
-            /* remove padding */
-            padding: 0;
-            /* add padding to the items */
-        }
-
-        /* move actions down */
-        .actions {
-            bottom: 0;
-        }
-
-        body {
-            justify-content: center;
-        }
-
-        /* } */
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="./css/styles.css">
 </head>
 
 <body>
     <header>
         <h1>AlphaSudokuGo</h1>
-        <h2>Meticusly programmed in C++.</h2>
+        <h2>Meticulously programmed in C++.</h2>
         <h2>Now with a WebAssembly frontend.</h2>
     </header>
-    <div id="sudoku-board"></div>
+    <section class="parser">
+        <div id="sudoku-board"></div>
+        <canvas id="canvas"></canvas> <!-- Hidden canvas element for image processing -->
+        <pre id="result"></pre>
+        <div id="processedImageContainer">
+            <img id="processedImage" alt="Processed Image will be shown here">
+            <div class="processingMessage">Processing image...</div>
+        </div>
+    </section>
     <div id="tutorial-popup" class="tutorial-popup" style="display:none;">
-        <!-- Existing tutorial steps -->
         <div class="tutorial-step" data-step="1">
             <p>Welcome to the Sudoku Solver!</p>
             <button class="close-btn">Close</button>
@@ -521,466 +48,163 @@
         </div>
         <div class="tutorial-step" data-step="2" style="display:none;">
             <p>How to use:</p>
-            <p>Enter the Sudoku board and click the "Solve Sudoku" button to solve the puzzle.</p>
+            <p>Enter the Sudoku board and click the play button to solve the puzzle.</p>
             <button class="close-btn">Close</button>
             <button class="next-btn">Next</button>
-
         </div>
         <div class="tutorial-step" data-step="3" style="display:none;">
             <p>You can enter the Sudoku board in multiple ways:</p>
             <ul>
+                <li>Upload an image: Click the camera icon to upload an image of the Sudoku board.</li>
                 <li>Interactively by clicking on the cells: Enter a number between 1 and 9 in each cell.</li>
-                <li>Pasting on the board: Pasted numbers from the clipboard and they will be distributed across the
-                    cells.</li>
-                <li>Use the input field: Enter the board or paste it in the input field. There are multiple formats
-                    supported:</li>
-                <ul>
-                    <li>Single line of numbers: Enter the board as a single line of numbers, with dots (.) representing
-                        empty cells.</li>
-                    <li>2D array format: Enter the board as a 2D array of numbers, with empty cells represented as null
-                        or 0.</li>
-                </ul>
+                <li>Pasting on the board: Pasted numbers from the clipboard and they will be distributed across the cells.</li>
+                <li>Use the input field: Enter the board or paste it in the input field. The app will parse the board automatically.</li>
             </ul>
-            <!-- <div class="actions">
-                <input id="input-board" type="text" placeholder="Enter board as one line...">
-                <button onclick="solveSudoku()" style="border: none; background-color: transparent; cursor: pointer;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                    </svg>
-                </button>
-            </div> -->
             <button class="close-btn">Close</button>
             <button class="next-btn">Next</button>
-
         </div>
         <div class="tutorial-step" data-step="4" style="display:none;">
             <p>You can also edit the board by clicking on the cells or using the input field.</p>
             <button class="close-btn">Close</button>
             <button class="next-btn">Next</button>
-
         </div>
         <div class="tutorial-step" data-step="5" style="display:none;">
             <p>Ready to solve the Sudoku puzzle? Try to copy and paste a board from those:</p>
             <ul>
-                <li><strong>Format 1:</strong>
-                    003020600900305001001806400008102900700000008006708200002609500800203009005010300
-                    <button class="copy-btn"
-                        data-text="003020600900305001001806400008102900700000008006708200002609500800203009005010300">Copy</button>
+                <li><strong>Format 1:</strong> 003020600900305001001806400008102900700000008006708200002609500800203009005010300
+                    <button class="copy-btn" data-text="003020600900305001001806400008102900700000008006708200002609500800203009005010300">Copy</button>
                 </li>
                 <li><strong>Format 2:</strong>
                     <pre>[["5","3",".",".","7",".",".",".","."],["6",".",".","1","9","5",".",".","."],[".","9","8",".",".",".",".","6","."],["8",".",".",".","6",".",".",".","3"],["4",".",".","8",".","3",".",".","1"],["7",".",".",".","2",".",".",".","6"],[".","6",".",".",".",".","2","8","."],[".",".",".","4","1","9",".",".","5"],[".",".",".",".","8",".",".","7","9"]]</pre>
-                    <button class="copy-btn"
-                        data-text='[["5","3",".",".","7",".",".",".","."],["6",".",".","1","9","5",".",".","."],[".","9","8",".",".",".",".","6","."],["8",".",".",".","6",".",".",".","3"],["4",".",".","8",".","3",".",".","1"],["7",".",".",".","2",".",".",".","6"],[".","6",".",".",".",".","2","8","."],[".",".",".","4","1","9",".",".","5"],[".",".",".",".","8",".",".","7","9"]]'>Copy</button>
+                    <button class="copy-btn" data-text='[["5","3",".",".","7",".",".",".","."],["6",".",".","1","9","5",".",".","."],[".","9","8",".",".",".",".","6","."],["8",".",".",".","6",".",".",".","3"],["4",".",".","8",".","3",".",".","1"],["7",".",".",".","2",".",".",".","6"],[".","6",".",".",".",".","2","8","."],[".",".",".","4","1","9",".",".","5"],[".",".",".",".","8",".",".","7","9"]]'>Copy</button>
                 </li>
-                <li><strong>Format 3:</strong>
-                    53..7....6..195....98....6.8...6...34..8.3..17...2...6.6....28....419..5....8..79
-                    <button class="copy-btn"
-                        data-text="53..7....6..195....98....6.8...6...34..8.3..17...2...6.6....28....419..5....8..79">Copy</button>
+                <li><strong>Format 3:</strong> 53..7....6..195....98....6.8...6...34..8.3..17...2...6.6....28....419..5....8..79
+                    <button class="copy-btn" data-text="53..7....6..195....98....6.8...6...34..8.3..17...2...6.6....28....419..5....8..79">Copy</button>
                 </li>
             </ul>
             <button class="close-btn">Finish</button>
         </div>
     </div>
     <div class="actions">
-        <input id="input-board" type="text" placeholder="Enter board as one line...">
-        <button onclick="solveSudoku()" style="border: none; background-color: transparent; cursor: pointer;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <div class="design-info">
+            <p>Designed By Dor © <script>document.write(new Date().getFullYear());</script></p>
+            <a href="https://dorpascal.com">dorpascal.com</a>
+        </div>
+        <button onclick="solveSudoku()" class="solve-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polygon points="5 3 19 12 5 21 5 3"></polygon>
             </svg>
         </button>
-
+        <div class="spacer"></div> <!-- Empty spacer for balancing -->
     </div>
-
-
-
     <footer class="footer">
-            <button id="help-btn" style="background-color: transparent; border: none; outline: none;">
-                <i class="fas fa-puzzle-piece" style="font-size: 24px; color: currentColor;"></i>
-                            </button>
-        <div class="footer-item">
-            <p>Designed By Dor ©
-                <script>document.write(new Date().getFullYear());</script>
-            </p>
-            <a href="https://dorpascal.com">dorpascal.com</a>
-        </div>
+        <button id="help-btn" style="background-color: transparent; border: none; outline: none;">
+            <i class="fas fa-puzzle-piece" style="font-size: 24px; color: currentColor;"></i>
+        </button>
+        <!-- Hide the original file input -->
+        <!-- Modified file input to allow image capture -->
+        <input type="file" id="fileInput" accept="image/*" capture="environment" style="display: none;">
+        <!-- Add a custom button that will trigger the file input click, styled to match the help button -->
+<label for="fileInput" class="upload-btn">
+    <i class="fas fa-camera" style="font-size: 24px;"></i>
+</label>
+
+                <input id="input-board" type="text" placeholder="Enter board as one line...">
+
         <div id="theme-toggle" class="theme-toggle">
             <div class="toggle-inner">
                 <div class="toggle-handle"></div>
             </div>
         </div>
     </footer>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+    <script src="./js/parser.js"></script>
+    <script src="./js/sudoku.js"></script>
+    <script src="./js/tutorial.js"></script>
+    <script src="./js/theme.js"></script>
+    <script>function handleFileSelection(files) {
+    if (files.length > 0) {
+        // Hide the sudoku board to show the processed image
+        document.getElementById('sudoku-board').style.display = 'none';
+        document.getElementById('processedImage').style.display = 'block';
+        document.getElementById('processedImageContainer').style.display = 'block';
+        // Dim background
+        document.body.style.opacity = 0.5;
+        document.getElementById('tutorial-popup').style.display = 'none';
 
+        processImage().then(() => {
+            const boardStr = readBoard(); // Ensure this is synchronous or properly awaited if async
+            return updateBoard(boardStr);
+        }).then(() => {
+            // Show a message to the user
+            alert("Processing and updating done!");
 
-
-    <script>
-        const sudokuBoard = document.getElementById('sudoku-board');
-        const inputBoard = document.getElementById('input-board');
-
-        // Initialize empty Sudoku board
-        const board = Array.from({ length: 9 }, () => Array(9).fill('.'));
-
-        // Create the grid elements
-        for (let row = 0; row < 9; row++) {
-            for (let col = 0; col < 9; col++) {
-                const cell = document.createElement('div');
-                cell.className = 'cell';
-                cell.contentEditable = true;
-                cell.dataset.row = row;
-                cell.dataset.col = col;
-
-                // Add event listener for handling input
-                cell.addEventListener('input', function (e) {
-                    const value = e.target.textContent.trim();
-                    if (value.match(/[1-9]/)) { // If a number between 1 and 9 is entered
-                        e.target.textContent = value; // Set the cell's content to the entered number
-                        moveToNextCell(row, col); // Move to the next cell
-                    } else {
-                        e.target.textContent = ''; // Clear the cell if the input is not a number
-                    }
-                    synchronizeInputBoard();
-                });
-                // Add event listener for handling keydown
-                cell.addEventListener('keydown', function (e) {
-                    // Check if the key pressed is a number or navigation/functional key
-                    if ((e.key >= '0' && e.key <= '9') || e.key === 'Backspace' || e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault(); // Prevent the default action
-
-                        if (e.key === 'Backspace') {
-                            e.target.textContent = ''; // Clear the cell
-                            moveToPreviousCell(row, col); // Move to the previous cell
-                        } else if (e.key === ' ' || e.key === 'Enter') {
-                            e.target.textContent = ''; // Clear the cell
-                            moveToNextCell(row, col); // Move to the next cell
-                        } else {
-                            // Ensure the cell is empty before setting a new number
-                            e.target.textContent = ''; // Clear existing content
-                            e.target.textContent = e.key; // Set new number
-                            moveToNextCell(row, col); // Then move to the next cell
-                        }
-
-                        synchronizeInputBoard();
-                    }
-                });
-                sudokuBoard.appendChild(cell);
-            }
-        }
-
-        function moveToPreviousCell(row, col) {
-            let prevCol = col - 1;
-            let prevRow = row;
-            if (prevCol < 0) { // If the current cell is the first in its row, move to the last cell of the previous row
-                prevCol = 8;
-                prevRow--;
-            }
-            if (prevRow >= 0) { // If the previous row exists
-                const prevCell = document.querySelector(`.cell[data-row='${prevRow}'][data-col='${prevCol}']`);
-                if (prevCell) {
-                    prevCell.focus(); // Move focus to the previous cell
-                }
-            }
-        }
-
-        // Function to move focus to the next cell, skipping cells that already contain a number
-        function moveToNextCell(row, col) {
-            let nextCol = col;
-            let nextRow = row;
-
-            do {
-                nextCol++;
-                if (nextCol > 8) { // If the current cell is the last in its row, move to the first cell of the next row
-                    nextCol = 0;
-                    nextRow++;
-                }
-                if (nextRow >= 9) { // If there are no more rows, stop the loop
-                    return;
-                }
-
-                var nextCell = document.querySelector(`.cell[data-row='${nextRow}'][data-col='${nextCol}']`);
-            } while (nextCell && nextCell.value); // Continue if the next cell exists and has a value
-
-            if (nextCell) {
-                nextCell.focus(); // Move focus to the next empty cell
-            }
-        }
-
-        // Function to synchronize the input board with the grid
-        function synchronizeInputBoard() {
-            let boardStr = '';
-            for (let row = 0; row < 9; row++) {
-                for (let col = 0; col < 9; col++) {
-                    const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
-                    boardStr += cell.textContent.trim() || '.';
-                }
-            }
-            inputBoard.value = boardStr;
-        }
-
-        // Synchronize text input with board cells
-        inputBoard.addEventListener('input', function (e) {
-            const value = e.target.value.trim();
-            for (let i = 0; i < 81; i++) {
-                const row = Math.floor(i / 9);
-                const col = i % 9;
-                const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
-                cell.textContent = (value[i] && value[i].match(/[1-9]/)) ? value[i] : '';
-            }
+            // Return to the board
+            document.getElementById('sudoku-board').style.display = 'grid';
+            document.getElementById('processedImage').style.display = 'none';
+            document.getElementById('processedImageContainer').style.display = 'none';
+            document.body.style.opacity = 1; // Reset background opacity
+        }).catch((error) => {
+            console.error("An error occurred:", error);
+            // Update UI to reflect error state
+            alert("An error occurred. Please try again.");
+            document.getElementById('sudoku-board').style.display = 'grid';
+            document.getElementById('processedImage').style.display = 'none';
+            document.getElementById('processedImageContainer').style.display = 'none';
+            document.body.style.opacity = 1; // Reset background opacity
         });
+    }
+}
 
-        // Function to convert 2D array to board string
-        function arrayToBoardString(array) {
-            // change 0 to . if there is any
-            array = array.map(row => row.map(cell => cell === 0 ? '.' : cell));
-            return array.flat().join('');
-        }
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('fileInput');
 
-        // Event listener for pasting on the sudoku-board
-        sudokuBoard.addEventListener('paste', function (e) {
-            e.preventDefault(); // Prevent the default paste action
-            const pastedText = (e.clipboardData || window.clipboardData).getData('text');
-            console.log('Pasted on sudoku-board:', pastedText);
-            distributeTextAcrossCells(pastedText, 'sudoku-board'); // Assuming this function handles the distribution of text across cells for the sudoku board
-        });
+    // Handle file selection from input
+    fileInput.addEventListener('change', function() {
+        handleFileSelection(this.files);
+    });
 
-        // Placeholder for the function to get the current cell's position
-        function getCurrentCellPosition() {
-            const cell = document.activeElement;
-            return {
-                row: Number(cell.dataset.row),
-                col: Number(cell.dataset.col)
-            };
-        }
+    // Prevent default behavior for drag over to allow drop
+    document.addEventListener('dragover', function(event) {
+        event.preventDefault();
+    });
 
-        // Placeholder for the function to set the value of a cell
-        function setCellValue(row, col, value) {
-            const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
-            cell.textContent = value;
-            // update the input board
-            synchronizeInputBoard();
-        }
-
-        function distributeTextAcrossCells(text, target) {
-            const splitText = text.split('');
-            let { row, col } = getCurrentCellPosition();
-            for (let i = 0; i < splitText.length; i++) {
-                setCellValue(row, col, splitText[i]);
-                if (target === 'sudoku-board') {
-                    moveToNextCell(row, col);
-                    ({ row, col } = getCurrentCellPosition());
-                }
-            }
-        }
-
-        inputBoard.addEventListener('paste', function (e) {
-            e.preventDefault();
-            const pastedText = (e.clipboardData || window.clipboardData).getData('text');
-            try {
-                let parsedArray;
-                // Check if pastedText contains "."
-                const containsDot = pastedText.includes('.');
-
-                // Attempt to parse as JSON first
-                try {
-                    parsedArray = JSON.parse(pastedText);
-                } catch {
-                    // If JSON parsing fails, process as a plain string
-                    if (pastedText.length === 81) { // Ensure it's the right length for a Sudoku board
-                        parsedArray = [];
-                        for (let i = 0; i < 9; i++) {
-                            let row;
-                            if (containsDot) {
-                                // If pastedText contains ".", split directly without converting "0" to "."
-                                row = pastedText.slice(i * 9, (i + 1) * 9).split('').map(cell => cell === '.' ? 0 : Number(cell));
-                            } else {
-                                // If pastedText does not contain ".", proceed as before
-                                row = pastedText.slice(i * 9, (i + 1) * 9).split('').map(Number);
-                            }
-                            parsedArray.push(row);
-                        }
-                    }
-                }
-                // Validate the parsed array
-                if (Array.isArray(parsedArray) && parsedArray.length === 9 && parsedArray.every(row => Array.isArray(row) && row.length === 9)) {
-                    const boardString = arrayToBoardString(parsedArray);
-                    inputBoard.value = boardString;
-                    updateBoard(boardString);
-                }
-                // check if cant trim white spaces and commas
-                else if (pastedText.length === 81) {
-                    const boardString = pastedText.replace(/[^0-9]/g, '');
-                    inputBoard.value = boardString;
-                    updateBoard(boardString);
-                }
-
-                else {
-                    console.error('Pasted content is not a valid Sudoku board.');
-                }
-            } catch (error) {
-                console.error('Error parsing pasted content:', error);
-            }
-        });
-
-        // Function to read board from DOM
-        function readBoard() {
-            return inputBoard.value.trim();
-        }
-
-        // Function to update board in DOM
-        function updateBoard(boardStr) {
-            let index = 0;
-            for (let row = 0; row < 9; row++) {
-                for (let col = 0; col < 9; col++) {
-                    const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
-                    cell.textContent = boardStr[index] === '.' ? '' : boardStr[index];
-                    index++;
-                }
-            }
-        }
-
-        // Load the WebAssembly module
-        var Module = {
-            onRuntimeInitialized: () => {
-                console.log('WASM module loaded');
-            }
-        };
-
-        function isValidPlacement(boardStr, row, col, num) {
-            for (let i = 0; i < 9; i++) {
-                if (boardStr[row * 9 + i] === num || boardStr[i * 9 + col] === num) {
-                    return false;
-                }
-            }
-            const startRow = Math.floor(row / 3) * 3;
-            const startCol = Math.floor(col / 3) * 3;
-            for (let i = startRow; i < startRow + 3; i++) {
-                for (let j = startCol; j < startCol + 3; j++) {
-                    if (boardStr[i * 9 + j] === num) {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
-
-        function isValidSudoku(boardStr) {
-            for (let i = 0; i < 9; i++) {
-                for (let j = 0; j < 9; j++) {
-                    if (boardStr[i * 9 + j] !== '.') {
-                        const num = boardStr[i * 9 + j];
-                        boardStr = boardStr.substr(0, i * 9 + j) + '.' + boardStr.substr(i * 9 + j + 1);
-                        if (!isValidPlacement(boardStr, i, j, num)) {
-                            return false;
-                        }
-                        boardStr = boardStr.substr(0, i * 9 + j) + num + boardStr.substr(i * 9 + j + 1);
-                    }
-                }
-            }
-            return true;
-        }
-
-        function solveSudoku() {
-            const boardStr = readBoard();
-            if (boardStr.length !== 81) {
-                alert('Please fill all cells with valid numbers');
-                return;
-            }
-
-            if (!isValidSudoku(boardStr)) {
-                alert('Invalid Sudoku board');
-                return;
-            }
-            const csp = new Module.SudokuCSP(boardStr);
-            csp.solve();
-            const solvedBoardStr = csp.getBoard();
-            updateBoard(solvedBoardStr);
-
-            celebrate();
+    // Handle file drop
+    document.addEventListener('drop', function(event) {
+        event.preventDefault(); // Prevent default behavior (file being opened)
+        const files = event.dataTransfer.files;
+        fileInput.files = files; // Update the file input
+        handleFileSelection(files);
+    });
+});
 
 
-        }
 
-        function celebrate() {
-            const cells = document.querySelectorAll('.cell');
-            cells.forEach(cell => {
-                cell.style.backgroundColor = "#8E8E93"; // Adjusted to a lighter Apple-esque gray
-            });
-            setTimeout(() => {
-                cells.forEach(cell => {
-                    cell.style.backgroundColor = '';
-                });
-            }, 2000);
-        }
-        // Load the WASM file
-        const script = document.createElement('script');
-        script.src = 'sudoku_solver.js';
-        script.onload = () => {
-            Module.onRuntimeInitialized();
-        };
-        document.body.appendChild(script);
-    </script>
-    <script>
-        document.getElementById('help-btn').addEventListener('click', function () {
-            var tutorialPopup = document.getElementById('tutorial-popup');
-            tutorialPopup.style.display = 'block'; // Use block if flex doesn't work as expected
+    // Load the WASM file
+const script = document.createElement('script');
+script.src = './src/sudoku_solver.js';
+script.onload = () => {
+    Module.onRuntimeInitialized();
+};
+document.body.appendChild(script);
+function solveSudoku() {
+    const boardStr = readBoard();
+    if (boardStr.length !== 81) {
+        alert('Please fill all cells with valid numbers');
+        return;
+    }
 
-            tutorialPopup.style.zIndex = '1000'; // Ensure it's above other content
+    if (!isValidSudoku(boardStr)) {
+        alert('Invalid Sudoku board');
+        return;
+    }
+    const csp = new Module.SudokuCSP(boardStr);
+    csp.solve();
+    const solvedBoardStr = csp.getBoard();
+    updateBoard(solvedBoardStr);
 
-            showStep(1);
-        });
-
-        document.querySelectorAll('.next-btn').forEach(btn => {
-            btn.addEventListener('click', function () {
-                const currentStep = this.parentElement.getAttribute('data-step');
-                showStep(parseInt(currentStep) + 1);
-            });
-        });
-
-
-        document.querySelectorAll('.copy-btn').forEach(btn => {
-            btn.addEventListener('click', function () {
-                const text = this.getAttribute('data-text');
-                navigator.clipboard.writeText(text).then(() => {
-                    alert('Copied to clipboard');
-                });
-            });
-        });
-
-        function showStep(step) {
-            document.querySelectorAll('.tutorial-step').forEach(stepEl => {
-                stepEl.style.display = 'none';
-            });
-            document.querySelector(`.tutorial-step[data-step="${step}"]`).style.display = 'block';
-        }
-
-        // after the last step, hide the popup - even if clicking on the overlay or copying the text
-        document.getElementById('tutorial-popup').addEventListener('click', function (e) {
-            if (e.target === this) {
-                this.style.display = 'none';
-            }
-        });
-
-        // if copied text from one of the examples, hide the popup and mark the #input-board as focused
-        document.querySelectorAll('.copy-btn').forEach(btn => {
-            btn.addEventListener('click', function () {
-                document.getElementById('tutorial-popup').style.display = 'none';
-                document.getElementById('input-board').setAttribute('placeholder', 'Paste the copied board here...');
-
-            });
-        });
-
-        document.getElementById('theme-toggle').addEventListener('click', function () {
-            this.classList.toggle('toggle-on');
-            document.body.classList.toggle('dark-theme');
-        });
-
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.close-btn').forEach(function(button) {
-                button.addEventListener('click', function () {
-                    document.getElementById('tutorial-popup').style.display = 'none';
-                });
-            });
-        });
+    celebrate();
+}
 
     </script>
 </body>

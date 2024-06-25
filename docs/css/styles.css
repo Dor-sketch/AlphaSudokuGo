@@ -1,0 +1,604 @@
+        /* Improved layout with refined color scheme and responsive design adjustments */
+        :root {
+            --background-color: #FFFFFF;
+            /* Pure white for a clean, fresh background */
+            --text-color: #2D2D2D;
+            /* Deep gray for strong readability without harshness */
+            --board-background-color: #FAFAFA;
+            /* Off-white for subtle differentiation */
+            --cell-border-color: #E0E0E0;
+            /* Very light gray for unobtrusive cell borders */
+            --cell-background-color: #FFFFFF;
+            /* Maintained pure white for clarity */
+            --cell-hover-background-color: #F0F0F0;
+            /* Slightly darker gray for hover, subtle interaction cue */
+            --cell-focus-background-color: #E3F2FD;
+            /* Soft blue for focus, gentle and accessible */
+            --cell-focus-shadow-color: #90CAF9;
+            /* Light blue for a more pronounced focus indication */
+            --button-background-color: #F5F5F5;
+            /* Light gray for neutral buttons that blend with the design */
+            --button-hover-background-color: #E0E0E0;
+            /* Slightly darker gray for button hover state */
+            --footer-background-color: #FAFAFA;
+            /* Matches board background for consistency */
+            --footer-text-color: #9E9E9E;
+            /* Soft gray for less prominent, yet readable footer text */
+            --primary-color: #1E88E5;
+            /* Bright blue for primary actions, vibrant and engaging */
+            --font-stack: 'San Francisco', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            /* Updated font stack for optimal readability and system integration */
+        }
+
+        .dark-theme {
+            --background-color: #121212;
+            /* Darker gray for deep mode, reducing eye strain */
+            --text-color: #E0E0E0;
+            /* Light gray for text, ensuring legibility */
+            --board-background-color: #1E1E1E;
+            /* Slightly lighter than background for subtle layering */
+            --cell-border-color: #333333;
+            /* Dark gray for defined cell borders in dark mode */
+            --cell-background-color: #1E1E1E;
+            /* Consistent with board background for seamless appearance */
+            --cell-hover-background-color: #2E2E2E;
+            /* Noticeably lighter for hover state distinction */
+            --cell-focus-background-color: #3949AB;
+            /* Deep blue for focus, ensuring visibility and contrast */
+            --cell-focus-shadow-color: #5C6BC0;
+            /* Slightly lighter blue for a glowing focus effect */
+            --button-background-color: #424242;
+            /* Dark gray for buttons, blending with the theme */
+            --button-hover-background-color: #535353;
+            /* Noticeably lighter for interactive feedback */
+            --footer-background-color: #1E1E1E;
+            /* Consistent with the board for a unified look */
+            --footer-text-color: #757575;
+            /* Gray for readable yet subdued footer text */
+        }
+        body {
+            font-family: var(--font-stack);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        #sudoku-board {
+            display: grid;
+            grid-template-columns: repeat(9, 60px);
+            grid-template-rows: repeat(9, 60px);
+            gap: 1px;
+            background-color: var(--board-background-color);
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+
+        }
+
+        .cell {
+            width: 60px;
+            height: 60px;
+            text-align: center;
+            font-size: 24px;
+            line-height: 60px;
+            border: 1px solid var(--cell-border-color);
+            background-color: var(--cell-background-color);
+            outline: none;
+            border-radius: 5px;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
+            transition: background-color 0.2s, box-shadow 0.2s;
+        }
+
+        .cell:hover {
+            background-color: var(--cell-hover-background-color);
+        }
+
+        .cell:focus {
+            background-color: var(--cell-focus-background-color);
+            box-shadow: 0 0 0 2px var(--cell-focus-shadow-color);
+        }
+
+        .actions {
+            /*stick under the board */
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        button,
+        #input-board {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            margin: 8px;
+            border-radius: 5px;
+            background-color: var(--button-background-color);
+            color: var(--text-color);
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+
+        }
+
+        button:hover,
+        #input-board:hover {
+            background-color: var(--button-hover-background-color);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        button:active,
+        #input-board:active {
+            transform: scale(0.98);
+        }
+
+        #input-board {
+            width: 100%;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            text-align: left;
+            /*make semi transparent*/
+            background-color: rgba(0, 0, 0, 0.5);
+            /* also for safari */
+            backdrop-filter: blur(10px);
+            ;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+            transition: background 0.3s;
+            padding-left: 3rem;
+            padding-right: 3rem;
+        }
+
+        .footer p {
+            margin: 0;
+            font-size: 14px;
+            color: var(--text-color);
+        }
+
+        .footer a {
+            color: #81E6D9;
+            text-decoration: none;
+        }
+
+        /* Highlighted input field */
+        #input-board {
+            border: 2px solid #CBD5E0;
+            transition: border 0.3s ease;
+        }
+
+        #input-board:focus {
+            border: 2px solid #2B6CB0;
+        }
+
+        .footer {
+            display: flex;
+            align-items: center;
+            /* Align items vertically in the center */
+            justify-content: space-between;
+            /* Optional: Distribute space between items */
+        }
+
+        .footer-item {
+            /* Ensure consistent margin, padding, and line-height for all items */
+            margin: 0 10px;
+            padding: 5px 10px;
+            line-height: 1.5;
+            text-align: center;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 0;
+            color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.2s, box-shadow 0.2s;
+            margin: 0 0 10px 0;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin: 0;
+            transition: background-color 0.2s, box-shadow 0.2s;
+        }
+
+        @media print {
+
+            body,
+            .actions,
+            .footer,
+            button,
+            #input-board {
+                display: none;
+            }
+        }
+
+        #sudoku-board {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            grid-template-rows: repeat(9, 1fr);
+            width: 90%;
+            /* Make the board fill the container width */
+            max-width: 600px;
+            /* Optional: limit the maximum width */
+            height: auto;
+            /* Adjust height automatically */
+            aspect-ratio: 1;
+            /* Keep the aspect ratio of the board to be square */
+            margin: auto;
+            /* Center the board horizontally */
+            position: fixed;
+            /* Use fixed to keep it in view at all times */
+            top: 50%;
+            /* Start at the middle of the screen vertically */
+            left: 50%;
+            /* Start at the middle of the screen horizontally */
+            transform: translate(-50%, -50%);
+            /* Adjust the position to truly center the board */
+        }
+
+        .cell {
+            width: 100%;
+            /* Make cell fill the column */
+            height: 100%;
+            /* Make cell fill the row */
+            font-size: 4vw;
+            /* Adjust font size based on viewport width */
+            line-height: normal;
+            /* Adjust line height to normal */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .actions {
+            /*below the board  but above the footer */
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        @media screen and (max-width: 600px) {
+
+
+            h1 {
+                font-size: 1.5rem;
+                box-shadow: 0 0 0 rgba(0, 0, 0, 0.1);
+                padding: 0;
+                margin: 0 0 10px 0;
+
+            }
+
+            .actions {
+                position: fixed;
+                bottom: 0;
+                width: 100%;
+                /*semi transparent*/
+                background-color: rgba(0, 0, 0, 0.5);
+                /* also for safari */
+                backdrop-filter: blur(10px);
+                box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+            }
+        }
+
+        .theme-toggle {
+            right: 0;
+            width: 60px;
+            height: 30px;
+            background-color: #ccc;
+            border-radius: 15px;
+            transform: translateX(-20%);
+        }
+
+        .toggle-inner {
+            position: absolute;
+            width: 25%;
+            height: 100%;
+            transition: transform 0.2s ease;
+        }
+
+        .toggle-handle {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            background-color: #fff;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-on .toggle-inner {
+            transform: translateX(200%);
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            /* Prevent horizontal scrollbar */
+        }
+
+        .tutorial-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--background-color);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            max-width: 90%;
+            width: 400px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            overflow-y: auto;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* Center content horizontally */
+            justify-content: center;
+            /* Center content vertically */
+        }
+
+        .tutorial-step {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tutorial-step p,
+        .tutorial-step ul {
+            margin: 0 0 15px 0;
+            padding: 0;
+        }
+
+        .tutorial-step ul {
+            list-style: disc;
+            padding-left: 20px;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .copy-btn {
+            margin-left: 10px;
+            padding: 5px 10px;
+            background-color: var(--button-background-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background-color: var(--button-hover-background-color);
+        }
+
+        .next-btn,
+        .close-btn {
+            background-color: var(--button-background-color);
+            color: var(--text-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .next-btn:hover,
+        .close-btn:hover {
+            background-color: var(--button-hover-background-color);
+        }
+
+        #help-btn {
+            bottom: 0;
+            right: 0;
+            background-color: var(--button-background-color);
+            color: var(--text-color);
+            border: none;
+            /* padding: 10px 20px; */
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #help-btn:hover {
+            background-color: var(--button-hover-background-color);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+
+        /* @media (max-width: 600px) { */
+        h1 {
+            font-size: 1.5rem;
+            margin: 0;
+            padding: 0;
+            margin-top: 1rem;
+        }
+
+        h2 {
+            display: none;
+        }
+
+        footer,
+        .footer {
+            font-size: 12px;
+            /* move top screen */
+            top: 0;
+            bottom: unset;
+            /* remove padding */
+            padding: 0;
+            /* add padding to the items */
+        }
+
+        /* move actions down */
+        .actions {
+            bottom: 0;
+        }
+
+        body {
+            justify-content: center;
+        }
+
+        /* } */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+
+/* parser */
+
+        canvas {
+            display: none; /* Hidden canvas element for image processing */
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px;
+        }
+
+        #processedImageContainer {
+    display: none; /* Hidden by default */
+    position: fixed; /* Overlay */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    z-index: 2; /* Ensure it's above other content */
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+#processedImage {
+    max-width: 80%;
+    max-height: 80%;
+}
+
+.processingMessage {
+    color: white;
+    margin-top: 20px;
+}
+
+#processedImageContainer.show {
+    display: flex; /* Show the container */
+}
+label {
+    cursor: pointer;
+    padding: 10px 20px;
+    background-color: var(--footer-text-color);
+    color: var(--text-color);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+.upload-btn {
+    background-color:var(--footer-text-color); /* Sets the background color */
+    color: var(--text-color); /* Sets the text color */
+    padding: 10px 25px; /* Adjust padding if needed */
+    box-shadow: none; /* Removes box-shadow */
+    border-radius: 5px; /* Adds rounded corners */
+    cursor: pointer; /* Changes cursor to pointer on hover */
+    transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s; /* Adds smooth transition effects */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow */
+}
+
+.upload-btn:hover {
+    background-color: rgba(0, 123, 255, 0.1); /* Light blue background on hover */
+    transform: scale(1.05); /* Slightly increase size on hover */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Adds a shadow on hover */
+}
+
+
+.actions {
+    display: flex;
+    justify-content: space-between; /* Ensures items are spaced out */
+    align-items: center;
+}
+
+
+.design-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.design-info p {
+    margin-top: 1 rem; /* Removes default margin */
+    margin-bottom: 0;
+    padding-left: 1rem; /* Adds padding to the left */
+    padding-top: 0.1rem; /* Adds padding to the top */
+}
+.design-info a {
+    color: var(--cell-focus-background-color); /* Sets the link color */
+    text-decoration: none; /* Removes underline */
+    padding-left: 1rem; /* Adds padding to the left */
+    padding-bottom: 1rem; /* Adds padding to the top */
+}
+.solve-button {
+    position: absolute; /* or 'fixed' depending on the layout context */
+    left: 50%;
+    transform: translateX(-50%);
+}
+.spacer {
+    /* This div acts as a balancing element for the .design-info */
+    flex: 1;
+}
+
+:root {
+    --cell-border-color-darker: #000000; /* Temporarily set to black for visibility */
+}
+
+/* Ensure the grid container is relatively positioned */
+/* Base cell styling */
+.cell {
+    position: relative;
+    border: 1px solid var(--cell-border-color); /* Regular cell border */
+}
+
+/* Target the right border of cells that are multiples of 3, except the last column */
+.grid-container > .cell:nth-child(3n):not(:nth-child(9n)) {
+    border-right: 2px solid var(--cell-border-color-darker); /* Thicker right border for group separation */
+}
+
+/* Target the bottom border of every cell in the 3rd and 6th row */
+.grid-container > .cell:nth-child(n+19):nth-child(-n+27),
+.grid-container > .cell:nth-child(n+10):nth-child(-n+18) {
+    border-bottom: 2px solid var(--cell-border-color-darker); /* Thicker bottom border for group separation */
+}
