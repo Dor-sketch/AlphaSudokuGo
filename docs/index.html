@@ -34,7 +34,7 @@
         <h2>Now with a WebAssembly frontend.</h2>
     </header>
     <section class="parser">
-        <img id="imageToCrop" style="max-width: 100%;" />
+        <img id="imageToCrop" alt="Image to crop will be shown here">
         <canvas id="canvas"></canvas> <!-- Hidden canvas element for image processing -->
         <pre id="result"></pre>
         <div id="processedImageContainer">
@@ -137,7 +137,7 @@
             document.body.classList.toggle('dark-theme')
             document.getElementById('sudoku-board').style.display = 'none';
             document.getElementById('processedImage').style.display = 'block';
-            document.getElementById('processedImageContainer').style.display = 'block';
+            document.getElementById('processedImageContainer').style.display = 'flex';
             document.getElementsByClassName('processingMessage')[0].style.display = 'block';
             document.getElementsByClassName('upload-btn')[0].style.display = 'none';
             // Dim background
@@ -191,10 +191,10 @@ function initiateCropping(file) {
                 aspectRatio: 1, // Optional: Set aspect ratio for the Sudoku board
                 viewMode: 1,
                 autoCropArea: 1,
-                movable: false,
-                zoomable: false,
-                rotatable: false,
-                scalable: false,
+                movable: true,
+                zoomable: true,
+                rotatable: true,
+                scalable: true,
                 crop: function(e) {
                     // This function is called when the cropping area is changed.
                     // You can access the cropped area's properties through e.detail

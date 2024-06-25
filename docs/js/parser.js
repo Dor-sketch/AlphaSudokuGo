@@ -53,11 +53,14 @@ function processImage(src) {
         img.src = src;
     });
 }
-
+function progressCallback(progress) {
+    document.querySelector('.processingMessage').textContent = `Extraction progress: ${progress.toFixed(2)}%`;
+}
 async function extractSudokuBoard(ctx, width, height) {
     const cellWidth = width / 9;
     const cellHeight = height / 9;
     let boardStr = '';
+    const totalCells = 9 * 9; // Total number of cells in a Sudoku board
 
     for (let row = 0; row < 9; row++) {
         for (let col = 0; col < 9; col++) {
@@ -65,7 +68,7 @@ async function extractSudokuBoard(ctx, width, height) {
             const cellCtx = cellCanvas.getContext('2d');
             cellCanvas.width = cellWidth;
             cellCanvas.height = cellHeight;
-            cellCtx.drawImage(canvas, col * cellWidth, row * cellHeight, cellWidth, cellHeight, 0, 0, cellWidth, cellHeight);
+            cellCtx.drawImage(ctx.canvas, col * cellWidth, row * cellHeight, cellWidth, cellHeight, 0, 0, cellWidth, cellHeight);
 
             const cellImageSrc = cellCanvas.toDataURL();
             const { data: { text } } = await Tesseract.recognize(cellImageSrc, 'eng', {
@@ -75,8 +78,19 @@ async function extractSudokuBoard(ctx, width, height) {
 
             const digit = text.trim();
             boardStr += digit.length === 1 && '123456789'.includes(digit) ? digit : '.';
+
+            // Calculate and report progress
+            const cellsProcessed = row * 9 + col + 1; // Calculate the number of cells processed so far
+            const progressPercent = (cellsProcessed / totalCells) * 100;
+            progressCallback(progressPercent);
         }
     }
 
     return boardStr;
 }
+
+extractSudokuBoard(ctx, width, height, (progress) => {
+    console.log(`Extraction progress: ${progress}%`);
+}).then((boardStr) => {
+    console.log('Sudoku board extracted:', boardStr);
+});
