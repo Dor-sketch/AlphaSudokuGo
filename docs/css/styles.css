@@ -227,7 +227,7 @@
             display: grid;
             grid-template-columns: repeat(9, 1fr);
             grid-template-rows: repeat(9, 1fr);
-            width: 90%;
+            width: 100%;
             /* Make the board fill the container width */
             max-width: 600px;
             /* Optional: limit the maximum width */
@@ -298,11 +298,12 @@
 
         .theme-toggle {
             right: 0;
-            width: 60px;
+            width: 80px;
             height: 30px;
             background-color: #ccc;
             border-radius: 15px;
             transform: translateX(-20%);
+            margin-left:2rem;
         }
 
         .toggle-inner {
@@ -321,6 +322,7 @@
             background-color: #fff;
             border-radius: 50%;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
         }
 
         .toggle-on .toggle-inner {
@@ -538,6 +540,7 @@ label {
     cursor: pointer; /* Changes cursor to pointer on hover */
     transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s; /* Adds smooth transition effects */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow */
+    margin-right: 0.5rem;
 }
 
 .upload-btn:hover {
@@ -557,19 +560,20 @@ label {
 .design-info {
     display: flex;
     flex-direction: column;
+    text-wrap: wrap;
 }
 
 .design-info p {
     margin-top: 1 rem; /* Removes default margin */
     margin-bottom: 0;
-    padding-left: 1rem; /* Adds padding to the left */
+    padding-left: 0.1rem; /* Adds padding to the left */
     padding-top: 0.1rem; /* Adds padding to the top */
 }
 .design-info a {
     color: var(--cell-focus-background-color); /* Sets the link color */
     text-decoration: none; /* Removes underline */
-    padding-left: 1rem; /* Adds padding to the left */
-    padding-bottom: 1rem; /* Adds padding to the top */
+    padding-left: 0.1rem; /* Adds padding to the left */
+    padding-bottom: 0rem; /* Adds padding to the top */
 }
 .solve-button {
     position: absolute; /* or 'fixed' depending on the layout context */

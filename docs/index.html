@@ -87,20 +87,16 @@
     </div>
     <div class="actions">
         <div class="design-info">
-            <p>Designed By Dor © <script>document.write(new Date().getFullYear());</script></p>
+            <p>Designed By Dor</p>
             <a href="https://dorpascal.com">dorpascal.com</a>
+            <p style="margin: 0.1rem;"> © <script>document.write(new Date().getFullYear());</script></p>
         </div>
         <button onclick="solveSudoku()" class="solve-button">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polygon points="5 3 19 12 5 21 5 3"></polygon>
             </svg>
         </button>
-        <div class="spacer"></div> <!-- Empty spacer for balancing -->
-    </div>
-    <footer class="footer">
-        <button id="help-btn" style="background-color: transparent; border: none; outline: none;">
-            <i class="fas fa-puzzle-piece" style="font-size: 24px; color: currentColor;"></i>
-        </button>
+        <!-- <div class="spacer"></div> Empty spacer for balancing -->
         <!-- Hide the original file input -->
         <!-- Modified file input to allow image capture -->
         <input type="file" id="fileInput" accept="image/*" capture="environment" style="display: none;">
@@ -108,6 +104,12 @@
 <label for="fileInput" class="upload-btn">
     <i class="fas fa-camera" style="font-size: 24px;"></i>
 </label>
+    </div>
+    <footer class="footer">
+        <button id="help-btn" style="background-color: transparent; border: none; outline: none;">
+            <i class="fas fa-puzzle-piece" style="font-size: 24px; color: currentColor;"></i>
+        </button>
+
 
                 <input id="input-board" type="text" placeholder="Enter board as one line...">
 
