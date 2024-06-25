@@ -201,28 +201,6 @@ header, footer, .header, .footer {
     z-index: 4;
 }
 
-/* Responsive Adjustments */
-@media screen and (max-width: 600px) {
-    #sudoku-board {
-        max-width: 100%;
-        border-radius: 0;
-        gap: 0;
-    }
-
-    .cell {
-        font-size: 18px;
-    }
-
-    .actions {
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(10px);
-        box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
-    }
-}
-
 /* Additional Component Styling */
 .theme-toggle {
     right: 0;
@@ -446,14 +424,41 @@ text-align: center;}
     padding-left: 0.1rem;
     padding-top: 0.1rem;
     left: 0;
-    bottom: 0;
+    z-index: 1;
 }
-
 .design-info a {
     color: var(--cell-focus-background-color);
     text-decoration: none;
     padding-left: 0.1rem;
     padding-bottom: 0rem;
+}
+
+/* Responsive Adjustments */
+@media screen and (max-width: 600px) {
+    #sudoku-board {
+        max-width: 100%;
+        border-radius: 0;
+        gap: 0;
+    }
+.design-info {
+position: fixed;
+text-align: left;
+left: 3rem;
+top: 5rem;
+font-size: 0.8rem;
+}
+    .cell {
+        font-size: 18px;
+    }
+
+    .actions {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+    }
 }
 
 
