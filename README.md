@@ -3,12 +3,20 @@
   <h1>AlphaSudokuGo:<br>Ultimate Sudoku AI with Image Processing</h1>
 </div>
 
+
+
 AlphaSudokuGo is a C++ program designed to solve Sudoku puzzles using a `Constraint Satisfaction Problem` (CSP) approach. It features a graphical user interface (GUI) built with Qt5, which enables users to input their own puzzles and observe the solver in real-time. The primary goals of this project are to showcase the capabilities of Artificial Intelligence (AI) in tackling complex puzzles and to create cool visualizations of the search process.
 
 **BIG NEWS**: The project now includes image processing capabilities, allowing users to input their own puzzles by uploading an image of the Sudoku puzzle - or even take a screenshot of a puzzle on their screen! The program is currently capable of recognizing most of the Sudoku puzzles, and can solve them in real-time.
 
 In this video, not only is AlphaSudokuGo training on a Haaretz "hard" puzzle and tackling the hardest sudoku puzzle ever conceived, but you can also enjoy an original piece of music I composed and produced.
 
+**UPDATE**: The project now deployed on the web, and you can try it out yourself!
+<p align="center">
+  <a href="https://dor-sketch.github.io/AlphaSudokuGo/">
+    <img src="images/web-cover.png" alt="Web deployment" width="200" style="padding:10px; margin:10px;">
+  </a>
+</p>
 https://github.com/Dor-sketch/AlphaSudokuGo/assets/138825033/8dc277b9-9e62-4ac8-9935-4cb13ed8f5b8
 
 <p align = "center">

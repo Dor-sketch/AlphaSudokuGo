@@ -1,248 +1,377 @@
-        /* Improved layout with refined color scheme and responsive design adjustments */
-        :root {
-            --background-color: #FFFFFF;
-            /* Pure white for a clean, fresh background */
-            --text-color: #2D2D2D;
-            /* Deep gray for strong readability without harshness */
-            --board-background-color: #FAFAFA;
-            /* Off-white for subtle differentiation */
-            --cell-border-color: #E0E0E0;
-            /* Very light gray for unobtrusive cell borders */
-            --cell-background-color: #FFFFFF;
-            /* Maintained pure white for clarity */
-            --cell-hover-background-color: #F0F0F0;
-            /* Slightly darker gray for hover, subtle interaction cue */
-            --cell-focus-background-color: #E3F2FD;
-            /* Soft blue for focus, gentle and accessible */
-            --cell-focus-shadow-color: #90CAF9;
-            /* Light blue for a more pronounced focus indication */
-            --button-background-color: #F5F5F5;
-            /* Light gray for neutral buttons that blend with the design */
-            --button-hover-background-color: #E0E0E0;
-            /* Slightly darker gray for button hover state */
-            --footer-background-color: #FAFAFA;
-            /* Matches board background for consistency */
-            --footer-text-color: #9E9E9E;
-            /* Soft gray for less prominent, yet readable footer text */
-            --primary-color: #1E88E5;
-            /* Bright blue for primary actions, vibrant and engaging */
-            --font-stack: 'San Francisco', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            /* Updated font stack for optimal readability and system integration */
-        }
-
-        .dark-theme {
-            --background-color: #121212;
-            /* Darker gray for deep mode, reducing eye strain */
-            --text-color: #d3fdc0;
-            /* d3fdc0 */
-            /* Light gray for text, ensuring legibility */
-            --board-background-color: #1E1E1E;
-            /* Slightly lighter than background for subtle layering */
-            --cell-border-color: #333333;
-            /* Dark gray for defined cell borders in dark mode */
-            --cell-background-color: #2E2E2E;
-            /* Consistent with board background for seamless appearance */
-            --cell-hover-background-color: #2E2E2E;
-            /* Noticeably lighter for hover state distinction */
-            --cell-focus-background-color: #deffd7;
-            /* Deep blue for focus, ensuring visibility and contrast */
-            --cell-focus-shadow-color: #5C6BC0;
-            /* Slightly lighter blue for a glowing focus effect */
-            --button-background-color: #424242;
-            /* Dark gray for buttons, blending with the theme */
-            --button-hover-background-color: #535353;
-            /* Noticeably lighter for interactive feedback */
-            --footer-background-color: #1E1E1E;
-            /* Consistent with the board for a unified look */
-            --footer-text-color: #757575;
-            /* Gray for readable yet subdued footer text */
-        }
-        body {
-            font-family: var(--font-stack);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background-color: var(--background-color);
-            color: var(--text-color);
-        }
-
-        #sudoku-board {
-            display: grid;
-            grid-template-columns: repeat(9, 1fr);
-            grid-template-rows: repeat(9, 1fr);
-            gap: 1px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 600px; /* Limit the maximum width */
-            height: auto; /* Adjust height automatically */
-            aspect-ratio: 1; /* Keep the aspect ratio square */
-            margin: auto; /* Center the board horizontally */
-            position: fixed; /* Keep it in view at all times */
-            top: 50%; /* Center vertically */
-            left: 50%; /* Center horizontally */
-            transform: translate(-50%, -50%); /* Adjust position to center */
-            background-color: var(--board-background-color);
-        }
-
-        .cell {
-            width: 60px; /* Fixed width, consider making this responsive */
-            height: 60px; /* Fixed height, consider making this responsive */
-            text-align: center;
-            font-size: 24px;
-            margin: 1px;
-            line-height: 60px; /* Adjust line height for vertical centering */
-            outline: none;
-            /* box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05); */
-            transition: background-color 0.2s, box-shadow 0.2s;
-            font-weight: bold;
-            background-clip: padding-box; /* Ensure background does not cover the borders */
-        }
-
-        #sudoku-board::before {
-            content: "";
-            background-image: linear-gradient(90deg, #81E6D9 0%, #81E6D9 100%);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            border-radius: 10px;
-        }
-
-        .cell:hover {
-            background-color: var(--cell-hover-background-color);
-        }
-
-        .actions {
-            /*stick under the board */
-            display: flex;
-            justify-content: center;
-            margin-top: 10px;
-        }
-
-        button,
-        #input-board {
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            margin: 8px;
-            border-radius: 5px;
-            background-color: var(--button-background-color);
-            color: var(--text-color);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
-
-        }
-
-        button:hover,
-        #input-board:hover {
-            background-color: var(--button-hover-background-color);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
-        }
-
-        button:active,
-        #input-board:active {
-            transform: scale(0.98);
-        }
-
-        #input-board {
-            width: 100%;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            text-align: left;
-            /*make semi transparent*/
-            background-color: rgba(0, 0, 0, 0.5);
-            /* also for safari */
-            backdrop-filter: saturate(180%) blur(20px); /* Creates a frosted */
-    text-decoration: none;
-    backdrop-filter: blur(10px); /* Adjust blur value as needed */
-    -webkit-backdrop-filter: blur(10px); /* Add this line first, it fixes blur for Safari*/
-    backdrop-filter: blur(10px);  /* This line activates blur*/
-            ;
-            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-            transition: background 0.3s;
-            padding-left: 3rem;
-            padding-right: 3rem;
-        }
-
-        .footer p {
-            margin: 0;
-            font-size: 14px;
-            color: var(--text-color);
-        }
-
-        .footer a {
-            color: #81E6D9;
-            text-decoration: none;
-        }
-
-        /* Highlighted input field */
-        #input-board {
-            border: 2px solid #CBD5E0;
-            transition: border 0.3s ease;
-        }
-
-
-        .footer {
-            display: flex;
-            align-items: center;
-            /* Align items vertically in the center */
-            justify-content: space-between;
-            /* Optional: Distribute space between items */
-        }
-
-        .footer-item {
-            /* Ensure consistent margin, padding, and line-height for all items */
-            margin: 0 10px;
-            padding: 5px 10px;
-            line-height: 1.5;
-            text-align: center;
-            align-items: center;
-        }
-
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 0;
-            color: var(--primary-color);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 10px;
-            border-radius: 5px;
-            transition: background-color 0.2s, box-shadow 0.2s;
-            margin: 0 0 10px 0;
-        }
-
-        h2 {
-            font-size: 1.5rem;
-            margin: 0;
-            transition: background-color 0.2s, box-shadow 0.2s;
-        }
-
-        @media print {
-
-            body,
-            .actions,
-            .footer,
-            button,
-            #input-board {
-                display: none;
-            }
-        }
+/* Root Variables for Light Theme */
+:root {
+    --background-color: #FFFFFF;
+    --text-color: #2D2D2D;
+    --board-background-color: #FAFAFA;
+    --cell-border-color: #E0E0E0;
+    --cell-background-color: #FFFFFF;
+    --cell-hover-background-color: #F0F0F0;
+    --cell-focus-background-color: #1E88E5;
+    --cell-focus-shadow-color: #90CAF9;
+    --button-background-color: #F5F5F5;
+    --button-hover-background-color: #E0E0E0;
+    --footer-background-color: #FAFAFA;
+    --footer-text-color: #9E9E9E;
+    --primary-color: #1E88E5;
+    --font-stack: 'San Francisco', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
 
 #imageToCrop {
 margin: 4rem;
 padding: 1rem;
 width: 70%;
 height: auto;
+}
+#canvas {
+    display: hidden;
+}
+.parcer {
+    display: block;
+    margin: 0 auto;
+    padding: 1rem;
+    width: 70%;
+    height: auto;
+}
+
+/* Root Variables for Dark Theme */
+.dark-theme {
+    --background-color: #121212;
+    --text-color: #E0E0E0;
+    --board-background-color: #1E1E1E;
+    --cell-border-color: #333333;
+    --cell-background-color: #2E2E2E;
+    --cell-hover-background-color: #2E2E2E;
+    --cell-focus-background-color: #1E88E5;
+    --cell-focus-shadow-color: #5C6BC0;
+    --button-background-color: #424242;
+    --button-hover-background-color: #535353;
+    --footer-background-color: #1E1E1E;
+    --footer-text-color: #757575;
+}
+
+/* Body Styling */
+body {
+    font-family: var(--font-stack);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+/* Sudoku Board Styling */
+#sudoku-board {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    grid-template-rows: repeat(9, 1fr);
+    gap: 1px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+    aspect-ratio: 1;
+    margin: auto;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--board-background-color);
+}
+
+.cell {
+    font-size: 24px;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    background-clip: padding-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cell:hover {
+    background-color: var(--cell-hover-background-color);
+}
+
+
+button,
+#input-board {
+    padding: 10px 20px;
+    margin: 0.5rem 0;
+    ;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--button-background-color);
+    color: var(--text-color);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+button:hover,
+#input-board:hover {
+    background-color: var(--button-hover-background-color);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+button:active,
+#input-board:active {
+    transform: scale(0.98);
+
+}
+
+#input-board {
+     width: 80%;
+     margin-left: 1rem;
+}
+
+.solve-button {
+    /* background-color: var(--primary-color); */
+    color: var(--text-color);
+    padding: 8px 25px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+
+}
+
+
+
+/* Footer Styling */
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s;
+}
+
+.footer p {
+    margin: 0;
+    color: var(--text-color);
+}
+
+.footer a {
+    color: #81E6D9;
+    text-decoration: none;
+}
+#parser {
+    display: none; /* Changed from none to flex to make it visible and enable flex properties */
+    width: 80%;
+    height: 80%;
+    max-width: 600px;
+    max-height: 600px;
+   aspect-ratio: 1;
+    z-index: 2;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    flex-direction: column;
+    position: fixed;
+}
+/* Headings Styling */
+h1 {
+    font-size: 1.5rem;
+    margin: 0;
+    padding: 0;
+    margin-top: 1rem;
+    color: var(--primary-color);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+h2 {
+    display: none;
+}
+header, footer, .header, .footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    border-radius: 0; /* Typically, Apple's nav bars are flat against the edge */
+    transition: background 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, transform 0.5s ease-out; /* Smooth transitions for visual effects */
+    -webkit-backdrop-filter: blur(10px); /* For Safari */
+    backdrop-filter: saturate(180%) blur(20px); /* Creates a frosted glass effect */
+    text-decoration: none;
+    z-index: 4;
+}
+
+/* Responsive Adjustments */
+@media screen and (max-width: 600px) {
+    #sudoku-board {
+        max-width: 100%;
+        border-radius: 0;
+        gap: 0;
+    }
+
+    .cell {
+        font-size: 18px;
+    }
+
+    .actions {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+    }
+}
+
+/* Additional Component Styling */
+.theme-toggle {
+    right: 0;
+    width: 60px;
+    height: 30px;
+    background-color: #ccc;
+    border-radius: 15px;
+    transform: translateX(-20%);
+    position: absolute;
+}
+
+.toggle-inner {
+    position: absolute;
+    width: 25%;
+    height: 100%;
+    transition: transform 0.2s ease;
+}
+
+.toggle-handle {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    background-color: #fff;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-on .toggle-inner {
+    transform: translateX(200%);
+}
+
+html,
+body {
+    height: 100%;
+}
+
+.tutorial-popup {
+display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    line-height: 1.5;
+    transform: translate(-50%, -50%);
+    background-color: var(--background-color);
+    padding: 20px 10px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    max-width: 90%;
+    width: 400px;
+    z-index: 2;
+    transition: all 0.3s ease;
+    overflow-y: auto;
+    max-height: 80vh;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.tutorial-popup p,
+.tutorial-popup ul {
+    margin: 0 0 15px 0;
+    padding: 0;
+    align-self: start;
+    text-align: left;
+}
+
+.tutorial-step {
+    display: none;
+    animation: fadeIn 0.3s ease;
+    align-items: center;
+    text-align: center;
+}
+
+.tutorial-step p,
+.tutorial-step ul {
+    margin: 0 0 15px 0;
+    padding: 0;
+}
+
+.tutorial-step ul {
+    list-style: disc;
+    padding-left: 20px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.copy-btn {
+    margin-left: 10px;
+    padding: 5px 10px;
+    background-color: var(--button-background-color);
+    color: var(--text-color);
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.copy-btn:hover {
+    background-color: var(--button-hover-background-color);
+}
+
+.next-btn,
+.close-btn {
+    background-color: var(--button-background-color);
+    color: var(--text-color);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+.next-btn:hover,
+.close-btn:hover {
+    background-color: var(--button-hover-background-color);
+}
+
+#help-btn {
+    bottom: 0;
+    right: 0;
+    background-color: var(--button-background-color);
+    color: var(--text-color);
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+#help-btn:hover {
+    background-color: var(--button-hover-background-color);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#imageToCrop {
+    margin: 4rem;
+    padding: 1rem;
+    width: 70%;
+    height: auto;
 }
 
 .parcer {
@@ -253,269 +382,13 @@ height: auto;
     height: auto;
 }
 
-        .actions {
-            /*below the board  but above the footer */
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        @media screen and (max-width: 600px) {
-            #sudoku-board {
-                width: 100%;
-                max-width: 100%;
-                border-radius: 0;
-                gap: 0;
-            }
-            .cell {
-                width: 8vw;
-                height: 8vw;
-                font-size: 18px;
-                line-height: 8vw;
-            }
-
-
-            h1 {
-                font-size: 1.5rem;
-                box-shadow: 0 0 0 rgba(0, 0, 0, 0.1);
-                padding: 0;
-                margin: 0 0 10px 0;
-
-            }
-
-            .actions {
-                position: fixed;
-                bottom: 0;
-                width: 100%;
-                /*semi transparent*/
-                background-color: rgba(0, 0, 0, 0.5);
-                /* also for safari */
-               backdrop-filter: saturate(180%) blur(20px); /* Creates a frosted */
-    text-decoration: none;
-    backdrop-filter: blur(10px); /* Adjust blur value as needed */
-    -webkit-backdrop-filter: blur(10px); /* Add this line first, it fixes blur for Safari*/
-    backdrop-filter: blur(10px);  /* This line activates blur*/
-                box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
-            }
-        }
-
-        .theme-toggle {
-            right: 0;
-            width: 80px;
-            height: 30px;
-            background-color: #ccc;
-            border-radius: 15px;
-            transform: translateX(-20%);
-            margin-left:2rem;
-        }
-
-        .toggle-inner {
-            position: absolute;
-            width: 25%;
-            height: 100%;
-            transition: transform 0.2s ease;
-        }
-
-        .toggle-handle {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 30px;
-            height: 30px;
-            background-color: #fff;
-            border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-
-        }
-
-        .toggle-on .toggle-inner {
-            transform: translateX(200%);
-        }
-
-        html,
-        body {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-            /* Prevent horizontal scrollbar */
-        }
-
-        .tutorial-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            line-height: 1.5;
-            transform: translate(-50%, -50%);
-            background-color: var(--background-color);
-            padding: 20px;
-            padding-bottom: 10px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            max-width: 90%;
-            width: 400px;
-            z-index: 2;
-            transition: all 0.3s ease;
-            overflow-y: auto;
-            max-height: 80vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            /* Center content horizontally */
-            justify-content: center;
-            /* Center content vertically */
-        }
-        .tutorial-popup p, .tutorial-popup ul {
-            margin: 0 0 15px 0;
-            padding: 0;
-            align-self: start;
-            text-align: left;
-        }
-
-        .tutorial-step {
-            display: none;
-            animation: fadeIn 0.3s ease;
-            align-items: center;
-            text-align: center;
-        }
-
-        .tutorial-step p,
-        .tutorial-step ul {
-            margin: 0 0 15px 0;
-            padding: 0;
-        }
-
-        .tutorial-step ul {
-            list-style: disc;
-            padding-left: 20px;
-            max-width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .copy-btn {
-            margin-left: 10px;
-            padding: 5px 10px;
-            background-color: var(--button-background-color);
-            color: var(--text-color);
-            border: none;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-
-        .copy-btn:hover {
-            background-color: var(--button-hover-background-color);
-        }
-
-        .next-btn,
-        .close-btn {
-            background-color: var(--button-background-color);
-            color: var(--text-color);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-            margin-top: 10px;
-        }
-
-        .next-btn:hover,
-        .close-btn:hover {
-            background-color: var(--button-hover-background-color);
-        }
-
-        #help-btn {
-            bottom: 0;
-            right: 0;
-            background-color: var(--button-background-color);
-            color: var(--text-color);
-            border: none;
-            /* padding: 10px 20px; */
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-
-        #help-btn:hover {
-            background-color: var(--button-hover-background-color);
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-
-        /* @media (max-width: 600px) { */
-        h1 {
-            font-size: 1.5rem;
-            margin: 0;
-            padding: 0;
-            margin-top: 1rem;
-        }
-
-        h2 {
-            display: none;
-        }
-
-        footer,
-        .footer {
-            font-size: 12px;
-            /* move top screen */
-            top: 0;
-            bottom: unset;
-            /* remove padding */
-            padding: 0;
-            /* add padding to the items */
-        }
-
-        /* move actions down */
-        .actions {
-            bottom: 0;
-        }
-
-        body {
-            justify-content: center;
-        }
-
-        /* } */
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-
-/* parser */
-
-        canvas {
-            display: none; /* Hidden canvas element for image processing */
-        }
-        img {
-            max-width: 100%;
-            height: auto;
-        }
-
-        #processedImageContainer {
-    display: none; /* Hidden by default */
-    left: 0;
-    top: 0;
-    width: 100%;
-    /* background-color: rgba(0, 0, 0, 0.5); Semi-transparent background */
-    z-index: 2; /* Ensure it's above other content */
-    justify-content: center;
+#processedImageContainer {
+    display: none;
+    align-content: space-between;
+    justify-content: flex-end;
     align-items: center;
-    text-align: center;
+    flex-direction: column-reverse;
+
 }
 
 #processedImage {
@@ -523,18 +396,11 @@ height: auto;
     max-height: 80%;
 }
 
-#processedImageContainer {
-    color: var(--text-color);
-    margin-top: 20px;
-    flex-direction: column;
-    align-content: space-between;
-    justify-content: flex-start;
-    align-content: center;
+#processedImageContainer.show {
+    display: flex;
+    flex-direction: column-reverse;
 }
 
-#processedImageContainer.show {
-    display: flex; /* Show the container */
-}
 label {
     padding: 10px 20px;
     background-color: var(--footer-text-color);
@@ -546,122 +412,110 @@ label {
 }
 
 .upload-btn {
-    background-color:var(--footer-text-color); /* Sets the background color */
-    color: var(--text-color); /* Sets the text color */
-    padding: 10px 25px; /* Adjust padding if needed */
-    box-shadow: none; /* Removes box-shadow */
-    border-radius: 5px; /* Adds rounded corners */
-    transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s; /* Adds smooth transition effects */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow */
+    background-color: var(--footer-text-color);
+    color: var(--text-color);
+    padding: 10px 25px;
+    border-radius: 5px;
+    transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-right: 0.5rem;
+
 }
 
 .upload-btn:hover {
-    background-color: rgba(0, 123, 255, 0.1); /* Light blue background on hover */
-    transform: scale(1.05); /* Slightly increase size on hover */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Adds a shadow on hover */
+    background-color: rgba(0, 123, 255, 0.1);
+    transform: scale(1.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
-
-
-.actions {
-    display: flex;
-    justify-content: space-between; /* Ensures items are spaced out */
-    align-items: center;
-}
-
 
 .design-info {
     display: flex;
-    flex-direction: column;
-    text-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    position: absolute; /* Added to position the element absolutely within its closest positioned ancestor */
+    top: 50%; /* Center vertically */
+    left: 50%; /* Center horizontally */
+    transform: translate(-50%, -50%); /* Adjust the element's position to be truly centered */
+    margin-top: 0; /* Reset margin-top as it's no longer needed */
+margin-left:1rem;
+text-align: center;}
+.design-info p {
+    margin-bottom: 0 !important;
+    margin-block-start: 0rem;
+    padding-left: 0.1rem;
+    padding-top: 0.1rem;
+    left: 0;
+    bottom: 0;
 }
 
-.design-info p {
-    margin-top: 1 rem; /* Removes default margin */
-    margin-bottom: 0;
-    padding-left: 0.1rem; /* Adds padding to the left */
-    padding-top: 0.1rem; /* Adds padding to the top */
-}
 .design-info a {
-    color: var(--cell-focus-background-color); /* Sets the link color */
-    text-decoration: none; /* Removes underline */
-    padding-left: 0.1rem; /* Adds padding to the left */
-    padding-bottom: 0rem; /* Adds padding to the top */
+    color: var(--cell-focus-background-color);
+    text-decoration: none;
+    padding-left: 0.1rem;
+    padding-bottom: 0rem;
 }
-.solve-button {
-    position: absolute; /* or 'fixed' depending on the layout context */
-    left: 50%;
-    transform: translateX(-50%);
-}
+
+
 .spacer {
-    /* This div acts as a balancing element for the .design-info */
     flex: 1;
 }
 
-#confirmCrop {
-display: none; /* Hidden by default */
-}
-
-
-:root {
-    --cell-border-color-darker: #000000; /* Temporarily set to black for visibility */
+.cropping-actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1rem;
+    bottom: 0;
+    left: 50%;
 }
 
 /* Ensure the grid container is relatively positioned */
-/* Base cell styling */
 .cell {
     position: relative;
-    border: 1px solid var(--cell-border-color); /* Regular cell border */
+    border: 1px solid var(--cell-border-color);
 }
 
 /* Target the right border of cells that are multiples of 3, except the last column */
 .grid-container > .cell:nth-child(3n):not(:nth-child(9n)) {
-    border-right: 2px solid var(--cell-border-color-darker); /* Thicker right border for group separation */
+    border-right: 2px solid var(--cell-border-color-darker);
 }
 
 /* Target the bottom border of every cell in the 3rd and 6th row */
 .grid-container > .cell:nth-child(n+19):nth-child(-n+27),
 .grid-container > .cell:nth-child(n+10):nth-child(-n+18) {
-    border-bottom: 2px solid var(--cell-border-color-darker); /* Thicker bottom border for group separation */
+    border-bottom: 2px solid var(--cell-border-color-darker);
 }
 
-
+/* Pseudo-element for the board */
 #sudoku-board::before {
-    content: ''; /* Add a pseudo-element */
-    position: absolute; /* Position it absolutely */
-    top: 0; /* Align it to the top */
-    left: 0; /* Align it to the left */
-    width: 100%; /* Make it span the entire width */
-    height: 100%; /* Make it span the entire height */
-    background:
-        linear-gradient(90deg, transparent calc(33.33% - 2px), var(--cell-border-color-darker) 33.33%, var(--cell-border-color-darker) calc(33.33% + 2px), transparent calc(66.66% - 2px), var(--cell-border-color-darker) 66.66%, var(--cell-border-color-darker) calc(66.66% + 2px), transparent), /* Add vertical lines */
-        linear-gradient(0deg, transparent calc(33.33% - 2px), var(--cell-border-color-darker) 33.33%, var(--cell-border-color-darker) calc(33.33% + 2px), transparent calc(66.66% - 2px), var(--cell-border-color-darker) 66.66%, var(--cell-border-color-darker) calc(66.66% + 2px), transparent); /* Add horizontal lines */
-    background-size: 100% 100%; /* Set the size of the background */
-    z-index: 1; /* Ensure it's behind the cells */
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent calc(33.33% - 2px), var(--cell-border-color-darker) 33.33%, var(--cell-border-color-darker) calc(33.33% + 2px), transparent calc(66.66% - 2px), var(--cell-border-color-darker) 66.66%, var(--cell-border-color-darker) calc(66.66% + 2px), transparent), linear-gradient(0deg, transparent calc(33.33% - 2px), var(--cell-border-color-darker) 33.33%, var(--cell-border-color-darker) calc(33.33% + 2px), transparent calc(66.66% - 2px), var(--cell-border-color-darker) 66.66%, var(--cell-border-color-darker) calc(66.66% + 2px), transparent);
+    background-size: 100% 100%;
+    z-index: 1;
 }
+
 /* Reset the cell border color */
 :root {
-    --cell-border-color-darker: #E0E0E0; /* Reset the cell border color */
+    --cell-border-color-darker: #E0E0E0;
+    --cell-border-color: #CCCCCC;
+    --cell-hover-background-color: #F0F0F0;
 }
 
-/* Add a hover effect to the cells */
 .cell:hover {
-    background-color: var(--cell-hover-background-color); /* Change the background color on hover */
+    background-color: var(--cell-hover-background-color);
 }
 
-:root {
-    --cell-border-color-darker: #E0E0E0; /* Reset the cell border color */
-    --cell-border-color: #CCCCCC; /* Define regular cell border color */
-    --cell-hover-background-color: #F0F0F0; /* Define hover background color */
-}
-
-/* Base cell styling with padding */
 .cell {
-    z-index: 2; /* Ensure cell content is above the pseudo-element */
+    z-index: 2;
 }
 
-/* Adjustments for group separation and 3D effect */
 #sudoku-board::before {
-    /* Existing styles */
-    z-index: 1; /* Ensure it's behind the cells */
+    z-index: 1;
 }
