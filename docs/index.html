@@ -23,6 +23,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="./css/styles.css">
+    <link  href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 </head>
 
 <body>
@@ -32,14 +34,15 @@
         <h2>Now with a WebAssembly frontend.</h2>
     </header>
     <section class="parser">
-        <div id="sudoku-board"></div>
+        <img id="imageToCrop" style="max-width: 100%;" />
         <canvas id="canvas"></canvas> <!-- Hidden canvas element for image processing -->
         <pre id="result"></pre>
         <div id="processedImageContainer">
             <img id="processedImage" alt="Processed Image will be shown here">
-            <div class="processingMessage">Processing image...</div>
+            <div class="processingMessage">Processing image</div>
         </div>
     </section>
+        <div id="sudoku-board"></div>
     <div id="tutorial-popup" class="tutorial-popup" style="display:none;">
         <div class="tutorial-step" data-step="1">
             <p>Welcome to the Sudoku Solver!</p>
@@ -55,15 +58,15 @@
         <div class="tutorial-step" data-step="3" style="display:none;">
             <p>You can enter the Sudoku board in multiple ways:</p>
             <ul>
-                <li>Upload an image: Click the camera icon to upload an image of the Sudoku board.</li>
-                <li>Interactively by clicking on the cells: Enter a number between 1 and 9 in each cell.</li>
-                <li>Pasting on the board: Pasted numbers from the clipboard and they will be distributed across the cells.</li>
-                <li>Use the input field: Enter the board or paste it in the input field. The app will parse the board automatically.</li>
+                <li>Upload an image: take a picture or choose an image from your device.</li>
+                <li>Enter the board as a text line in the input field.</li>
+                <li>Edit the board by clicking on the interactive cells.</li>
             </ul>
             <button class="close-btn">Close</button>
             <button class="next-btn">Next</button>
         </div>
         <div class="tutorial-step" data-step="4" style="display:none;">
+        <p>If you upload an image, crop the Sudoku board and confirm for best results.</p>
             <p>You can also edit the board by clicking on the cells or using the input field.</p>
             <button class="close-btn">Close</button>
             <button class="next-btn">Next</button>
@@ -91,6 +94,8 @@
             <a href="https://dorpascal.com">dorpascal.com</a>
             <p style="margin: 0.1rem;"> © <script>document.write(new Date().getFullYear());</script></p>
         </div>
+                <button id="confirmCrop">Confirm Crop</button>
+
         <button onclick="solveSudoku()" class="solve-button">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polygon points="5 3 19 12 5 21 5 3"></polygon>
@@ -124,40 +129,95 @@
     <script src="./js/sudoku.js"></script>
     <script src="./js/tutorial.js"></script>
     <script src="./js/theme.js"></script>
-    <script>function handleFileSelection(files) {
-    if (files.length > 0) {
-        // Hide the sudoku board to show the processed image
-        document.getElementById('sudoku-board').style.display = 'none';
-        document.getElementById('processedImage').style.display = 'block';
-        document.getElementById('processedImageContainer').style.display = 'block';
-        // Dim background
-        document.body.style.opacity = 0.5;
-        document.getElementById('tutorial-popup').style.display = 'none';
+    <script>
+    async function handleFileSelection(files) {
+        if (files.length > 0) {
+            // Hide the sudoku board to show the processed image
+            // toggle dark mode
+            document.body.classList.toggle('dark-theme')
+            document.getElementById('sudoku-board').style.display = 'none';
+            document.getElementById('processedImage').style.display = 'block';
+            document.getElementById('processedImageContainer').style.display = 'block';
+            document.getElementsByClassName('processingMessage')[0].style.display = 'block';
+            document.getElementsByClassName('upload-btn')[0].style.display = 'none';
+            // Dim background
+            document.getElementById('confirmCrop').style.display = 'block';
+            document.getElementById('tutorial-popup').style.display = 'none';
+            document.getElementById('input-board').style.display = 'none';
+            document.getElementsByClassName('solve-button')[0].style.display = 'none';
 
-        processImage().then(() => {
-            const boardStr = readBoard(); // Ensure this is synchronous or properly awaited if async
-            return updateBoard(boardStr);
-        }).then(() => {
-            // Show a message to the user
-            alert("Processing and updating done!");
+            try {
+                // Assuming initiateCropping returns a promise that resolves when cropping is done
+                const img_src = await initiateCropping(files[0]);
+                await processImage(img_src); // Assuming this now uses the cropped image
+                const boardStr = await readBoard(); // Ensure this is properly awaited if async
+                await updateBoard(boardStr);
 
-            // Return to the board
-            document.getElementById('sudoku-board').style.display = 'grid';
-            document.getElementById('processedImage').style.display = 'none';
-            document.getElementById('processedImageContainer').style.display = 'none';
-            document.body.style.opacity = 1; // Reset background opacity
-        }).catch((error) => {
-            console.error("An error occurred:", error);
-            // Update UI to reflect error state
-            alert("An error occurred. Please try again.");
-            document.getElementById('sudoku-board').style.display = 'grid';
-            document.getElementById('processedImage').style.display = 'none';
-            document.getElementById('processedImageContainer').style.display = 'none';
-            document.body.style.opacity = 1; // Reset background opacity
-        });
+                alert("Processing and updating done!");
+            } catch (error) {
+                console.error("An error occurred:", error);
+                alert("An error occurred. Please try again.");
+            } finally {
+                // Reset UI regardless of success or failure
+                            document.getElementsByClassName('upload-btn')[0].style.display = 'block';
+                document.getElementById('confirmCrop').style.display = 'none';
+                document.getElementById('sudoku-board').style.display = 'grid';
+                document.getElementById('processedImage').style.display = 'none';
+                document.getElementById('processedImageContainer').style.display = 'none';
+                document.getElementById('input-board').style.display = 'block';
+                document.getElementsByClassName('solve-button')[0].style.display = 'block';
+                document.body.classList.remove('dark-theme'); // Reset dark mode
+                document.body.style.opacity = 1; // Reset background opacity
+            }
+        }
     }
-}
 
+function initiateCropping(file) {
+    return new Promise((resolve, reject) => {
+        if (!file) {
+            alert("Please upload an image first.");
+            reject(new Error("No file uploaded."));
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+            const imgElement = document.getElementById('imageToCrop');
+            imgElement.src = event.target.result;
+
+            // Initialize Cropper.js on the image
+            const cropper = new Cropper(imgElement, {
+                aspectRatio: 1, // Optional: Set aspect ratio for the Sudoku board
+                viewMode: 1,
+                autoCropArea: 1,
+                movable: false,
+                zoomable: false,
+                rotatable: false,
+                scalable: false,
+                crop: function(e) {
+                    // This function is called when the cropping area is changed.
+                    // You can access the cropped area's properties through e.detail
+                }
+            });
+
+            // Add a button for the user to confirm the crop
+            document.getElementById('confirmCrop').addEventListener('click', function() {
+                cropper.getCroppedCanvas().toBlob((blob) => {
+                    // Resolve the promise with the cropped image source instead of appending it to the body
+                    resolve(URL.createObjectURL(blob));
+                            // Hide the confirm crop button
+        document.getElementById('confirmCrop').style.display = 'none';
+        document.getElementById('imageToCrop').style.display = 'none';
+
+        // Destroy the cropper instance
+        cropper.destroy();
+                });
+            });
+        };
+        reader.readAsDataURL(file);
+    });
+}
 document.addEventListener('DOMContentLoaded', function() {
     const fileInput = document.getElementById('fileInput');
 

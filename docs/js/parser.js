@@ -5,57 +5,52 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const inputBoard = document.getElementById('input-board');
 const processedImageElement = document.getElementById('processedImage');
-function processImage() {
+function processImage(src) {
     return new Promise((resolve, reject) => {
-        const file = fileInput.files[0];
-        if (!file) {
+        if (!src) {
             alert("Please upload an image first.");
-            reject(new Error("No file uploaded."));
+            reject(new Error("No image source provided."));
             return;
         }
 
         const img = new Image();
-        const reader = new FileReader();
-        reader.onload = function (event) {
-            img.onload = async function () {
-                // Resize the image to make processing faster
-                const MAX_WIDTH = 500;
-                const scale = MAX_WIDTH / img.width;
-                const scaledHeight = img.height * scale;
+        img.onload = async function () {
+            // Resize the image to make processing faster
+            const MAX_WIDTH = 500;
+            const scale = MAX_WIDTH / img.width;
+            const scaledHeight = img.height * scale;
 
-                canvas.width = MAX_WIDTH;
-                canvas.height = scaledHeight;
-                ctx.drawImage(img, 0, 0, MAX_WIDTH, scaledHeight);
+            canvas.width = MAX_WIDTH;
+            canvas.height = scaledHeight;
+            ctx.drawImage(img, 0, 0, MAX_WIDTH, scaledHeight);
 
-                // Binarize the image
-                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                const data = imageData.data;
-                for (let i = 0; i < data.length; i += 4) {
-                    const avg = data[i]; // Since the image is greyscale, we can just use the red channel
-                    data[i] = avg < 128 ? 0 : 255;
-                    data[i + 1] = data[i];
-                    data[i + 2] = data[i];
+            // Binarize the image
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                const avg = data[i]; // Since the image is greyscale, we can just use the red channel
+                data[i] = avg < 128 ? 0 : 255;
+                data[i + 1] = data[i];
+                data[i + 2] = data[i];
+            }
+            ctx.putImageData(imageData, 0, 0);
+            const processedImageSrc = canvas.toDataURL();
+            processedImageElement.src = processedImageSrc;
+
+            try {
+                const boardStr = await extractSudokuBoard(ctx, canvas.width, canvas.height);
+                console.log(boardStr);
+                inputBoard.value = boardStr;
+
+                if (boardStr.length !== 81) {
+                    resultElement.value += "\n\nFailed to parse Sudoku board. Please try again with a clearer image.";
                 }
-                ctx.putImageData(imageData, 0, 0);
-                const processedImageSrc = canvas.toDataURL();
-                processedImageElement.src = processedImageSrc;
-
-                try {
-                    const boardStr = await extractSudokuBoard(ctx, canvas.width, canvas.height);
-                    console.log(boardStr);
-                    inputBoard.value = boardStr;
-
-                    if (boardStr.length !== 81) {
-                        resultElement.value += "\n\nFailed to parse Sudoku board. Please try again with a clearer image.";
-                    }
-                    resolve(); // Resolve the promise after all processing is done
-                } catch (error) {
-                    reject(error); // Reject the promise if there's an error
-                }
-            };
-            img.src = event.target.result;
+                resolve(); // Resolve the promise after all processing is done
+            } catch (error) {
+                reject(error); // Reject the promise if there's an error
+            }
         };
-        reader.readAsDataURL(file);
+        img.src = src;
     });
 }
 
