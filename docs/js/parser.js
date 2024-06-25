@@ -52,45 +52,47 @@ function processImage(src) {
         };
         img.src = src;
     });
-}
-function progressCallback(progress) {
+}function progressCallback(progress) {
     document.querySelector('.processingMessage').textContent = `Extraction progress: ${progress.toFixed(2)}%`;
 }
+
 async function extractSudokuBoard(ctx, width, height) {
     const cellWidth = width / 9;
     const cellHeight = height / 9;
     let boardStr = '';
     const totalCells = 9 * 9; // Total number of cells in a Sudoku board
+    const ocrPromises = [];
+    let cellsProcessed = 0; // Track the number of cells processed
+
+    // Create a single canvas for reuse
+    const cellCanvas = document.createElement('canvas');
+    const cellCtx = cellCanvas.getContext('2d');
+    cellCanvas.width = cellWidth;
+    cellCanvas.height = cellHeight;
 
     for (let row = 0; row < 9; row++) {
         for (let col = 0; col < 9; col++) {
-            const cellCanvas = document.createElement('canvas');
-            const cellCtx = cellCanvas.getContext('2d');
-            cellCanvas.width = cellWidth;
-            cellCanvas.height = cellHeight;
+            // Reuse the canvas for each cell
             cellCtx.drawImage(ctx.canvas, col * cellWidth, row * cellHeight, cellWidth, cellHeight, 0, 0, cellWidth, cellHeight);
-
             const cellImageSrc = cellCanvas.toDataURL();
-            const { data: { text } } = await Tesseract.recognize(cellImageSrc, 'eng', {
+
+            // Push OCR promise to the array
+            ocrPromises.push(Tesseract.recognize(cellImageSrc, 'eng', {
                 tessedit_char_whitelist: '123456789',
                 tessedit_pageseg_mode: Tesseract.PSM.SINGLE_CHAR
-            });
-
-            const digit = text.trim();
-            boardStr += digit.length === 1 && '123456789'.includes(digit) ? digit : '.';
-
-            // Calculate and report progress
-            const cellsProcessed = row * 9 + col + 1; // Calculate the number of cells processed so far
-            const progressPercent = (cellsProcessed / totalCells) * 100;
-            progressCallback(progressPercent);
+            }).then(({ data: { text } }) => {
+                const digit = text.trim();
+                cellsProcessed++;
+                const progressPercent = (cellsProcessed / totalCells) * 100;
+                progressCallback(progressPercent); // Update progress as each OCR operation completes
+                return digit.length === 1 && '123456789'.includes(digit) ? digit : '.';
+            }));
         }
     }
 
+    // Wait for all OCR promises to resolve and update the board string
+    const ocrResults = await Promise.all(ocrPromises);
+    boardStr = ocrResults.join('');
+
     return boardStr;
 }
-
-extractSudokuBoard(ctx, width, height, (progress) => {
-    console.log(`Extraction progress: ${progress}%`);
-}).then((boardStr) => {
-    console.log('Sudoku board extracted:', boardStr);
-});
