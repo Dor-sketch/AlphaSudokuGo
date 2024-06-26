@@ -262,16 +262,15 @@
 
                 const img = new Image();
                 img.onload = function () {
-                    const MAX_WIDTH = 300;
+                    const MAX_WIDTH = 500;
                     let targetWidth = img.width;
                     let targetHeight = img.height;
 
-                    // Scale only if the image width is larger than MAX_WIDTH
-                    if (img.width > MAX_WIDTH) {
+
                         const scale = MAX_WIDTH / img.width;
                         targetWidth = MAX_WIDTH; // Scale width to MAX_WIDTH
                         targetHeight = img.height * scale; // Scale height to maintain aspect ratio
-                    }
+
 
                     canvas.width = targetWidth;
                     canvas.height = targetHeight;
@@ -279,14 +278,7 @@
 
                     // Binarize and enhance the image
                     let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
- for (let i = 0; i < imageData.length; i += 4) {
-                const avg = data[i]; // Since the image is greyscale, we can just use the red channel
-                imageData[i] = avg < 128 ? 0 : 255;
-                imageData[i + 1] = imageData[i];
-                imageData[i + 2] = imageData[i];
-            }
-            ctx.putImageData(imageData, 0, 0);
+                    imageData = binarizeImage(imageData);
                     ctx.putImageData(imageData, 0, 0);
 
                     const processedImageSrc = canvas.toDataURL();
@@ -297,6 +289,18 @@
                 };
                 img.src = src;
             });
+        }
+
+        function binarizeImage(imageData) {
+            const data = imageData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                const avg = data[i] * 0.3 + data[i + 1] * 0.59 + data[i + 2] * 0.11; // Grayscale
+                const binarized = avg < 90 ? 0 : 255;
+                data[i] = binarized;
+                data[i + 1] = binarized;
+                data[i + 2] = binarized;
+            }
+            return imageData;
         }
 
 
@@ -325,7 +329,7 @@
             const centerRegionSize = 0.5; // Sample the central 50% of the cell
             for (let row = 0; row < 9; row++) {
                 for (let col = 0; col < 9; col++) {
-// Calculate the coordinates for the central region of the cell
+                    // Calculate the coordinates for the central region of the cell
                     const offsetX = (cellWidth * (1 - centerRegionSize)) / 2;
                     const offsetY = (cellHeight * (1 - centerRegionSize)) / 2;
                     const centerWidth = cellWidth * centerRegionSize;
@@ -347,7 +351,6 @@
                         const cellImageData = ctx.getImageData(col * cellWidth, row * cellHeight, cellWidth, cellHeight).data;
                         tasks.push({ width: cellWidth, height: cellHeight, imageData: cellImageData, row, col });
                     }
-
                 }
             }
             const numWorkers = Math.min(tasks.length, navigator.hardwareConcurrency) || 1;
