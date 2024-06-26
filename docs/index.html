@@ -262,7 +262,7 @@
 
                 const img = new Image();
                 img.onload = function () {
-                    const MAX_WIDTH = 600;
+                    const MAX_WIDTH = 300;
                     let targetWidth = img.width;
                     let targetHeight = img.height;
 
@@ -279,7 +279,14 @@
 
                     // Binarize and enhance the image
                     let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    imageData = binarizeImage(imageData);
+
+ for (let i = 0; i < imageData.length; i += 4) {
+                const avg = data[i]; // Since the image is greyscale, we can just use the red channel
+                imageData[i] = avg < 128 ? 0 : 255;
+                imageData[i + 1] = imageData[i];
+                imageData[i + 2] = imageData[i];
+            }
+            ctx.putImageData(imageData, 0, 0);
                     ctx.putImageData(imageData, 0, 0);
 
                     const processedImageSrc = canvas.toDataURL();
@@ -292,51 +299,6 @@
             });
         }
 
-        function binarizeImage(imageData) {
-            const data = imageData.data;
-            for (let i = 0; i < data.length; i += 4) {
-                const avg = data[i] * 0.3 + data[i + 1] * 0.59 + data[i + 2] * 0.11; // Grayscale
-                const binarized = avg < 30 ? 0 : 255;
-                data[i] = binarized;
-                data[i + 1] = binarized;
-                data[i + 2] = binarized;
-            }
-            return imageData;
-        }
-
-        function sharpenImage(imageData) {
-            const kernel = [
-                [0, -1, 0],
-                [-1, 5, -1],
-                [0, -1, 0]
-            ];
-            const width = imageData.width;
-            const height = imageData.height;
-            const data = imageData.data;
-            const result = new Uint8ClampedArray(data.length);
-
-            for (let y = 1; y < height - 1; y++) {
-                for (let x = 1; x < width - 1; x++) {
-                    let r = 0, g = 0, b = 0;
-                    for (let ky = -1; ky <= 1; ky++) {
-                        for (let kx = -1; kx <= 1; kx++) {
-                            const pixelIndex = ((y + ky) * width + (x + kx)) * 4;
-                            const weight = kernel[ky + 1][kx + 1];
-                            r += data[pixelIndex] * weight;
-                            g += data[pixelIndex + 1] * weight;
-                            b += data[pixelIndex + 2] * weight;
-                        }
-                    }
-                    const resultIndex = (y * width + x) * 4;
-                    result[resultIndex] = r;
-                    result[resultIndex + 1] = g;
-                    result[resultIndex + 2] = b;
-                    result[resultIndex + 3] = data[resultIndex + 3]; // Alpha
-                }
-            }
-
-            return new ImageData(result, width, height);
-        }
 
         function setupWebWorkers(numWorkers) {
             const workers = [];
@@ -363,7 +325,7 @@
             const centerRegionSize = 0.5; // Sample the central 50% of the cell
             for (let row = 0; row < 9; row++) {
                 for (let col = 0; col < 9; col++) {
-                    // Calculate the coordinates for the central region of the cell
+// Calculate the coordinates for the central region of the cell
                     const offsetX = (cellWidth * (1 - centerRegionSize)) / 2;
                     const offsetY = (cellHeight * (1 - centerRegionSize)) / 2;
                     const centerWidth = cellWidth * centerRegionSize;
@@ -385,6 +347,7 @@
                         const cellImageData = ctx.getImageData(col * cellWidth, row * cellHeight, cellWidth, cellHeight).data;
                         tasks.push({ width: cellWidth, height: cellHeight, imageData: cellImageData, row, col });
                     }
+
                 }
             }
             const numWorkers = Math.min(tasks.length, navigator.hardwareConcurrency) || 1;
