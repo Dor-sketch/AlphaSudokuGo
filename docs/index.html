@@ -262,15 +262,9 @@
 
                 const img = new Image();
                 img.onload = function () {
-                    const MAX_WIDTH = 400;
+                    const MAX_WIDTH = 540;
                     let targetWidth = img.width;
                     let targetHeight = img.height;
-
-                        const scale = MAX_WIDTH / img.width;
-                        targetWidth = MAX_WIDTH; // Scale width to MAX_WIDTH
-                        targetHeight = img.height * scale; // Scale height to maintain aspect ratio
-
-
                     canvas.width = targetWidth;
                     canvas.height = targetHeight;
                     ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
