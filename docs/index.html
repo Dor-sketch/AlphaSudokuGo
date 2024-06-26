@@ -319,7 +319,7 @@
         function setupWebWorkers(numWorkers) {
             const workers = [];
             for (let i = 0; i < numWorkers; i++) {
-                const worker = new Worker('/worker.js');
+                const worker = new Worker('/AlphaSudokuGo/worker.js');
                 workers.push({ worker: worker, busy: false });
             }
             return workers;
