@@ -22,9 +22,9 @@ padding: 1rem;
 width: 70%;
 height: auto;
 }
-#canvas {
+/* #canvas {
     display: hidden;
-}
+} */
 .parcer {
     display: block;
     margin: 0 auto;

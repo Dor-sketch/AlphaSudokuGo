@@ -24,31 +24,29 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <link rel="stylesheet" href="./css/normalize.css">
-
     <link rel="stylesheet" href="./css/styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
 </head>
 
 <body>
     <header>
-    <div>
-        <button id="help-btn" style="background-color: transparent; border: none; outline: none;">
-            <i class="fas fa-puzzle-piece" style="font-size: 24px; color: currentColor;"></i>
-        </button>
-
-        <input type="file" id="fileInput" accept="image/*" style="display: none;">
-        <label for="fileInput" class="upload-btn">
-            <i class="fas fa-camera" style="font-size: 24px;"></i>
-        </label>
+        <div>
+            <button id="help-btn" style="background-color: transparent; border: none; outline: none;">
+                <i class="fas fa-puzzle-piece" style="font-size: 24px; color: currentColor;"></i>
+            </button>
+            <input type="file" id="fileInput" accept="image/*" style="display: none;">
+            <label for="fileInput" class="upload-btn">
+                <i class="fas fa-camera" style="font-size: 24px;"></i>
+            </label>
         </div>
         <div class="design-info">
-            <p>Built By Dor © <script>document.write(new Date().getFullYear());</script><br>
-            <a href="https://dorpascal.com">dorpascal.com</a>
+            <p>Built By Dor ©
+                <script>document.write(new Date().getFullYear());</script><br>
+                <a href="https://dorpascal.com">dorpascal.com</a>
             </p>
         </div>
-
         <div id="theme-toggle" class="theme-toggle">
             <div class="toggle-inner">
                 <div class="toggle-handle"></div>
@@ -56,19 +54,15 @@
         </div>
     </header>
     <main style="height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-    <section id="parser">
-        <img id="imageToCrop" alt="Image to crop will be shown here">
-        <canvas id="canvas" style="display: none;"></canvas>
-        <pre id="result"></pre>
-        <div id="processedImageContainer">
-            <div class="processingMessage">Please crop the Sudoku board and click confirm</div>
-            <img id="processedImage" alt="Processed Image will be shown here">
-        </div>
-    </section>
-
-    <div id="sudoku-board"></div>
-
-    <div id="tutorial-popup" class="tutorial-popup">
+        <section id="parser">
+            <canvas id="canvas" style="display: block;"></canvas>
+            <pre id="result"></pre>
+            <div id="processedImageContainer">
+                <div class="processingMessage">Please crop the Sudoku board and click confirm</div>
+            </div>
+        </section>
+        <div id="sudoku-board"></div>
+        <div id="tutorial-popup" class="tutorial-popup">
         <div class="tutorial-step" data-step="1">
             <p>Welcome to the Sudoku Solver!</p>
             <button class="close-btn">Close</button>
@@ -120,35 +114,314 @@
     </div>
     </main>
     <footer>
-
-        <div class="cropping-actions" id="cropping-actions" , style="display: none;">
+        <div class="cropping-actions" id="cropping-actions" style="display: none;">
             <button id="cancelCrop">Cancel Crop</button>
             <button id="confirmCrop">Confirm Crop</button>
         </div>
-
         <input id="input-board" type="text" placeholder="Enter board as one line...">
-
-
         <button onclick="solveSudoku()" class="solve-button">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polygon points="5 3 19 12 5 21 5 3"></polygon>
             </svg>
         </button>
-
     </footer>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
-    <script src="./js/parser.js"></script>
-    <script src="./js/sudoku.js"></script>
     <script src="./js/tutorial.js"></script>
     <script src="./js/theme.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
     <script>
+        const inputBoard = document.getElementById('input-board');
+        const fileInput = document.getElementById('fileInput');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
+        let cropper;
+
+        fileInput.addEventListener('change', function () {
+            handleFileSelection(this.files);
+        });
+
+        // listen for drop event
+        document.addEventListener('drop', function (event) {
+            event.preventDefault();
+            handleFileSelection(event.dataTransfer.files);
+        });
+
+        // listen for dragover event
+        document.addEventListener('dragover', function (event) {
+            event.preventDefault();
+        });
+
+
+
+        async function handleFileSelection(files) {
+            if (files.length > 0) {
+                console.log('Handling file selection');
+                // document.body.classList.toggle('dark-theme');
+                document.getElementById('parser').style.display = 'block';
+                document.getElementById('sudoku-board').style.display = 'none';
+                document.getElementById('processedImageContainer').style.display = 'flex';
+                document.getElementsByClassName('processingMessage')[0].style.display = 'block';
+                document.getElementsByClassName('upload-btn')[0].style.display = 'none';
+                document.getElementById('cropping-actions').style.display = 'block';
+                document.getElementById('tutorial-popup').style.display = 'none';
+                document.getElementById('input-board').style.display = 'none';
+                document.getElementsByClassName('solve-button')[0].style.display = 'none';
+                await initiateCropping(files[0]);
+            }
+        }
+
+        function resetUI() {
+            document.getElementById('parser').style.display = 'none';
+            // document.getElementsByClassName('upload-btn')[0].style.display = 'inline-block';
+            document.getElementById('cropping-actions').style.display = 'none';
+            document.getElementById('sudoku-board').style.display = 'grid';
+            document.getElementById('processedImageContainer').style.display = 'none';
+            document.getElementById('input-board').style.display = 'block';
+            document.getElementsByClassName('solve-button')[0].style.display = 'block';
+            // document.body.classList.remove('dark-theme');
+        }
+
+        function initiateCropping(file) {
+            console.log('Initiating cropping');
+            return new Promise((resolve, reject) => {
+                if (!file) {
+                    alert("Please upload an image first.");
+                    reject(new Error("No file uploaded."));
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    const img = new Image();
+                    img.onload = function () {
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0);
+                        cropper = new Cropper(canvas, {
+                            aspectRatio: 1,
+                            viewMode: 1,
+                            autoCropArea: 1,
+                            movable: true,
+                            zoomable: true,
+                            rotatable: true,
+                            scalable: true,
+                        });
+
+                        document.getElementById('confirmCrop').style.display = 'inline';
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        document.getElementById('confirmCrop').addEventListener('click', async function () {
+            console.log('Confirming crop');
+            if (cropper) {
+                const croppedCanvas = cropper.getCroppedCanvas();
+                const croppedImageDataURL = croppedCanvas.toDataURL();
+                const croppedImg = new Image();
+                croppedImg.onload = async function () {
+                    canvas.width = croppedImg.width;
+                    canvas.height = croppedImg.height;
+                    ctx.drawImage(croppedImg, 0, 0);
+                    await processImage(canvas.toDataURL());
+                    const boardStr = await extractSudokuBoard(ctx, canvas.width, canvas.height, progressCallback);
+                    console.log('Extracted board:', boardStr);
+                    updateBoard(boardStr);
+                    resetUI();
+                };
+                croppedImg.src = croppedImageDataURL;
+                document.getElementById('confirmCrop').style.display = 'none';
+            }
+        });
+        function processImage(src) {
+            return new Promise((resolve, reject) => {
+                if (!src) {
+                    alert("Please upload an image first.");
+                    reject(new Error("No image source provided."));
+                    return;
+                }
+
+                const img = new Image();
+                img.onload = function () {
+                    const MAX_WIDTH = 500;
+                    const scale = MAX_WIDTH / img.width;
+                    const scaledHeight = img.height * scale;
+
+                    canvas.width = MAX_WIDTH;
+                    canvas.height = scaledHeight;
+                    ctx.drawImage(img, 0, 0, MAX_WIDTH, scaledHeight);
+
+                    // Binarize and enhance the image
+                    let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    imageData = binarizeImage(imageData);
+                    imageData = sharpenImage(imageData);
+                    ctx.putImageData(imageData, 0, 0);
+
+                    const processedImageSrc = canvas.toDataURL();
+                    resolve(processedImageSrc);
+                };
+                img.onerror = function (err) {
+                    reject(new Error("Failed to load image: " + err.message));
+                };
+                img.src = src;
+            });
+        }
+
+        function binarizeImage(imageData) {
+            const data = imageData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                const avg = data[i] * 0.3 + data[i + 1] * 0.59 + data[i + 2] * 0.11; // Grayscale
+                const binarized = avg < 128 ? 0 : 255;
+                data[i] = binarized;
+                data[i + 1] = binarized;
+                data[i + 2] = binarized;
+            }
+            return imageData;
+        }
+
+        function sharpenImage(imageData) {
+            const kernel = [
+                [0, -1, 0],
+                [-1, 5, -1],
+                [0, -1, 0]
+            ];
+            const width = imageData.width;
+            const height = imageData.height;
+            const data = imageData.data;
+            const result = new Uint8ClampedArray(data.length);
+
+            for (let y = 1; y < height - 1; y++) {
+                for (let x = 1; x < width - 1; x++) {
+                    let r = 0, g = 0, b = 0;
+                    for (let ky = -1; ky <= 1; ky++) {
+                        for (let kx = -1; kx <= 1; kx++) {
+                            const pixelIndex = ((y + ky) * width + (x + kx)) * 4;
+                            const weight = kernel[ky + 1][kx + 1];
+                            r += data[pixelIndex] * weight;
+                            g += data[pixelIndex + 1] * weight;
+                            b += data[pixelIndex + 2] * weight;
+                        }
+                    }
+                    const resultIndex = (y * width + x) * 4;
+                    result[resultIndex] = r;
+                    result[resultIndex + 1] = g;
+                    result[resultIndex + 2] = b;
+                    result[resultIndex + 3] = data[resultIndex + 3]; // Alpha
+                }
+            }
+
+            return new ImageData(result, width, height);
+        }
+
+        function setupWebWorkers(numWorkers) {
+            const workers = [];
+            for (let i = 0; i < numWorkers; i++) {
+                const worker = new Worker('/worker.js');
+                workers.push({ worker: worker, busy: false });
+            }
+            return workers;
+        }
+
+        async function extractSudokuBoard(ctx, width, height, progressCallback) {
+            console.log('Extracting Sudoku board');
+            const cellWidth = Math.floor(width / 9);
+            const cellHeight = Math.floor(height / 9);
+            console.log('Cell width:', cellWidth, 'Cell height:', cellHeight);
+            let boardStr = Array(81).fill('.'); // Initialize board string with placeholders
+            const totalCells = 9 * 9;
+
+            const tasks = [];
+            const centerRegionSize = 0.5; // Sample the central 50% of the cell
+            for (let row = 0; row < 9; row++) {
+                for (let col = 0; col < 9; col++) {
+                    // Calculate the coordinates for the central region of the cell
+                    const offsetX = (cellWidth * (1 - centerRegionSize)) / 2;
+                    const offsetY = (cellHeight * (1 - centerRegionSize)) / 2;
+                    const centerWidth = cellWidth * centerRegionSize;
+                    const centerHeight = cellHeight * centerRegionSize;
+
+                    // Get the image data for the central region
+                    const centerImageData = ctx.getImageData(col * cellWidth + offsetX, row * cellHeight + offsetY, centerWidth, centerHeight).data;
+
+                    // Check if the central region is not empty by looking for any non-transparent pixel
+                    let isEmpty = true;
+                    for (let i = 3; i < centerImageData.length; i += 4) { // Check only alpha values of each pixel
+                        if (centerImageData[i] > 0) { // If any pixel is not fully transparent
+                            isEmpty = false;
+                            break; // Exit the loop early if a non-transparent pixel is found
+                        }
+                    }
+                    if (!isEmpty) {
+                        // If the center is not empty, consider the whole cell as not empty and add a task for it
+                        const cellImageData = ctx.getImageData(col * cellWidth, row * cellHeight, cellWidth, cellHeight).data;
+                        tasks.push({ width: cellWidth, height: cellHeight, imageData: cellImageData, row, col });
+                    }
+                }
+            }
+            const numWorkers = Math.min(tasks.length, navigator.hardwareConcurrency) || 1;
+            const workers = setupWebWorkers(numWorkers);
+            // Function to find an available worker
+            const getAvailableWorker = () => workers.find(worker => !worker.busy);
+
+            // Process tasks with available workers
+            const processTasks = tasks.map((task, index) => new Promise(resolve => {
+                const attemptToProcessTask = () => {
+                    const workerInfo = getAvailableWorker();
+                    if (workerInfo) {
+                        workerInfo.busy = true;
+                        workerInfo.worker.postMessage(task);
+                        workerInfo.worker.onmessage = (e) => {
+                            boardStr[task.row * 9 + task.col] = e.data.result; // Assuming the worker returns the recognized digit or '.'
+                            workerInfo.busy = false;
+                            if (progressCallback) {
+                                const progressPercent = ((index + 1) / totalCells) * 100;
+                                progressCallback(progressPercent);
+                            }
+                            resolve();
+                        };
+                    } else {
+                        setTimeout(attemptToProcessTask, 100); // Retry after a short delay if no worker is available
+                    }
+                };
+                attemptToProcessTask();
+            }));
+
+            await Promise.all(processTasks);
+            console.log('Extracted board:', boardStr);
+            //cleanup
+            workers.forEach(worker => worker.worker.terminate());
+
+            return boardStr.join('');
+        }
+
+        async function progressCallback(progress) {
+            document.querySelector('.processingMessage').textContent = `Extraction progress: ${progress.toFixed(2)}%`;
+        }
+        function readBoard() {
+            return inputBoard.value.trim();
+        }
+
+        function isValidSudoku(boardStr) {
+            for (let i = 0; i < 9; i++) {
+                for (let j = 0; j < 9; j++) {
+                    if (boardStr[i * 9 + j] !== '.') {
+                        const num = boardStr[i * 9 + j];
+                        boardStr = boardStr.substr(0, i * 9 + j) + '.' + boardStr.substr(i * 9 + j + 1);
+                        if (!isValidPlacement(boardStr, i, j, num)) {
+                            return false;
+                        }
+                        boardStr = boardStr.substr(0, i * 9 + j) + num + boardStr.substr(i * 9 + j + 1);
+                    }
+                }
+            }
+            return true;
+        }
         document.getElementById('cancelCrop').addEventListener('click', function () {
             // Hide the confirm crop and cancel buttons
-            document.getElementById('confirmCrop').style.display = 'none';
-            document.getElementById('cancelCrop').style.display = 'none';
-            document.getElementById('imageToCrop').style.display = 'none';
+            document.getElementById('parser').style.display = 'none';
 
             // Destroy the cropper instance
             if (typeof cropper !== 'undefined') {
@@ -158,127 +431,273 @@
             // Reset the UI
             resetUI();
         });
+        function isValidPlacement(boardStr, row, col, num) {
+            for (let i = 0; i < 9; i++) {
+                if (boardStr[row * 9 + i] === num || boardStr[i * 9 + col] === num) {
+                    return false;
+                }
+            }
+            const startRow = Math.floor(row / 3) * 3;
+            const startCol = Math.floor(col / 3) * 3;
+            for (let i = startRow; i < startRow + 3; i++) {
+                for (let j = startCol; j < startCol + 3; j++) {
+                    if (boardStr[i * 9 + j] === num) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
 
-        async function handleFileSelection(files) {
-            if (files.length > 0) {
-                // Toggle dark mode and show/hide appropriate elements
-                document.body.classList.toggle('dark-theme');
-                document.getElementById('parser').style.display = 'block';
-                document.getElementById('sudoku-board').style.display = 'none';
-                document.getElementById('processedImage').style.display = 'block';
-                document.getElementById('processedImageContainer').style.display = 'flex';
-                document.getElementsByClassName('processingMessage')[0].style.display = 'block';
-                document.getElementsByClassName('upload-btn')[0].style.display = 'none';
-                document.getElementById('cropping-actions').style.display = 'block';
-                document.getElementById('tutorial-popup').style.display = 'none';
-                document.getElementById('input-board').style.display = 'none';
-                document.getElementsByClassName('solve-button')[0].style.display = 'none';
 
-                try {
-                    // Assuming initiateCropping returns a promise that resolves when cropping is done
-                    const img_src = await initiateCropping(files[0]);
-                    await processImage(img_src); // Assuming this now uses the cropped image
-                    const boardStr = await readBoard(); // Ensure this is properly awaited if async
-                    await updateBoard(boardStr);
 
-                    alert("Processing and updating done!");
-                } catch (error) {
-                    console.error("An error occurred:", error);
-                    alert("An error occurred. Please try again.");
-                } finally {
-                    // Reset UI regardless of success or failure
-                    resetUI();
+        const sudokuBoard = document.getElementById('sudoku-board');
+
+        // Initialize empty Sudoku board
+        const board = Array.from({ length: 9 }, () => Array(9).fill('.'));
+
+        // Create the grid elements
+        for (let row = 0; row < 9; row++) {
+            for (let col = 0; col < 9; col++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.contentEditable = true;
+                cell.dataset.row = row;
+                cell.dataset.col = col;
+
+                // Add event listener for handling input
+                cell.addEventListener('input', function (e) {
+                    const value = e.target.textContent.trim();
+                    if (value.match(/[1-9]/)) { // If a number between 1 and 9 is entered
+                        e.target.textContent = value; // Set the cell's content to the entered number
+                        moveToNextCell(row, col); // Move to the next cell
+                    } else {
+                        e.target.textContent = ''; // Clear the cell if the input is not a number
+                    }
+                    synchronizeInputBoard();
+                });
+
+                // Add event listener for handling keydown
+                cell.addEventListener('keydown', function (e) {
+                    // Check if the key pressed is a number or navigation/functional key
+                    if ((e.key >= '0' && e.key <= '9') || e.key === 'Backspace' || e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault(); // Prevent the default action
+
+                        if (e.key === 'Backspace') {
+                            e.target.textContent = ''; // Clear the cell
+                            moveToPreviousCell(row, col); // Move to the previous cell
+                        } else if (e.key === ' ' || e.key === 'Enter') {
+                            e.target.textContent = ''; // Clear the cell
+                            moveToNextCell(row, col); // Move to the next cell
+                        } else {
+                            // Ensure the cell is empty before setting a new number
+                            e.target.textContent = ''; // Clear existing content
+                            e.target.textContent = e.key; // Set new number
+                            moveToNextCell(row, col); // Then move to the next cell
+                        }
+
+                        synchronizeInputBoard();
+                    } else if (e.key.startsWith('Arrow')) {
+                        e.preventDefault();
+                        navigateUsingArrowKeys(e.key, row, col);
+                    }
+                });
+
+                sudokuBoard.appendChild(cell);
+            }
+        }
+
+        function moveToPreviousCell(row, col) {
+            let prevCol = col - 1;
+            let prevRow = row;
+            if (prevCol < 0) { // If the current cell is the first in its row, move to the last cell of the previous row
+                prevCol = 8;
+                prevRow--;
+            }
+            if (prevRow >= 0) { // If the previous row exists
+                const prevCell = document.querySelector(`.cell[data-row='${prevRow}'][data-col='${prevCol}']`);
+                if (prevCell) {
+                    prevCell.focus(); // Move focus to the previous cell
                 }
             }
         }
 
-        function resetUI() {
-            document.getElementById('parser').style.display = 'none';
-            document.getElementsByClassName('upload-btn')[0].style.display = 'inline-block';
-            document.getElementById('cropping-actions').style.display = 'none';
-            document.getElementById('sudoku-board').style.display = 'grid';
-            document.getElementById('processedImage').style.display = 'none';
-            document.getElementById('processedImageContainer').style.display = 'none';
-            document.getElementById('input-board').style.display = 'block';
-            document.getElementsByClassName('solve-button')[0].style.display = 'block';
-            document.body.classList.remove('dark-theme'); // Reset dark mode
-            document.body.style.opacity = 1; // Reset background opacity
-        }
+        function moveToNextCell(row, col) {
+            let nextCol = col;
+            let nextRow = row;
 
-
-        function initiateCropping(file) {
-            return new Promise((resolve, reject) => {
-                if (!file) {
-                    alert("Please upload an image first.");
-                    reject(new Error("No file uploaded."));
+            do {
+                nextCol++;
+                if (nextCol > 8) { // If the current cell is the last in its row, move to the first cell of the next row
+                    nextCol = 0;
+                    nextRow++;
+                }
+                if (nextRow >= 9) { // If there are no more rows, stop the loop
                     return;
                 }
 
-                const reader = new FileReader();
+                var nextCell = document.querySelector(`.cell[data-row='${nextRow}'][data-col='${nextCol}']`);
+            } while (nextCell && nextCell.textContent); // Continue if the next cell exists and has a value
 
-                reader.onload = function (event) {
-                    const imgElement = document.getElementById('imageToCrop');
-                    imgElement.src = event.target.result;
-
-                    // Initialize Cropper.js on the image
-                    const cropper = new Cropper(imgElement, {
-                        aspectRatio: 1, // Optional: Set aspect ratio for the Sudoku board
-                        viewMode: 1,
-                        autoCropArea: 1,
-                        movable: true,
-                        zoomable: true,
-                        rotatable: true,
-                        scalable: true,
-                        crop: function (e) {
-                            // This function is called when the cropping area is changed.
-                            // You can access the cropped area's properties through e.detail
-                        }
-                    });
-
-
-
-                    // Add a button for the user to confirm the crop
-                    document.getElementById('confirmCrop').addEventListener('click', function () {
-                        cropper.getCroppedCanvas().toBlob((blob) => {
-                            // Resolve the promise with the cropped image source instead of appending it to the body
-                            resolve(URL.createObjectURL(blob));
-                            // Hide the confirm crop button
-                            document.getElementById('confirmCrop').style.display = 'none';
-                            document.getElementById('imageToCrop').style.display = 'none';
-
-                            // Destroy the cropper instance
-                            cropper.destroy();
-                        });
-                    });
-                };
-                reader.readAsDataURL(file);
-            });
+            if (nextCell) {
+                nextCell.focus(); // Move focus to the next empty cell
+            }
         }
-        document.addEventListener('DOMContentLoaded', function () {
-            const fileInput = document.getElementById('fileInput');
 
-            // Handle file selection from input
-            fileInput.addEventListener('change', function () {
-                handleFileSelection(this.files);
-            });
+        function synchronizeInputBoard() {
+            let boardStr = '';
+            for (let row = 0; row < 9; row++) {
+                for (let col = 0; col < 9; col++) {
+                    const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
+                    boardStr += cell.textContent.trim() || '.';
+                }
+            }
+            inputBoard.value = boardStr;
+        }
+// Function to convert 2D array to board string
+function arrayToBoardString(array) {
+    // change 0 to . if there is any
+    array = array.map(row => row.map(cell => cell === 0 ? '.' : cell));
+    return array.flat().join('');
+}
 
-            // Prevent default behavior for drag over to allow drop
-            document.addEventListener('dragover', function (event) {
-                event.preventDefault();
-            });
+        sudokuBoard.addEventListener('paste', function (e) {
+            e.preventDefault();
+            const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+            console.log('Pasted on sudoku-board:', pastedText);
+            distributeTextAcrossCells(pastedText, 'sudoku-board');
+        });
 
-            // Handle file drop
-            document.addEventListener('drop', function (event) {
-                event.preventDefault(); // Prevent default behavior (file being opened)
-                const files = event.dataTransfer.files;
-                fileInput.files = files; // Update the file input
-                handleFileSelection(files);
-            });
+        function getCurrentCellPosition() {
+            const cell = document.activeElement;
+            return {
+                row: Number(cell.dataset.row),
+                col: Number(cell.dataset.col)
+            };
+        }
+
+        function setCellValue(row, col, value) {
+            const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
+            cell.textContent = value;
+            synchronizeInputBoard();
+        }
+
+        function distributeTextAcrossCells(text, target) {
+            const splitText = text.split('');
+            let { row, col } = getCurrentCellPosition();
+            for (let i = 0; i < splitText.length; i++) {
+                setCellValue(row, col, splitText[i]);
+                if (target === 'sudoku-board') {
+                    moveToNextCell(row, col);
+                    ({ row, col } = getCurrentCellPosition());
+                }
+            }
+        }
+
+        inputBoard.addEventListener('paste', function (e) {
+            e.preventDefault();
+            const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+            try {
+                let parsedArray;
+                const containsDot = pastedText.includes('.');
+                try {
+                    parsedArray = JSON.parse(pastedText);
+                } catch {
+                    if (pastedText.length === 81) {
+                        parsedArray = [];
+                        for (let i = 0; i < 9; i++) {
+                            let row;
+                            if (containsDot) {
+                                row = pastedText.slice(i * 9, (i + 1) * 9).split('').map(cell => cell === '.' ? 0 : Number(cell));
+                            } else {
+                                row = pastedText.slice(i * 9, (i + 1) * 9).split('').map(Number);
+                            }
+                            parsedArray.push(row);
+                        }
+                    }
+                }
+                if (Array.isArray(parsedArray) && parsedArray.length === 9 && parsedArray.every(row => Array.isArray(row) && row.length === 9)) {
+                    const boardString = arrayToBoardString(parsedArray);
+                    inputBoard.value = boardString;
+                    updateBoard(boardString);
+                } else if (pastedText.length === 81) {
+                    const boardString = pastedText.replace(/[^0-9]/g, '');
+                    inputBoard.value = boardString;
+                    updateBoard(boardString);
+                } else {
+                    console.error('Pasted content is not a valid Sudoku board:', pastedText);
+                    // update message on input board
+                    inputBoard.value = 'Invalid Sudoku board: ' + pastedText;
+
+                }
+            } catch (error) {
+                console.error('Error parsing pasted content:', error);
+            }
         });
 
 
+        function updateBoard(boardStr) {
+            inputBoard.value = boardStr;
+            let index = 0;
+            for (let row = 0; row < 9; row++) {
+                for (let col = 0; col < 9; col++) {
+                    const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
+                    cell.textContent = boardStr[index] === '.' ? '' : boardStr[index];
+                    index++;
+                }
+            }
+        }
 
-        // Load the WASM file
+        function navigateUsingArrowKeys(key, row, col) {
+            switch (key) {
+                case 'ArrowUp':
+                    if (row > 0) document.querySelector(`.cell[data-row='${row - 1}'][data-col='${col}']`).focus();
+                    break;
+                case 'ArrowDown':
+                    if (row < 8) document.querySelector(`.cell[data-row='${row + 1}'][data-col='${col}']`).focus();
+                    break;
+                case 'ArrowLeft':
+                    if (col > 0) document.querySelector(`.cell[data-row='${row}'][data-col='${col - 1}']`).focus();
+                    break;
+                case 'ArrowRight':
+                    if (col < 8) document.querySelector(`.cell[data-row='${row}'][data-col='${col + 1}']`).focus();
+                    break;
+            }
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === ' ' && !e.repeat) {
+                e.preventDefault();
+                document.addEventListener('keydown', handleSpaceNavigation);
+            } else if (e.key === 'Escape') {
+                document.removeEventListener('keydown', handleSpaceNavigation);
+            }
+        });
+
+        document.addEventListener('keyup', function (e) {
+            if (e.key === ' ') {
+                document.removeEventListener('keydown', handleSpaceNavigation);
+            }
+        });
+
+        function handleSpaceNavigation(e) {
+            const { row, col } = getCurrentCellPosition();
+            if (e.key.startsWith('Arrow')) {
+                navigateUsingArrowKeys(e.key, row, col);
+            }
+        }
+
+//         // Synchronize text input with board cells
+// inputBoard.addEventListener('input', function (e) {
+//     const value = e.target.value.trim();
+//     for (let i = 0; i < 81; i++) {
+//         const row = Math.floor(i / 9);
+//         const col = i % 9;
+//         const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
+//         cell.textContent = (value[i] && value[i].match(/[1-9]/)) ? value[i] : '';
+//     }
+// });
+
         const script = document.createElement('script');
         script.src = './src/sudoku_solver.js';
         document.body.appendChild(script);
@@ -299,6 +718,19 @@
             updateBoard(solvedBoardStr);
 
             celebrate();
+        }
+
+
+        function celebrate() {
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach(cell => {
+                cell.style.backgroundColor = "#8E8E93";
+            });
+            setTimeout(() => {
+                cells.forEach(cell => {
+                    cell.style.backgroundColor = '';
+                });
+            }, 2000);
         }
 
     </script>
