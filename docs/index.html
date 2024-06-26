@@ -115,7 +115,7 @@
     </main>
     <footer>
         <div class="cropping-actions" id="cropping-actions" style="display: none;">
-            <button id="cancelCrop">Cancel Crop</button>
+            <button id="cancelCrop">Close</button>
             <button id="confirmCrop">Confirm Crop</button>
         </div>
         <input id="input-board" type="text" placeholder="Enter board as one line...">
@@ -127,7 +127,6 @@
         </button>
     </footer>
     <script src="./js/tutorial.js"></script>
-    <script src="./js/theme.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
     <script>
         const inputBoard = document.getElementById('input-board');
@@ -135,7 +134,6 @@
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
-        let cropper;
 
         fileInput.addEventListener('change', function () {
             handleFileSelection(this.files);
@@ -173,7 +171,7 @@
 
         function resetUI() {
             document.getElementById('parser').style.display = 'none';
-            // document.getElementsByClassName('upload-btn')[0].style.display = 'inline-block';
+            document.getElementsByClassName('upload-btn')[0].style.display = 'inline-block';
             document.getElementById('cropping-actions').style.display = 'none';
             document.getElementById('sudoku-board').style.display = 'grid';
             document.getElementById('processedImageContainer').style.display = 'none';
@@ -182,7 +180,9 @@
             // document.body.classList.remove('dark-theme');
         }
 
+            let cropper;
         function initiateCropping(file) {
+
             console.log('Initiating cropping');
             return new Promise((resolve, reject) => {
                 if (!file) {
@@ -191,7 +191,7 @@
                     return;
                 }
 
-                const reader = new FileReader();
+                let reader = new FileReader();
                 reader.onload = function (event) {
                     const img = new Image();
                     img.onload = function () {
@@ -201,13 +201,19 @@
                         cropper = new Cropper(canvas, {
                             aspectRatio: 1,
                             viewMode: 1,
-                            autoCropArea: 1,
+                            autoCropArea: 0.98, // Adjust the crop area to 98% of the image area
                             movable: true,
                             zoomable: true,
                             rotatable: true,
                             scalable: true,
+                            data: {
+                                // Calculate the dimensions and position for the crop box to be centered and cover 98% of the area
+                                width: canvas.width * 0.98, // 98% of the canvas width
+                                height: canvas.height * 0.98, // 98% of the canvas height
+                                x: canvas.width * 0.01, // Center the crop box by starting at 1% of the canvas width
+                                y: canvas.height * 0.01, // Center the crop box by starting at 1% of the canvas height
+                            },
                         });
-
                         document.getElementById('confirmCrop').style.display = 'inline';
                     };
                     img.src = event.target.result;
@@ -217,13 +223,22 @@
         }
 
         document.getElementById('confirmCrop').addEventListener('click', async function () {
+
+
             console.log('Confirming crop');
             document.getElementById('parser').style.display = 'none';
             // show board
             document.getElementById('sudoku-board').style.display = 'grid';
             if (cropper) {
-                const croppedCanvas = cropper.getCroppedCanvas();
-                const croppedImageDataURL = croppedCanvas.toDataURL();
+                let croppedCanvas = cropper.getCroppedCanvas();
+                if (!croppedCanvas) {
+                    // Perform your reset actions here
+                    // For example, initializing croppedCanvas with a new canvas or setting a default value
+                    croppedCanvas = document.createElement('canvas');
+                    // You can also set default properties for the new canvas if necessary
+                }
+
+                const croppedImageDataURL = croppedCanvas ? croppedCanvas.toDataURL() : '';
                 const croppedImg = new Image();
                 croppedImg.onload = async function () {
                     canvas.width = croppedImg.width;
@@ -231,8 +246,6 @@
                     ctx.drawImage(croppedImg, 0, 0);
                     await processImage(canvas.toDataURL());
                     const boardStr = await extractSudokuBoard(ctx, canvas.width, canvas.height, progressCallback);
-                    console.log('Extracted board:', boardStr);
-                    updateBoard(boardStr);
                     resetUI();
                 };
                 croppedImg.src = croppedImageDataURL;
@@ -372,8 +385,10 @@
             const workers = setupWebWorkers(numWorkers);
             // Function to find an available worker
             const getAvailableWorker = () => workers.find(worker => !worker.busy);
+            // Initialize a counter for completed tasks
+            let completedTasks = 0;
+            const totalTasks = tasks.length;
 
-            // Process tasks with available workers
             const processTasks = tasks.map((task, index) => new Promise(resolve => {
                 const attemptToProcessTask = () => {
                     const workerInfo = getAvailableWorker();
@@ -384,11 +399,29 @@
                             boardStr[task.row * 9 + task.col] = e.data.result; // Assuming the worker returns the recognized digit or '.'
                             updateBoard(boardStr.join(''));
                             workerInfo.busy = false;
+                            completedTasks++; // Increment the completed tasks counter
                             if (progressCallback) {
-                                const progressPercent = ((index + 1) / totalCells) * 100;
+                                const progressPercent = (completedTasks / totalTasks) * 100;
                                 progressCallback(progressPercent);
                             }
+                            // Resolve the promise when the task is completed
                             resolve();
+                            // Check if all tasks are completed
+                            if (completedTasks === totalTasks) {
+                                console.log('All tasks completed');
+                                // Cleanup
+                                resetUI();
+                                celebrate();
+                                // highlight the solve button so the user can solve the puzzle
+                                document.getElementsByClassName('solve-button')[0].style.fill = 'green';
+
+                                workers.forEach(worker => worker.worker.terminate());
+                                            // Destroy the cropper instance
+            if (typeof cropper !== 'undefined') {
+                cropper.destroy();
+            }
+                                resolve(boardStr.join(''));
+                            }
                         };
                     } else {
                         setTimeout(attemptToProcessTask, 100); // Retry after a short delay if no worker is available
@@ -396,14 +429,9 @@
                 };
                 attemptToProcessTask();
             }));
-
-            await Promise.all(processTasks);
-            console.log('Extracted board:', boardStr);
-            //cleanup
-            workers.forEach(worker => worker.worker.terminate());
-
-            return boardStr.join('');
         }
+
+
 
         async function progressCallback(progress) {
             document.querySelector('.processingMessage').textContent = `Extraction progress: ${progress.toFixed(2)}%`;
@@ -730,19 +758,57 @@ function arrayToBoardString(array) {
 
             celebrate();
         }
+// Cache DOM references
+const themeToggle = document.getElementById('theme-toggle');
+const tutorialPopup = document.getElementById('tutorial-popup');
 
+themeToggle.addEventListener('click', function () {
+    this.classList.toggle('toggle-on');
+    document.body.classList.toggle('dark-theme');
+});
 
-        function celebrate() {
-            const cells = document.querySelectorAll('.cell');
-            cells.forEach(cell => {
-                cell.style.backgroundColor = "#8E8E93";
-            });
-            setTimeout(() => {
-                cells.forEach(cell => {
-                    cell.style.backgroundColor = '';
-                });
-            }, 2000);
+document.addEventListener('DOMContentLoaded', function () {
+    // Use event delegation for close buttons
+    document.body.addEventListener('click', function (e) {
+        if (e.target.classList.contains('close-btn')) {
+            tutorialPopup.style.display = 'none';
         }
+    });
+});
+
+// Toggles the theme-related UI elements based on the isDark parameter.
+function setToggleTheme(isDark) {
+    // Toggle the class on the theme toggle button
+    themeToggle.classList.toggle('toggle-on', isDark);
+    // Toggle the class on the body to apply dark or light theme styles
+    document.body.classList.toggle('dark-theme', isDark);
+}
+
+// Changes the theme from light to dark or dark to light.
+function changeTheme() {
+    // Toggle the 'dark-theme' class on the body and store the new state
+    const isDark = document.body.classList.toggle('dark-theme');
+    // Save the current theme state to localStorage
+    localStorage.setItem('dark-theme', isDark);
+    // Update the UI elements to reflect the current theme
+    setToggleTheme(isDark);
+}
+    function celebrate() {
+        const cells = document.querySelectorAll('.cell');
+        changeTheme();
+        cells.forEach(cell => {
+                        cell.classList.add('celebrateEffect');
+
+        });
+        setTimeout(() => {
+            cells.forEach(cell => {
+                cell.classList.remove('celebrateEffect');
+            });
+        }, 4000);
+        setTimeout(() => {
+            changeTheme();
+        }, 4000);
+    }
 
     </script>
 </body>
