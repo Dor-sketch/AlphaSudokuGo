@@ -218,6 +218,9 @@
 
         document.getElementById('confirmCrop').addEventListener('click', async function () {
             console.log('Confirming crop');
+            document.getElementById('parser').style.display = 'none';
+            // show board
+            document.getElementById('sudoku-board').style.display = 'grid';
             if (cropper) {
                 const croppedCanvas = cropper.getCroppedCanvas();
                 const croppedImageDataURL = croppedCanvas.toDataURL();
@@ -319,7 +322,11 @@
         function setupWebWorkers(numWorkers) {
             const workers = [];
             for (let i = 0; i < numWorkers; i++) {
-                const worker = new Worker('/AlphaSudokuGo/worker.js');
+                let scriptUrl = '/AlphaSudokuGo/worker.js';
+                if (location.hostname === 'localhost') {
+                    scriptUrl = '/worker.js';
+                }
+                const worker = new Worker(scriptUrl);
                 workers.push({ worker: worker, busy: false });
             }
             return workers;
@@ -375,6 +382,7 @@
                         workerInfo.worker.postMessage(task);
                         workerInfo.worker.onmessage = (e) => {
                             boardStr[task.row * 9 + task.col] = e.data.result; // Assuming the worker returns the recognized digit or '.'
+                            updateBoard(boardStr.join(''));
                             workerInfo.busy = false;
                             if (progressCallback) {
                                 const progressPercent = ((index + 1) / totalCells) * 100;
@@ -427,6 +435,9 @@
             if (typeof cropper !== 'undefined') {
                 cropper.destroy();
             }
+
+            // kill workers if any
+            // cleanup
 
             // Reset the UI
             resetUI();
