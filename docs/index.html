@@ -61,8 +61,9 @@
                 <div class="processingMessage">Please crop the Sudoku board and click confirm</div>
             </div>
         </section>
-        <div id="sudoku-board"></div>
-        <div id="tutorial-popup" class="tutorial-popup">
+    <div id="sudoku-board" class="sudoku-board">
+
+    <script src="./js/sudoku.js"></script>        <div id="tutorial-popup" class="tutorial-popup">
         <div class="tutorial-step" data-step="1">
             <p>Welcome to the Sudoku Solver!</p>
             <button class="close-btn">Close</button>
@@ -129,7 +130,6 @@
     <script src="./js/tutorial.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
     <script>
-        const inputBoard = document.getElementById('input-board');
         const fileInput = document.getElementById('fileInput');
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
@@ -397,6 +397,8 @@
             document.querySelector('.processingMessage').textContent = `Extraction progress: ${progress.toFixed(2)}%`;
         }
         function readBoard() {
+                const inputBoard = document.getElementById('input-board');
+
             return inputBoard.value.trim();
         }
 
@@ -450,252 +452,7 @@
 
 
 
-        const sudokuBoard = document.getElementById('sudoku-board');
 
-        // Initialize empty Sudoku board
-        const board = Array.from({ length: 9 }, () => Array(9).fill('.'));
-
-        // Create the grid elements
-        for (let row = 0; row < 9; row++) {
-            for (let col = 0; col < 9; col++) {
-                const cell = document.createElement('div');
-                cell.className = 'cell';
-                cell.contentEditable = true;
-                cell.dataset.row = row;
-                cell.dataset.col = col;
-
-                // Add event listener for handling input
-                cell.addEventListener('input', function (e) {
-                    const value = e.target.textContent.trim();
-                    if (value.match(/[1-9]/)) { // If a number between 1 and 9 is entered
-                        e.target.textContent = value; // Set the cell's content to the entered number
-                        moveToNextCell(row, col); // Move to the next cell
-                    } else {
-                        e.target.textContent = ''; // Clear the cell if the input is not a number
-                    }
-                    synchronizeInputBoard();
-                });
-
-                // Add event listener for handling keydown
-                cell.addEventListener('keydown', function (e) {
-                    // Check if the key pressed is a number or navigation/functional key
-                    if ((e.key >= '0' && e.key <= '9') || e.key === 'Backspace' || e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault(); // Prevent the default action
-
-                        if (e.key === 'Backspace') {
-                            e.target.textContent = ''; // Clear the cell
-                            moveToPreviousCell(row, col); // Move to the previous cell
-                        } else if (e.key === ' ' || e.key === 'Enter') {
-                            e.target.textContent = ''; // Clear the cell
-                            moveToNextCell(row, col); // Move to the next cell
-                        } else {
-                            // Ensure the cell is empty before setting a new number
-                            e.target.textContent = ''; // Clear existing content
-                            e.target.textContent = e.key; // Set new number
-                            moveToNextCell(row, col); // Then move to the next cell
-                        }
-
-                        synchronizeInputBoard();
-                    } else if (e.key.startsWith('Arrow')) {
-                        e.preventDefault();
-                        navigateUsingArrowKeys(e.key, row, col);
-                    }
-                });
-
-                sudokuBoard.appendChild(cell);
-            }
-        }
-
-        function moveToPreviousCell(row, col) {
-            let prevCol = col - 1;
-            let prevRow = row;
-            if (prevCol < 0) { // If the current cell is the first in its row, move to the last cell of the previous row
-                prevCol = 8;
-                prevRow--;
-            }
-            if (prevRow >= 0) { // If the previous row exists
-                const prevCell = document.querySelector(`.cell[data-row='${prevRow}'][data-col='${prevCol}']`);
-                if (prevCell) {
-                    prevCell.focus(); // Move focus to the previous cell
-                }
-            }
-        }
-
-        function moveToNextCell(row, col) {
-            let nextCol = col;
-            let nextRow = row;
-
-            do {
-                nextCol++;
-                if (nextCol > 8) { // If the current cell is the last in its row, move to the first cell of the next row
-                    nextCol = 0;
-                    nextRow++;
-                }
-                if (nextRow >= 9) { // If there are no more rows, stop the loop
-                    return;
-                }
-
-                var nextCell = document.querySelector(`.cell[data-row='${nextRow}'][data-col='${nextCol}']`);
-            } while (nextCell && nextCell.textContent); // Continue if the next cell exists and has a value
-
-            if (nextCell) {
-                nextCell.focus(); // Move focus to the next empty cell
-            }
-        }
-
-        function synchronizeInputBoard() {
-            let boardStr = '';
-            for (let row = 0; row < 9; row++) {
-                for (let col = 0; col < 9; col++) {
-                    const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
-                    boardStr += cell.textContent.trim() || '.';
-                }
-            }
-            inputBoard.value = boardStr;
-        }
-// Function to convert 2D array to board string
-function arrayToBoardString(array) {
-    // change 0 to . if there is any
-    array = array.map(row => row.map(cell => cell === 0 ? '.' : cell));
-    return array.flat().join('');
-}
-
-        sudokuBoard.addEventListener('paste', function (e) {
-            e.preventDefault();
-            const pastedText = (e.clipboardData || window.clipboardData).getData('text');
-            console.log('Pasted on sudoku-board:', pastedText);
-            distributeTextAcrossCells(pastedText, 'sudoku-board');
-        });
-
-        function getCurrentCellPosition() {
-            const cell = document.activeElement;
-            return {
-                row: Number(cell.dataset.row),
-                col: Number(cell.dataset.col)
-            };
-        }
-
-        function setCellValue(row, col, value) {
-            const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
-            cell.textContent = value;
-            synchronizeInputBoard();
-        }
-
-        function distributeTextAcrossCells(text, target) {
-            const splitText = text.split('');
-            let { row, col } = getCurrentCellPosition();
-            for (let i = 0; i < splitText.length; i++) {
-                setCellValue(row, col, splitText[i]);
-                if (target === 'sudoku-board') {
-                    moveToNextCell(row, col);
-                    ({ row, col } = getCurrentCellPosition());
-                }
-            }
-        }
-
-        inputBoard.addEventListener('paste', function (e) {
-            e.preventDefault();
-            const pastedText = (e.clipboardData || window.clipboardData).getData('text');
-            try {
-                let parsedArray;
-                const containsDot = pastedText.includes('.');
-                try {
-                    parsedArray = JSON.parse(pastedText);
-                } catch {
-                    if (pastedText.length === 81) {
-                        parsedArray = [];
-                        for (let i = 0; i < 9; i++) {
-                            let row;
-                            if (containsDot) {
-                                row = pastedText.slice(i * 9, (i + 1) * 9).split('').map(cell => cell === '.' ? 0 : Number(cell));
-                            } else {
-                                row = pastedText.slice(i * 9, (i + 1) * 9).split('').map(Number);
-                            }
-                            parsedArray.push(row);
-                        }
-                    }
-                }
-                if (Array.isArray(parsedArray) && parsedArray.length === 9 && parsedArray.every(row => Array.isArray(row) && row.length === 9)) {
-                    const boardString = arrayToBoardString(parsedArray);
-                    inputBoard.value = boardString;
-                    updateBoard(boardString);
-                } else if (pastedText.length === 81) {
-                    const boardString = pastedText.replace(/[^0-9]/g, '');
-                    inputBoard.value = boardString;
-                    updateBoard(boardString);
-                } else {
-                    console.error('Pasted content is not a valid Sudoku board:', pastedText);
-                    // update message on input board
-                    inputBoard.value = 'Invalid Sudoku board: ' + pastedText;
-
-                }
-            } catch (error) {
-                console.error('Error parsing pasted content:', error);
-            }
-        });
-
-
-        function updateBoard(boardStr) {
-            inputBoard.value = boardStr;
-            let index = 0;
-            for (let row = 0; row < 9; row++) {
-                for (let col = 0; col < 9; col++) {
-                    const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
-                    cell.textContent = boardStr[index] === '.' ? '' : boardStr[index];
-                    index++;
-                }
-            }
-        }
-
-        function navigateUsingArrowKeys(key, row, col) {
-            switch (key) {
-                case 'ArrowUp':
-                    if (row > 0) document.querySelector(`.cell[data-row='${row - 1}'][data-col='${col}']`).focus();
-                    break;
-                case 'ArrowDown':
-                    if (row < 8) document.querySelector(`.cell[data-row='${row + 1}'][data-col='${col}']`).focus();
-                    break;
-                case 'ArrowLeft':
-                    if (col > 0) document.querySelector(`.cell[data-row='${row}'][data-col='${col - 1}']`).focus();
-                    break;
-                case 'ArrowRight':
-                    if (col < 8) document.querySelector(`.cell[data-row='${row}'][data-col='${col + 1}']`).focus();
-                    break;
-            }
-        }
-
-        document.addEventListener('keydown', function (e) {
-            if (e.key === ' ' && !e.repeat) {
-                e.preventDefault();
-                document.addEventListener('keydown', handleSpaceNavigation);
-            } else if (e.key === 'Escape') {
-                document.removeEventListener('keydown', handleSpaceNavigation);
-            }
-        });
-
-        document.addEventListener('keyup', function (e) {
-            if (e.key === ' ') {
-                document.removeEventListener('keydown', handleSpaceNavigation);
-            }
-        });
-
-        function handleSpaceNavigation(e) {
-            const { row, col } = getCurrentCellPosition();
-            if (e.key.startsWith('Arrow')) {
-                navigateUsingArrowKeys(e.key, row, col);
-            }
-        }
-
-//         // Synchronize text input with board cells
-// inputBoard.addEventListener('input', function (e) {
-//     const value = e.target.value.trim();
-//     for (let i = 0; i < 81; i++) {
-//         const row = Math.floor(i / 9);
-//         const col = i % 9;
-//         const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
-//         cell.textContent = (value[i] && value[i].match(/[1-9]/)) ? value[i] : '';
-//     }
-// });
 
         const script = document.createElement('script');
         script.src = './src/sudoku_solver.js';
@@ -754,11 +511,15 @@ function changeTheme() {
     setToggleTheme(isDark);
 }
     function celebrate() {
-        const cells = document.querySelectorAll('.cell');
+        const cells = document.querySelectorAll('.number');
+        const numbers = document.querySelectorAll('.number');
         changeTheme();
         cells.forEach(cell => {
                         cell.classList.add('celebrateEffect');
 
+        });
+        numbers.forEach(number => {
+            number.style.color = '#368dd9';
         });
         setTimeout(() => {
             cells.forEach(cell => {
@@ -767,6 +528,11 @@ function changeTheme() {
         }, 4000);
         setTimeout(() => {
             changeTheme();
+        }, 4000);
+        setTimeout(() => {
+            numbers.forEach(number => {
+                number.style.color = '#00172b';
+            });
         }, 4000);
     }
 

@@ -1,0 +1,41 @@
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+            margin: 0;
+        }
+        table {
+            border-collapse: collapse;
+        }
+        td {
+            border: 1px solid #000;
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            vertical-align: middle;
+            position: relative;
+            overflow: hidden;
+        }
+        .spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+        }
+        .wheel {
+            display: flex;
+            flex-direction: column;
+            /* Remove transition for manual control */
+        }
+        .number {
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+        }

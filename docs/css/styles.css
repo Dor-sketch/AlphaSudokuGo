@@ -62,24 +62,6 @@ body {
     color: var(--text-color);
 }
 
-/* Sudoku Board Styling */
-#sudoku-board {
-    display: grid;
-    grid-template-columns: repeat(9, 1fr);
-    grid-template-rows: repeat(9, 1fr);
-    gap: 1px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 600px;
-    aspect-ratio: 1;
-    margin: auto;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: var(--board-background-color);
-}
-
 .cell {
     font-size: 24px;
     transition: background-color 0.2s, box-shadow 0.2s;
@@ -492,7 +474,9 @@ font-size: 0.8rem;
 .grid-container > .cell:nth-child(n+10):nth-child(-n+18) {
     border-bottom: 2px solid var(--cell-border-color-darker);
 }
-
+/* ackground: linear-gradient(90deg, transparent calc(33.33% - 2px), #000 33.33%, #373737 calc(33.33% + 2px), transparent calc(66.66% - 2px), #000 66.66%, #353535 calc(66.66% + 2px), transparent), linear-gradient(0deg, transparent calc(33.33% - 2px), #000 33.33%, #262626 calc(33.33% + 2px), transparent calc(66.66% - 2px), #2a2828 66.66%, #282828 calc(66.66% + 2px), transparent);
+    background-size: auto, auto;
+  background-size: 100% 100%; */
 /* Pseudo-element for the board */
 #sudoku-board::before {
     content: '';
@@ -501,9 +485,12 @@ font-size: 0.8rem;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent calc(33.33% - 2px), var(--cell-border-color-darker) 33.33%, var(--cell-border-color-darker) calc(33.33% + 2px), transparent calc(66.66% - 2px), var(--cell-border-color-darker) 66.66%, var(--cell-border-color-darker) calc(66.66% + 2px), transparent), linear-gradient(0deg, transparent calc(33.33% - 2px), var(--cell-border-color-darker) 33.33%, var(--cell-border-color-darker) calc(33.33% + 2px), transparent calc(66.66% - 2px), var(--cell-border-color-darker) 66.66%, var(--cell-border-color-darker) calc(66.66% + 2px), transparent);
+    background: linear-gradient(90deg, transparent calc(33.33% - 2px), #444444 33.33%, #444444 calc(33.33% + 2px), transparent calc(66.66% - 2px), #555555 66.66%, #555555 calc(66.66% + 2px), transparent),
+                linear-gradient(0deg, transparent calc(33.33% - 2px), #444444 33.33%, #444444 calc(33.33% + 2px), transparent calc(66.66% - 2px), #555555 66.66%, #555555 calc(66.66% + 2px), transparent),
+                linear-gradient(0deg, #666666 100%, transparent 100%);
     background-size: 100% 100%;
-    z-index: 1;
+    z-index: 0;
+    box-shadow: 0 10px 20px 0 rgba(0,0,0,0.3); /* Enhanced shadow for a deeper 3D effect */
 }
 
 /* Reset the cell border color */
@@ -521,24 +508,100 @@ font-size: 0.8rem;
     z-index: 2;
 }
 
+
+
+
+                body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+
+        table {
+            border-collapse: collapse;
+        }
+        td {
+            border: 1px solid #000;
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            vertical-align: middle;
+            position: relative;
+            overflow: hidden;
+        }
+        /* Pseudo-element for the board */
+
+        .spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            z-index: 100;
+        }
+        .wheel {
+            display: flex;
+            flex-direction: column;
+            /* Enhanced visual effect */
+            transition: transform 0.3s ease; /* Reintroduce transition for smoothness */
+        }
+
+        .number {
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px; /* Increased font size */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Stylish, readable font */
+            color: #00172b; /* Dark color for high contrast */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2); /* Subtle text shadow for depth */
+            transition: all 0.3s ease; /* Smooth transition for interactivity */
+        }
+
+        .number:hover {
+            transform: scale(1.1); /* Slightly enlarge digits on hover */
+            cursor: pointer; /* Change cursor to indicate interactivity */
+        }
+        #sudoku-board {
+            position: relative; /* Ensure this is set so the pseudo-element positions correctly */
+            /* Other styles for sudoku board */
+        }
+
+
 #sudoku-board::before {
     z-index: 1;
 }
-        @keyframes glowPulse {
-            0%, 100% {
-                text-shadow: 0 0 25px rgba(7, 188, 229, 1), 0 0 50px rgba(7, 188, 229, 0.9);
-                        background-color: rgba(10, 10, 74, 0.7);
-
-            }
-            50% {
-                text-shadow: 0 0 35px rgba(31, 45, 55, 1), 0 0 70px rgba(31, 45, 55, 0.9);
-                        background-color: rgba(9, 9, 34, 0.7);
-
-            }
-        }
-
+@keyframes glowPulse {
+    0%, 100% {
+        text-shadow:
+            0 0 10px #ff69b4, /* Light pink */
+            0 0 20px #ff69b4,
+            0 0 30px #ff1493, /* Deep pink */
+            0 0 40px #ff1493,
+            0 0 50px #c71585, /* Medium violet red */
+            0 0 60px #c71585,
+            0 0 70px #db7093, /* Pale violet red */
+            0 0 80px #db7093;
+    }
+    50% {
+        text-shadow:
+            0 0 20px #add8e6, /* Light blue */
+            0 0 30px #add8e6,
+            0 0 40px #00bfff, /* Deep sky blue */
+            0 0 50px #00bfff,
+            0 0 60px #1e90ff, /* Dodger blue */
+            0 0 70px #1e90ff,
+            0 0 80px #4169e1, /* Royal blue */
+            0 0 90px #4169e1;
+    }
+}
         .celebrateEffect {
+        color: #ffffff !important;
             animation: glowPulse 5s ease-out infinite;
             transition: background-color 0.3s, text-shadow 0.3s;
-            
         }
