@@ -453,7 +453,23 @@ text-align: center;}
     background-size: auto, auto;
   background-size: 100% 100%; */
 /* Pseudo-element for the board */
+
 #sudoku-board::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent calc(33.33% - 2px), #cccccc 33.33%, #cccccc calc(33.33% + 2px), transparent calc(66.66% - 2px), #dddddd 66.66%, #dddddd calc(66.66% + 2px), transparent),
+                linear-gradient(0deg, transparent calc(33.33% - 2px), #cccccc 33.33%, #cccccc calc(33.33% + 2px), transparent calc(66.66% - 2px), #dddddd 66.66%, #dddddd calc(66.66% + 2px), transparent),
+                linear-gradient(0deg, #eeeeee 100%, transparent 100%);
+    background-size: 100% 100%;
+    z-index: 0;
+    box-shadow: 0 10px 20px 0 rgba(0,0,0,0.1); /* Lighter shadow for a softer effect */
+}
+
+body.dark-theme #sudoku-board::before {
     content: '';
     position: absolute;
     top: 0;
@@ -532,9 +548,7 @@ text-align: center;}
             justify-content: center;
             align-items: center;
             font-size: 24px; /* Increased font size */
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Stylish, readable font */
-            color: #00172b; /* Dark color for high contrast */
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.2); /* Subtle text shadow for depth */
+
             transition: all 0.3s ease; /* Smooth transition for interactivity */
         }
 
@@ -592,7 +606,9 @@ text-align: center;}
 position: fixed;
 text-align: left;
 bottom: 0rem;
+margin-left: 1rem;
 font-size: 0.8rem;
+padding-left: 2rem;
 }
     .cell {
         font-size: 18px;
