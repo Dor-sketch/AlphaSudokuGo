@@ -48,7 +48,7 @@ const inertiaFactor = 0.1; // Increased from 0.1 to 0.5
 
 function spinMove(event, wheel) {
     const currentY = event.touches ? event.touches[0].clientY : event.clientY;
-    const deltaY = (currentY - startY) * 2; // Multiply the difference by 2 to amplify the effect
+    const deltaY = (currentY - startY); // Multiply the difference by 2 to amplify the effect
     const now = Date.now();
     // Modify the velocity calculation to increase sensitivity to small movements
     velocity = ((currentY - lastY)) / (now - lastMoveTime); // Multiply the difference by 2 to amplify the effect
