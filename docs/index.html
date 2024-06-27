@@ -308,91 +308,87 @@
             }
             return workers;
         }
-
         async function extractSudokuBoard(ctx, width, height, progressCallback) {
             console.log('Extracting Sudoku board');
             const cellWidth = Math.floor(width / 9);
             const cellHeight = Math.floor(height / 9);
             console.log('Cell width:', cellWidth, 'Cell height:', cellHeight);
             let boardStr = Array(81).fill('.'); // Initialize board string with placeholders
-            const totalCells = 9 * 9;
 
             const tasks = [];
             const centerRegionSize = 0.5; // Sample the central 50% of the cell
             for (let row = 0; row < 9; row++) {
                 for (let col = 0; col < 9; col++) {
-                    // Calculate the coordinates for the central region of the cell
                     const offsetX = (cellWidth * (1 - centerRegionSize)) / 2;
                     const offsetY = (cellHeight * (1 - centerRegionSize)) / 2;
                     const centerWidth = cellWidth * centerRegionSize;
                     const centerHeight = cellHeight * centerRegionSize;
 
-                    // Get the image data for the central region
                     const centerImageData = ctx.getImageData(col * cellWidth + offsetX, row * cellHeight + offsetY, centerWidth, centerHeight).data;
 
-                    // Check if the central region is not empty by looking for any non-transparent pixel
                     let isEmpty = true;
-                    for (let i = 3; i < centerImageData.length; i += 4) { // Check only alpha values of each pixel
-                        if (centerImageData[i] > 0) { // If any pixel is not fully transparent
+                    for (let i = 3; i < centerImageData.length; i += 4) {
+                        if (centerImageData[i] > 0) {
                             isEmpty = false;
-                            break; // Exit the loop early if a non-transparent pixel is found
+                            break;
                         }
                     }
                     if (!isEmpty) {
-                        // If the center is not empty, consider the whole cell as not empty and add a task for it
                         const cellImageData = ctx.getImageData(col * cellWidth, row * cellHeight, cellWidth, cellHeight).data;
                         tasks.push({ width: cellWidth, height: cellHeight, imageData: cellImageData, row, col });
                     }
                 }
             }
+
+            if (tasks.length === 0) {
+                console.log('No tasks to process.');
+                return boardStr.join(''); // Return the initial board string if no tasks are created
+            }
+
             const numWorkers = Math.min(tasks.length, navigator.hardwareConcurrency) || 1;
             const workers = setupWebWorkers(numWorkers);
-            // Function to find an available worker
+
             const getAvailableWorker = () => workers.find(worker => !worker.busy);
-            // Initialize a counter for completed tasks
+
             let completedTasks = 0;
             const totalTasks = tasks.length;
 
-            const processTasks = tasks.map((task, index) => new Promise(resolve => {
+            await Promise.all(tasks.map(task => new Promise(resolve => {
                 const attemptToProcessTask = () => {
                     const workerInfo = getAvailableWorker();
                     if (workerInfo) {
                         workerInfo.busy = true;
                         workerInfo.worker.postMessage(task);
                         workerInfo.worker.onmessage = (e) => {
-                            boardStr[task.row * 9 + task.col] = e.data.result; // Assuming the worker returns the recognized digit or '.'
+                            boardStr[task.row * 9 + task.col] = e.data.result;
                             updateBoard(boardStr.join(''));
                             workerInfo.busy = false;
-                            completedTasks++; // Increment the completed tasks counter
+                            completedTasks++;
                             if (progressCallback) {
                                 const progressPercent = (completedTasks / totalTasks) * 100;
                                 progressCallback(progressPercent);
+                                console.log(`Progress: ${progressPercent}%`);
                             }
-                            // Resolve the promise when the task is completed
                             resolve();
-                            // Check if all tasks are completed
                             if (completedTasks === totalTasks) {
                                 console.log('All tasks completed');
-                                // Cleanup
                                 resetUI();
                                 solveSudoku();
-                                // highlight the solve button so the user can solve the puzzle
                                 document.getElementsByClassName('solve-button')[0].style.fill = 'green';
-
                                 workers.forEach(worker => worker.worker.terminate());
-                                            // Destroy the cropper instance
-            if (typeof cropper !== 'undefined') {
-                cropper.destroy();
-            }
-                                resolve(boardStr.join(''));
+                                if (typeof cropper !== 'undefined') {
+                                    cropper.destroy();
+                                }
                             }
                         };
                     } else {
-                        setTimeout(attemptToProcessTask, 100); // Retry after a short delay if no worker is available
+                        setTimeout(attemptToProcessTask, 100);
                     }
                 };
                 attemptToProcessTask();
-            }));
+            })));
+
+            return boardStr.join('');
         }
 
 
