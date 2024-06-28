@@ -129,7 +129,6 @@
     </footer>
     <script src="./js/tutorial.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
-    <script src="./js/parser.js"></script>
     <script>
         const fileInput = document.getElementById('fileInput');
 
@@ -207,8 +206,11 @@
         const script = document.createElement('script');
         script.src = './src/sudoku_solver.js';
         document.body.appendChild(script);
+
+
         function solveSudoku() {
             const boardStr = readBoard();
+            console.log(boardStr);
             if (boardStr.length !== 81) {
                 alert('Please fill all cells with valid numbers');
                 return;
@@ -221,6 +223,7 @@
             const csp = new Module.SudokuCSP(boardStr);
             csp.solve();
             const solvedBoardStr = csp.getBoard();
+            console.log(solvedBoardStr);
             updateBoard(solvedBoardStr);
 
             celebrate();
@@ -287,6 +290,8 @@ function changeTheme() {
     }
 
     </script>
+        <script src="./js/parser.js"></script>
+
 </body>
 
 </html>

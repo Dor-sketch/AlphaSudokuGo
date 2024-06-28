@@ -170,6 +170,8 @@ function processImage(src) {
             reject(new Error("No image source provided."));
             return;
         }
+        // make black and white and extream contrast (black and white)
+
 
         const img = new Image();
         img.onload = function () {
@@ -181,7 +183,10 @@ function processImage(src) {
             ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
 
             // Binarize and enhance the image
+
             let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            imageData = binarizeImage(imageData);
+
             ctx.putImageData(imageData, 0, 0);
 
             const processedImageSrc = canvas.toDataURL();
