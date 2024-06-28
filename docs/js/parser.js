@@ -126,9 +126,8 @@ function updateGridLines() {
 document.getElementById('confirmCrop').addEventListener('click', async function () {
     console.log('Confirming crop');
     if (DEBUG) {
-    document.getElementById('sudoku-board').style.display = 'none';
-    }
-    else {
+        document.getElementById('sudoku-board').style.display = 'none';
+    } else {
         document.getElementById('sudoku-board').style.display = 'grid';
         document.getElementById('parser').style.display = 'none';
     }
@@ -144,18 +143,32 @@ document.getElementById('confirmCrop').addEventListener('click', async function 
         const croppedImageDataURL = croppedCanvas ? croppedCanvas.toDataURL() : '';
         const croppedImg = new Image();
         croppedImg.onload = async function () {
-            canvas.width = croppedImg.width;
-            canvas.height = croppedImg.height;
-            ctx.drawImage(croppedImg, 0, 0);
+            // Initialize a single canvas and context for all operations
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            const MAX_WIDTH = 540;
+            let targetWidth = croppedImg.width; // Use croppedImg dimensions
+            let targetHeight = croppedImg.height; // Use croppedImg dimensions
+            if (targetWidth > MAX_WIDTH) {
+                targetHeight *= MAX_WIDTH / targetWidth;
+                targetWidth = MAX_WIDTH;
+            }
+
+            // Set canvas dimensions once before drawing operations
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
+
+            // Draw the cropped image on the canvas
+            ctx.drawImage(croppedImg, 0, 0, targetWidth, targetHeight);
+
             // Draw white lines over where the red marks were
-            // Adjust the logic based on your grid
-            const numLines = 9; // Number of grid lines, adjust based on your grid
+            const numLines = 9; // Number of grid lines
             const lineWidth = 10; // Width of the grid lines
             const segmentWidth = canvas.width / numLines;
             const segmentHeight = canvas.height / numLines;
 
-            ctx.fillStyle = 'white'
-
+            ctx.fillStyle = 'white';
             for (let i = 1; i < numLines; i++) {
                 // Draw over vertical lines
                 ctx.fillRect(segmentWidth * i - lineWidth / 2, 0, lineWidth, canvas.height);
@@ -163,8 +176,13 @@ document.getElementById('confirmCrop').addEventListener('click', async function 
                 ctx.fillRect(0, segmentHeight * i - lineWidth / 2, canvas.width, lineWidth);
             }
 
-            // Continue with the rest of the processing
-            await processImage(canvas.toDataURL());
+            // Binarize and enhance the image
+            let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            imageData = binarizeImage(imageData);
+            ctx.putImageData(imageData, 0, 0);
+
+            const processedImageSrc = canvas.toDataURL();
+            // resolve(processedImageSrc); // Assuming resolve is part of a Promise, ensure it's correctly handled
             const boardStr = await extractSudokuBoard(ctx, canvas.width, canvas.height, progressCallback);
 
             resetUI();
