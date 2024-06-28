@@ -20,6 +20,7 @@ __pycache__/*
 Parser
 
 *.gif
+!/docs/*.gif
 *.pem
 .docs/serve.py
 serve.py
