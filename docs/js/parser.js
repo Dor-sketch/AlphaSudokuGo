@@ -80,7 +80,16 @@ function initiateCropping(file) {
         reader.readAsDataURL(file);
     });
 }
+const rotationSlider = document.getElementById('rotationSlider');
 
+// Listen for slider changes
+rotationSlider.addEventListener('input', function () {
+    // Get the selected angle from the slider
+    const selectedAngle = parseInt(this.value, 10);
+
+    // Rotate the image to the selected angle
+    cropper.rotateTo(selectedAngle);
+});
 
 function updateGridLines() {
     const cropBox = document.querySelector('#parser > div.cropper-container.cropper-bg > div.cropper-crop-box > span.cropper-face.cropper-move');
