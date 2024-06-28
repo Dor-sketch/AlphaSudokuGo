@@ -263,7 +263,7 @@ document.addEventListener('keydown', function (e) {
 
     // Check if cell exists
     if (!cell) {
-        console.error(`No cell found at row ${row}, col ${col}`);
+        console.log(`No cell found at row ${row}, col ${col}`);
         return; // Exit the function if no cell is found
     }
 

@@ -81,7 +81,7 @@ button:active,
      margin-left: 1rem;
 }
 
-.solve-button {
+.solve-button, .reset-button {
     /* background-color: var(--primary-color); */
     color: var(--text-color);
     padding: 8px 25px;
@@ -100,7 +100,7 @@ footer {
     position: fixed;
     bottom: 0;
     width: 100%;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(2px);
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
     transition: background 0.3s;
     z-index: 50000;
@@ -153,8 +153,8 @@ header, footer, .header, .footer {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
     border-radius: 0; /* Typically, Apple's nav bars are flat against the edge */
     transition: background 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, transform 0.5s ease-out; /* Smooth transitions for visual effects */
-    -webkit-backdrop-filter: blur(10px); /* For Safari */
-    backdrop-filter: saturate(180%) blur(20px); /* Creates a frosted glass effect */
+    -webkit-backdrop-filter: blur(2px); /* For Safari */
+    backdrop-filter: saturate(180%) blur(2px); /* Creates a frosted glass effect */
     text-decoration: none;
     z-index: 4;
 }
@@ -355,7 +355,7 @@ label {
 }
 
 .upload-btn:hover {
-    background-color: rgba(0, 123, 255, 0.1);
+ound-color: rgba(0, 123, 255, 0.1);
     transform: scale(1.05);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
@@ -533,7 +533,7 @@ color: #ffffff !important;
         bottom: 0;
         width: 100%;
         background-color: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(10px);
+        backdrop-filter: blur(5px);
         box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
     }
 }
