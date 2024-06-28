@@ -366,24 +366,20 @@ label {
     text-align: left;
     position: absolute;
     left: 0;
-    bottom: 4rem;
+    bottom: 3rem;
     margin: 1rem;
 }
 
 
 .design-info p {
-    margin-bottom: 0 !important;
     margin-block-start: 0rem;
-    padding-left: 0.1rem;
-    padding-top: 0.1rem;
+    margin-block-end: 0rem;
     left: 0;
     z-index: 1;
 }
 .design-info a {
     color: var(--focus-color);
     text-decoration: none;
-    padding-left: 0.1rem;
-    padding-bottom: 0rem;
 }
 
 .cropping-actions {
@@ -520,10 +516,17 @@ color: #ffffff !important;
         gap: 0;
     }
     .design-info {
+    display: flex;
         text-align: left;
         font-size: 0.8rem;
+        white-space: nowrap;
+        flex-direction: row;
     }
-
+    h1 {
+        font-size: 0.8rem;
+        margin-right: 0.2rem;
+        margin-left: 0rem;
+    }
 
     .actions {
         position: fixed;
