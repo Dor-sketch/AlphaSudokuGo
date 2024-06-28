@@ -15,8 +15,9 @@
     <title>Snap & Solve: Turn Puzzle Images into Sudoku Answers</title>
     <meta name="author" content="Dor Pascal">
     <meta property="og:title" content="Snap & Solve: Turn Puzzle Images into Sudoku Answers" />
-    <meta property="og:image" content="https://dorpascal.com/AlphaSudokuGo/sudoku-solver.png" />
-    <meta property="og:description" content="Fastest Sudoku solver ever. Enter a board, click solve, and see the magic happen. Built by Dor." />
+    <meta property="og:image" content="https://dorpascal.com/AlphaSudokuGo/sudoku-solver.gif" />
+    <meta property="og:description"
+        content="Fastest Sudoku solver ever. Enter a board, click solve, and see the magic happen. Built by Dor." />
     <meta property="og:url" content="https://dorpascal.com/AlphaSudokuGo/" />
     <meta property="og:type" content="website" />
     <link rel="icon" href="./favicon.ico">
@@ -37,11 +38,7 @@
                 <i class="fas fa-camera icon-style"></i>
             </label>
         </div>
-        <div class="design-info">
-            <p>Built By Dor © <script>document.write(new Date().getFullYear());</script><br>
-                <a href="https://dorpascal.com">dorpascal.com</a>
-            </p>
-        </div>
+
         <div id="theme-toggle" class="theme-toggle">
             <div class="toggle-inner">
                 <div class="toggle-handle"></div>
@@ -58,8 +55,54 @@
         </section>
         <div id="sudoku-board" class="sudoku-board"></div>
         <div id="tutorial-popup" class="tutorial-popup">
-            <!-- Tutorial steps here -->
+            <div class="tutorial-step" data-step="1">
+                <p>👋 Welcome to the Sudoku Solver!</p>
+                <p>Let's get started.</p>
+                <button class="close-btn">❌ Close</button>
+                <button class="next-btn">➡️ Next</button>
+            </div>
+            <div class="tutorial-step" data-step="2" style="display:none;">
+                <p>How to use:</p>
+                <p>Enter the Sudoku board and click the play button to solve the puzzle.</p>
+                <button class="close-btn">❌ Close</button>
+                <button class="next-btn">➡️ Next</button>
+            </div>
+            <div class="tutorial-step" data-step="3" style="display:none;">
+                <p>📝 You can enter the Sudoku board in multiple ways:</p>
+                <ul style="list-style-type: none; padding: 0;">
+                    <li>📷 Take a picture or choose an image from your device.</li>
+                    <li>🖱️ Drag and drop an image.</li>
+                    <li>✍️ Enter the board as a text line in the input field.</li>
+                </ul>
+                <button class="close-btn">❌ Close</button>
+                <button class="next-btn">➡️ Next</button>
+            </div>
+            <div class="tutorial-step" data-step="4" style="display:none;">
+                <p>🖼️ If you upload an image, crop the Sudoku board and confirm for best results.</p>
+                <p>📝 You can also edit the board by clicking on the cells or using the input field.</p>
+                <button class="close-btn">❌ Close</button>
+                <button class="next-btn">➡️ Next</button>
+            </div>
+            <div class="tutorial-step" data-step="5" style="display:none;">
+                <p>🚀 Ready to solve the Sudoku puzzle?</p>
+                <p>Try to copy and paste the hardest Sudoku puzzle ever (according to <a
+                        href="https://www.telegraph.co.uk/news/science/science-news/9359579/Worlds-hardest-sudoku-can-you-crack-it.html"
+                        target="_blank">The Telegraph</a>).</p>
+                <span>53..7....6..195....98....6.8...6...34..8.3..17...2...6.6....28....419..5....8..79</span>
+                <button class="copy-btn" data-text="8..........36......7..9.2...5...7.......457.....1...3...1....68..85...1..9....4..">📋 Copy</button>
+                <br>
+                <br>
+                <button class="close-btn">✅ Finish</button>
+            </div>
         </div>
+    </div>
+         <div class="design-info">
+        <h1>Snap & Solve</h1>
+                <p>Built By Dor ©
+                    <script>document.write(new Date().getFullYear());</script><br>
+                    <a href="https://dorpascal.com">dorpascal.com</a>
+                </p>
+            </div>
     </main>
     <footer>
         <div class="cropping-actions" id="cropping-actions" style="display: none;">

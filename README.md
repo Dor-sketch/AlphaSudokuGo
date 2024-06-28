@@ -324,6 +324,3 @@ Any contributions you make are greatly appreciated.
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-............5.3.3...84.12...59...8..........6.23...57...53.7....1.
-............5.3.3...84.12...59...8..........6.23...57...53.7....1.....9.....1...
