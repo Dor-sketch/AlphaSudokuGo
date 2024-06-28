@@ -24,10 +24,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <link rel="stylesheet" href="./css/styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+    <link rel="stylesheet" href="./css/styles.css">
 </head>
 
 <body>
@@ -129,10 +129,10 @@
     </footer>
     <script src="./js/tutorial.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+    <script src="./js/parser.js"></script>
     <script>
         const fileInput = document.getElementById('fileInput');
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
 
 
         fileInput.addEventListener('change', function () {
@@ -151,256 +151,6 @@
         });
 
 
-
-        async function handleFileSelection(files) {
-            if (files.length > 0) {
-                console.log('Handling file selection');
-                // document.body.classList.toggle('dark-theme');
-                document.getElementById('parser').style.display = 'block';
-                document.getElementById('sudoku-board').style.display = 'none';
-                document.getElementById('processedImageContainer').style.display = 'flex';
-                document.getElementsByClassName('processingMessage')[0].style.display = 'block';
-                document.getElementsByClassName('upload-btn')[0].style.display = 'none';
-                document.getElementById('cropping-actions').style.display = 'block';
-                document.getElementById('tutorial-popup').style.display = 'none';
-                document.getElementById('input-board').style.display = 'none';
-                document.getElementsByClassName('solve-button')[0].style.display = 'none';
-                await initiateCropping(files[0]);
-            }
-        }
-
-        function resetUI() {
-            document.getElementById('parser').style.display = 'none';
-            document.getElementsByClassName('upload-btn')[0].style.display = 'inline-block';
-            document.getElementById('cropping-actions').style.display = 'none';
-            document.getElementById('sudoku-board').style.display = 'grid';
-            document.getElementById('processedImageContainer').style.display = 'none';
-            document.getElementById('input-board').style.display = 'block';
-            document.getElementsByClassName('solve-button')[0].style.display = 'block';
-            // document.body.classList.remove('dark-theme');
-        }
-
-            let cropper;
-        function initiateCropping(file) {
-
-            console.log('Initiating cropping');
-            return new Promise((resolve, reject) => {
-                if (!file) {
-                    alert("Please upload an image first.");
-                    reject(new Error("No file uploaded."));
-                    return;
-                }
-
-                let reader = new FileReader();
-                reader.onload = function (event) {
-                    const img = new Image();
-                    img.onload = function () {
-                        canvas.width = img.width;
-                        canvas.height = img.height;
-                        ctx.drawImage(img, 0, 0);
-                        cropper = new Cropper(canvas, {
-                            aspectRatio: 1,
-                            viewMode: 1,
-                            autoCropArea: 0.98, // Adjust the crop area to 98% of the image area
-                            movable: true,
-                            zoomable: true,
-                            rotatable: true,
-                            scalable: true,
-                            data: {
-                                // Calculate the dimensions and position for the crop box to be centered and cover 98% of the area
-                                width: canvas.width * 0.98, // 98% of the canvas width
-                                height: canvas.height * 0.98, // 98% of the canvas height
-                                x: canvas.width * 0.01, // Center the crop box by starting at 1% of the canvas width
-                                y: canvas.height * 0.01, // Center the crop box by starting at 1% of the canvas height
-                            },
-                        });
-                        document.getElementById('confirmCrop').style.display = 'inline';
-                    };
-                    img.src = event.target.result;
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        document.getElementById('confirmCrop').addEventListener('click', async function () {
-
-
-            console.log('Confirming crop');
-            document.getElementById('parser').style.display = 'none';
-            // show board
-            document.getElementById('sudoku-board').style.display = 'grid';
-            if (cropper) {
-                let croppedCanvas = cropper.getCroppedCanvas();
-                if (!croppedCanvas) {
-                    // Perform your reset actions here
-                    // For example, initializing croppedCanvas with a new canvas or setting a default value
-                    croppedCanvas = document.createElement('canvas');
-                    // You can also set default properties for the new canvas if necessary
-                }
-
-                const croppedImageDataURL = croppedCanvas ? croppedCanvas.toDataURL() : '';
-                const croppedImg = new Image();
-                croppedImg.onload = async function () {
-                    canvas.width = croppedImg.width;
-                    canvas.height = croppedImg.height;
-                    ctx.drawImage(croppedImg, 0, 0);
-                    await processImage(canvas.toDataURL());
-                    const boardStr = await extractSudokuBoard(ctx, canvas.width, canvas.height, progressCallback);
-                    resetUI();
-                };
-                croppedImg.src = croppedImageDataURL;
-                document.getElementById('confirmCrop').style.display = 'none';
-            }
-        });
-        function processImage(src) {
-            return new Promise((resolve, reject) => {
-                if (!src) {
-                    alert("Please upload an image first.");
-                    reject(new Error("No image source provided."));
-                    return;
-                }
-
-                const img = new Image();
-                img.onload = function () {
-                    const MAX_WIDTH = 540;
-                    let targetWidth = img.width;
-                    let targetHeight = img.height;
-                    canvas.width = targetWidth;
-                    canvas.height = targetHeight;
-                    ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
-
-                    // Binarize and enhance the image
-                    let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    ctx.putImageData(imageData, 0, 0);
-
-                    const processedImageSrc = canvas.toDataURL();
-                    resolve(processedImageSrc);
-                };
-                img.onerror = function (err) {
-                    reject(new Error("Failed to load image: " + err.message));
-                };
-                img.src = src;
-            });
-        }
-
-        function binarizeImage(imageData) {
-            const data = imageData.data;
-            for (let i = 0; i < data.length; i += 4) {
-                const avg = data[i] * 0.3 + data[i + 1] * 0.59 + data[i + 2] * 0.11; // Grayscale
-                const binarized = avg <= 150 ? 0 : 255;
-                data[i] = binarized;
-                data[i + 1] = binarized;
-                data[i + 2] = binarized;
-            }
-            return imageData;
-        }
-
-
-        function setupWebWorkers(numWorkers) {
-            const workers = [];
-            for (let i = 0; i < numWorkers; i++) {
-                let scriptUrl = '/AlphaSudokuGo/worker.js';
-                if (location.hostname === 'localhost') {
-                    scriptUrl = '/worker.js';
-                }
-                const worker = new Worker(scriptUrl);
-                workers.push({ worker: worker, busy: false });
-            }
-            return workers;
-        }
-        async function extractSudokuBoard(ctx, width, height, progressCallback) {
-            console.log('Extracting Sudoku board');
-            const cellWidth = Math.floor(width / 9);
-            const cellHeight = Math.floor(height / 9);
-            console.log('Cell width:', cellWidth, 'Cell height:', cellHeight);
-            let boardStr = Array(81).fill('.'); // Initialize board string with placeholders
-
-            const tasks = [];
-            const centerRegionSize = 0.5; // Sample the central 50% of the cell
-            for (let row = 0; row < 9; row++) {
-                for (let col = 0; col < 9; col++) {
-                    const offsetX = (cellWidth * (1 - centerRegionSize)) / 2;
-                    const offsetY = (cellHeight * (1 - centerRegionSize)) / 2;
-                    const centerWidth = cellWidth * centerRegionSize;
-                    const centerHeight = cellHeight * centerRegionSize;
-
-                    const centerImageData = ctx.getImageData(col * cellWidth + offsetX, row * cellHeight + offsetY, centerWidth, centerHeight).data;
-
-                    let isEmpty = true;
-                    for (let i = 3; i < centerImageData.length; i += 4) {
-                        if (centerImageData[i] > 0) {
-                            isEmpty = false;
-                            break;
-                        }
-                    }
-                    if (!isEmpty) {
-                        const cellImageData = ctx.getImageData(col * cellWidth, row * cellHeight, cellWidth, cellHeight).data;
-                        tasks.push({ width: cellWidth, height: cellHeight, imageData: cellImageData, row, col });
-                    }
-                }
-            }
-
-            if (tasks.length === 0) {
-                console.log('No tasks to process.');
-                return boardStr.join(''); // Return the initial board string if no tasks are created
-            }
-
-            const numWorkers = Math.min(tasks.length, navigator.hardwareConcurrency) || 1;
-            const workers = setupWebWorkers(numWorkers);
-
-            const getAvailableWorker = () => workers.find(worker => !worker.busy);
-
-            let completedTasks = 0;
-            const totalTasks = tasks.length;
-
-            await Promise.all(tasks.map(task => new Promise(resolve => {
-                const attemptToProcessTask = () => {
-                    const workerInfo = getAvailableWorker();
-                    if (workerInfo) {
-                        workerInfo.busy = true;
-                        workerInfo.worker.postMessage(task);
-                        workerInfo.worker.onmessage = (e) => {
-                            boardStr[task.row * 9 + task.col] = e.data.result;
-                            updateBoard(boardStr.join(''));
-                            workerInfo.busy = false;
-                            completedTasks++;
-                            if (progressCallback) {
-                                const progressPercent = (completedTasks / totalTasks) * 100;
-                                progressCallback(progressPercent);
-                                console.log(`Progress: ${progressPercent}%`);
-                            }
-                            resolve();
-                            if (completedTasks === totalTasks) {
-                                console.log('All tasks completed');
-                                resetUI();
-                                solveSudoku();
-                                document.getElementsByClassName('solve-button')[0].style.fill = 'green';
-                                workers.forEach(worker => worker.worker.terminate());
-                                if (typeof cropper !== 'undefined') {
-                                    cropper.destroy();
-                                }
-                            }
-                        };
-                    } else {
-                        setTimeout(attemptToProcessTask, 100);
-                    }
-                };
-                attemptToProcessTask();
-            })));
-
-            return boardStr.join('');
-        }
-
-
-
-        async function progressCallback(progress) {
-            document.querySelector('.processingMessage').textContent = `Extraction progress: ${progress.toFixed(2)}%`;
-        }
-        function readBoard() {
-                const inputBoard = document.getElementById('input-board');
-
-            return inputBoard.value.trim();
-        }
 
         function isValidSudoku(boardStr) {
             for (let i = 0; i < 9; i++) {
