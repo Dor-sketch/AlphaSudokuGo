@@ -12,7 +12,7 @@ async function extractSudokuNumber(cellWidth, cellHeight, imageData) {
   // Convert ImageData to Blob as Tesseract.js can work with Blob for recognition
   const blob = await new Promise(resolve => {
     const canvas = new OffscreenCanvas(cellWidth, cellHeight);
-    const ctx = canvas.getContext('2d');
+const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true, willReadFrequently: false });
     ctx.putImageData(cellImageData, 0, 0);
     canvas.convertToBlob().then(resolve);
   });

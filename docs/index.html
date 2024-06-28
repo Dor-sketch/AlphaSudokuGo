@@ -61,58 +61,59 @@
                 <div class="processingMessage">Please crop the Sudoku board and click confirm</div>
             </div>
         </section>
-    <div id="sudoku-board" class="sudoku-board">
+        <div id="sudoku-board" class="sudoku-board">
 
-    <script src="./js/sudoku.js"></script>        <div id="tutorial-popup" class="tutorial-popup">
-        <div class="tutorial-step" data-step="1">
-            <p>Welcome to the Sudoku Solver!</p>
-            <button class="close-btn">Close</button>
-            <button class="next-btn">Next</button>
-        </div>
-        <div class="tutorial-step" data-step="2" style="display:none;">
-            <p>How to use:</p>
-            <p>Enter the Sudoku board and click the play button to solve the puzzle.</p>
-            <button class="close-btn">Close</button>
-            <button class="next-btn">Next</button>
-        </div>
-        <div class="tutorial-step" data-step="3" style="display:none;">
-            <p>You can enter the Sudoku board in multiple ways:</p>
-            <ul>
-                <li>Upload an image: take a picture or choose an image from your device.</li>
-                <li>Enter the board as a text line in the input field.</li>
-                <li>Edit the board by clicking on the interactive cells.</li>
-            </ul>
-            <button class="close-btn">Close</button>
-            <button class="next-btn">Next</button>
-        </div>
-        <div class="tutorial-step" data-step="4" style="display:none;">
-            <p>If you upload an image, crop the Sudoku board and confirm for best results.</p>
-            <p>You can also edit the board by clicking on the cells or using the input field.</p>
-            <button class="close-btn">Close</button>
-            <button class="next-btn">Next</button>
-        </div>
-        <div class="tutorial-step" data-step="5" style="display:none;">
-            <p>Ready to solve the Sudoku puzzle? Try to copy and paste a board from those:</p>
-            <ul>
-                <li><strong>Format 1:</strong>
-                    003020600900305001001806400008102900700000008006708200002609500800203009005010300
-                    <button class="copy-btn"
-                        data-text="003020600900305001001806400008102900700000008006708200002609500800203009005010300">Copy</button>
-                </li>
-                <li><strong>Format 2:</strong>
-                    <pre>[["5","3",".",".","7",".",".",".","."],["6",".",".","1","9","5",".",".","."],[".","9","8",".",".",".",".","6","."],["8",".",".",".","6",".",".",".","3"],["4",".",".","8",".","3",".",".","1"],["7",".",".",".","2",".",".",".","6"],[".","6",".",".",".",".","2","8","."],[".",".",".","4","1","9",".",".","5"],[".",".",".",".","8",".",".","7","9"]]</pre>
-                    <button class="copy-btn"
-                        data-text='[["5","3",".",".","7",".",".",".","."],["6",".",".","1","9","5",".",".","."],[".","9","8",".",".",".",".","6","."],["8",".",".",".","6",".",".",".","3"],["4",".",".","8",".","3",".",".","1"],["7",".",".",".","2",".",".",".","6"],[".","6",".",".",".",".","2","8","."],[".",".",".","4","1","9",".",".","5"],[".",".",".",".","8",".",".","7","9"]]'>Copy</button>
-                </li>
-                <li><strong>Format 3:</strong>
-                    53..7....6..195....98....6.8...6...34..8.3..17...2...6.6....28....419..5....8..79
-                    <button class="copy-btn"
-                        data-text="53..7....6..195....98....6.8...6...34..8.3..17...2...6.6....28....419..5....8..79">Copy</button>
-                </li>
-            </ul>
-            <button class="close-btn">Finish</button>
-        </div>
-    </div>
+            <script src="./js/sudoku.js"></script>
+            <div id="tutorial-popup" class="tutorial-popup">
+                <div class="tutorial-step" data-step="1">
+                    <p>Welcome to the Sudoku Solver!</p>
+                    <button class="close-btn">Close</button>
+                    <button class="next-btn">Next</button>
+                </div>
+                <div class="tutorial-step" data-step="2" style="display:none;">
+                    <p>How to use:</p>
+                    <p>Enter the Sudoku board and click the play button to solve the puzzle.</p>
+                    <button class="close-btn">Close</button>
+                    <button class="next-btn">Next</button>
+                </div>
+                <div class="tutorial-step" data-step="3" style="display:none;">
+                    <p>You can enter the Sudoku board in multiple ways:</p>
+                    <ul>
+                        <li>Upload an image: take a picture or choose an image from your device.</li>
+                        <li>Enter the board as a text line in the input field.</li>
+                        <li>Edit the board by clicking on the interactive cells.</li>
+                    </ul>
+                    <button class="close-btn">Close</button>
+                    <button class="next-btn">Next</button>
+                </div>
+                <div class="tutorial-step" data-step="4" style="display:none;">
+                    <p>If you upload an image, crop the Sudoku board and confirm for best results.</p>
+                    <p>You can also edit the board by clicking on the cells or using the input field.</p>
+                    <button class="close-btn">Close</button>
+                    <button class="next-btn">Next</button>
+                </div>
+                <div class="tutorial-step" data-step="5" style="display:none;">
+                    <p>Ready to solve the Sudoku puzzle? Try to copy and paste a board from those:</p>
+                    <ul>
+                        <li><strong>Format 1:</strong>
+                            003020600900305001001806400008102900700000008006708200002609500800203009005010300
+                            <button class="copy-btn"
+                                data-text="003020600900305001001806400008102900700000008006708200002609500800203009005010300">Copy</button>
+                        </li>
+                        <li><strong>Format 2:</strong>
+                            <pre>[["5","3",".",".","7",".",".",".","."],["6",".",".","1","9","5",".",".","."],[".","9","8",".",".",".",".","6","."],["8",".",".",".","6",".",".",".","3"],["4",".",".","8",".","3",".",".","1"],["7",".",".",".","2",".",".",".","6"],[".","6",".",".",".",".","2","8","."],[".",".",".","4","1","9",".",".","5"],[".",".",".",".","8",".",".","7","9"]]</pre>
+                            <button class="copy-btn"
+                                data-text='[["5","3",".",".","7",".",".",".","."],["6",".",".","1","9","5",".",".","."],[".","9","8",".",".",".",".","6","."],["8",".",".",".","6",".",".",".","3"],["4",".",".","8",".","3",".",".","1"],["7",".",".",".","2",".",".",".","6"],[".","6",".",".",".",".","2","8","."],[".",".",".","4","1","9",".",".","5"],[".",".",".",".","8",".",".","7","9"]]'>Copy</button>
+                        </li>
+                        <li><strong>Format 3:</strong>
+                            53..7....6..195....98....6.8...6...34..8.3..17...2...6.6....28....419..5....8..79
+                            <button class="copy-btn"
+                                data-text="53..7....6..195....98....6.8...6...34..8.3..17...2...6.6....28....419..5....8..79">Copy</button>
+                        </li>
+                    </ul>
+                    <button class="close-btn">Finish</button>
+                </div>
+            </div>
     </main>
     <footer>
         <div class="cropping-actions" id="cropping-actions" style="display: none;">
@@ -131,27 +132,6 @@
     <script src="./js/tutorial.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
     <script>
-        const fileInput = document.getElementById('fileInput');
-
-
-
-        fileInput.addEventListener('change', function () {
-            handleFileSelection(this.files);
-        });
-
-        // listen for drop event
-        document.addEventListener('drop', function (event) {
-            event.preventDefault();
-            handleFileSelection(event.dataTransfer.files);
-        });
-
-        // listen for dragover event
-        document.addEventListener('dragover', function (event) {
-            event.preventDefault();
-        });
-
-
-
         function isValidSudoku(boardStr) {
             for (let i = 0; i < 9; i++) {
                 for (let j = 0; j < 9; j++) {
@@ -167,21 +147,7 @@
             }
             return true;
         }
-        document.getElementById('cancelCrop').addEventListener('click', function () {
-            // Hide the confirm crop and cancel buttons
-            document.getElementById('parser').style.display = 'none';
 
-            // Destroy the cropper instance
-            if (typeof cropper !== 'undefined') {
-                cropper.destroy();
-            }
-
-            // kill workers if any
-            // cleanup
-
-            // Reset the UI
-            resetUI();
-        });
         function isValidPlacement(boardStr, row, col, num) {
             for (let i = 0; i < 9; i++) {
                 if (boardStr[row * 9 + i] === num || boardStr[i * 9 + col] === num) {
@@ -207,7 +173,11 @@
         const script = document.createElement('script');
         script.src = './src/sudoku_solver.js';
         document.body.appendChild(script);
+        function readBoard() {
+            const inputBoard = document.getElementById('input-board');
 
+            return inputBoard.value.trim();
+        }
 
         function solveSudoku() {
             const boardStr = readBoard();
@@ -229,69 +199,89 @@
 
             celebrate();
         }
-// Cache DOM references
-const themeToggle = document.getElementById('theme-toggle');
-const tutorialPopup = document.getElementById('tutorial-popup');
 
-themeToggle.addEventListener('click', function () {
-    this.classList.toggle('toggle-on');
-    document.body.classList.toggle('dark-theme');
-});
 
-document.addEventListener('DOMContentLoaded', function () {
-    // Use event delegation for close buttons
-    document.body.addEventListener('click', function (e) {
-        if (e.target.classList.contains('close-btn')) {
-            tutorialPopup.style.display = 'none';
-        }
-    });
-});
+        document.addEventListener('DOMContentLoaded', function () {
 
-// Toggles the theme-related UI elements based on the isDark parameter.
-function setToggleTheme(isDark) {
-    // Toggle the class on the theme toggle button
-    themeToggle.classList.toggle('toggle-on', isDark);
-    // Toggle the class on the body to apply dark or light theme styles
-    document.body.classList.toggle('dark-theme', isDark);
-}
+        // Cache DOM references
+                const fileInput = document.getElementById('fileInput');
 
-// Changes the theme from light to dark or dark to light.
-function changeTheme() {
-    // Toggle the 'dark-theme' class on the body and store the new state
-    const isDark = document.body.classList.toggle('dark-theme');
-    // Save the current theme state to localStorage
-    localStorage.setItem('dark-theme', isDark);
-    // Update the UI elements to reflect the current theme
-    setToggleTheme(isDark);
-}
-    function celebrate() {
-        const cells = document.querySelectorAll('.number');
-        const numbers = document.querySelectorAll('.number');
-        changeTheme();
-        cells.forEach(cell => {
-                        cell.classList.add('celebrateEffect');
-
-        });
-        numbers.forEach(number => {
-            number.style.color = '#368dd9';
-        });
-        setTimeout(() => {
-            cells.forEach(cell => {
-                cell.classList.remove('celebrateEffect');
+        const themeToggle = document.getElementById('theme-toggle');
+        const tutorialPopup = document.getElementById('tutorial-popup');
+            // Use event delegation for close buttons
+            document.body.addEventListener('click', function (e) {
+                if (e.target.classList.contains('close-btn')) {
+                    tutorialPopup.style.display = 'none';
+                }
             });
-        }, 4000);
-        setTimeout(() => {
+            themeToggle.addEventListener('click', function () {
+                this.classList.toggle('toggle-on');
+                document.body.classList.toggle('dark-theme');
+            });
+
+
+            fileInput.addEventListener('change', function () {
+                handleFileSelection(this.files);
+            });
+
+            // listen for drop event
+            document.addEventListener('drop', function (event) {
+                event.preventDefault();
+                handleFileSelection(event.dataTransfer.files);
+            });
+
+            // listen for dragover event
+            document.addEventListener('dragover', function (event) {
+                event.preventDefault();
+            });
+
+            document.getElementById('cancelCrop').addEventListener('click', function () {
+                // Hide the confirm crop and cancel buttons
+                document.getElementById('parser').style.display = 'none';
+
+                // Destroy the cropper instance
+                if (typeof cropper !== 'undefined') {
+                    cropper.destroy();
+                }
+
+                resetUI();
+            });
+
+        });
+
+        function celebrate() {
+            const cells = document.querySelectorAll('.number');
+            const numbers = document.querySelectorAll('.number');
+            // simualte clicking on changing theme button
+            const changeTheme = () => {
+                const themeToggle = document.getElementById('theme-toggle');
+                themeToggle.click();
+            };
             changeTheme();
-        }, 4000);
-        setTimeout(() => {
-            numbers.forEach(number => {
-                number.style.color = '#00172b';
+            cells.forEach(cell => {
+                cell.classList.add('celebrateEffect');
+
             });
-        }, 4000);
-    }
+            numbers.forEach(number => {
+                number.style.color = '#368dd9';
+            });
+            setTimeout(() => {
+                cells.forEach(cell => {
+                    cell.classList.remove('celebrateEffect');
+                });
+            }, 4000);
+            setTimeout(() => {
+                changeTheme();
+            }, 4000);
+            setTimeout(() => {
+                numbers.forEach(number => {
+                    number.style.color = '#00172b';
+                });
+            }, 4000);
+        }
 
     </script>
-        <script src="./js/parser.js"></script>
+    <script src="./js/parser.js"></script>
 
 </body>
 
