@@ -4,7 +4,7 @@ async function handleFileSelection(files) {
     if (files.length > 0) {
         console.log('Handling file selection');
         // document.body.classList.toggle('dark-theme');
-        document.getElementById('parser').style.display = 'flex';
+        document.getElementById('parser').style.display = 'block';
         document.getElementById('sudoku-board').style.display = 'none';
         document.getElementById('processedImageContainer').style.display = 'flex';
         document.getElementsByClassName('processingMessage')[0].style.display = 'block';
@@ -73,6 +73,7 @@ let cropper;
             document.getElementById('sudoku-board').style.display = 'grid';
             document.getElementById('parser').style.display = 'none';
         }
+        document.getElementsByClassName('actions')[0].style.display = 'block';
         document.getElementById('rotationSlider').style.display = 'none';
         if (cropper) {
             let croppedCanvas = cropper.getCroppedCanvas();
@@ -320,16 +321,15 @@ let cropper;
                 cropper = new Cropper(canvas, {
                     aspectRatio: 1,
                     viewMode: 1,
-                    autoCropArea: 0.98,
                     movable: true,
                     zoomable: true,
                     rotatable: true,
                     scalable: true,
                     data: {
-                        width: canvas.width * 0.98,
-                        height: canvas.height * 0.98,
-                        x: canvas.width * 0.01,
-                        y: canvas.height * 0.01,
+                        width: canvas.width,
+                        height: canvas.height,
+                        x: canvas.width,
+                        y: canvas.height,
                     },
                     ready: function () {
                         updateGridLines();

@@ -18,7 +18,6 @@
     <meta name="theme-color" content="#368dd9">
     <link rel="icon" href="./favicon.ico">
     <link rel="preload" href="./css/styles.css" as="style">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet" />
@@ -156,13 +155,12 @@
             <script>document.write(new Date().getFullYear());</script>
         </p>
     </footer>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js" defer></script>
-    <script src="./js/sudoku.js" defer></script>
-    <script src="./js/tutorial.js" defer></script>
-    <script src="./js/parser.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js" ></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js" ></script>
+    <script src="./js/sudoku.js" ></script>
+    <script src="./js/tutorial.js" ></script>
+    <script src="./js/parser.js" ></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
             const fileInput = document.getElementById('fileInput');
             const themeToggle = document.getElementById('theme-toggle');
             const tutorialPopup = document.getElementById('tutorial-popup');
@@ -207,7 +205,6 @@
                 }
                 resetUI();
             });
-        });
 
         function solveSudoku() {
             const boardStr = readBoard();
@@ -235,10 +232,6 @@
             return inputBoard.value.trim();
         }
 
-        const script = document.createElement('script');
-        script.src = './src/sudoku_solver.js';
-        document.body.appendChild(script);
-
         function isValidSudoku(boardStr) {
             for (let i = 0; i < 9; i++) {
                 for (let j = 0; j < 9; j++) {
@@ -257,10 +250,6 @@
 
         function resetBoard() {
         /* if in the middle of solving or parsing, reset the board */
-            if (document.getElementById('parser').style.display !== 'none') {
-                document.getElementById('cancelCrop').click();
-            }
-
             updateBoard('.................................................................................');
         }
 
@@ -298,6 +287,9 @@
                 changeTheme();
             }, 4000);
         }
+                    const script = document.createElement('script');
+        script.src = './src/sudoku_solver.js';
+        document.body.appendChild(script);
     </script>
 </body>
 

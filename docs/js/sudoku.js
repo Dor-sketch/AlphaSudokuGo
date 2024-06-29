@@ -268,7 +268,7 @@ document.addEventListener('keydown', function (e) {
 
     // Check if cell exists
     if (!cell) {
-        console.log(`No cell found at row ${row}, col ${col}`);
+        console.error(`No cell found at row ${row}, col ${col}`);
         return; // Exit the function if no cell is found
     }
 
@@ -301,23 +301,3 @@ document.addEventListener('keydown', function (e) {
         }
     }
 });
-// Debounce function to delay execution
-function debounce(func, wait) {
-    let timeout;
-    return function() {
-        const context = this, args = arguments;
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(context, args), wait);
-    };
-}
-
-// Adjusted update logic
-const updateInput = debounce(function() {
-    // Directly use this.value without replacing characters in the textarea
-    // Process the input for updateBoard without altering the textarea's content
-    const boardStr = this.value;
-    // Assume updateBoard can handle the raw input without needing it to be padded with periods
-    updateBoard(boardStr);
-}, 250); // 250 milliseconds delay
-
-document.getElementById('input-board').addEventListener('input', updateInput);

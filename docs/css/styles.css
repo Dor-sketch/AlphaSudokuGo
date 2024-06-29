@@ -4,7 +4,7 @@
     --text-color: #2D2D2D;
     --button-background-color: #F5F5F5;
     --button-hover-background-color: #E0E0E0;
-    --footer-text-color: #9E9E9E;
+    --footer-text-color: #ffffff;
     --primary-color: #1E88E5;
     --focus-color: #1E88E5;
     --sudoku-board-color: #ffffff;
@@ -167,7 +167,7 @@ header, .header {
             bottom: 0;
             width: 100%;
             text-align: center;
-            background-color: #4169e1;
+            background-color: #368dd9;
             padding: 10px;
             box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
             position: fixed;
@@ -176,7 +176,7 @@ header, .header {
         footer p {
             margin: 0;
             font-size: small;
-            color: #999;
+            color: var(--footer-text-color)
         }
 
 
@@ -524,8 +524,8 @@ td{
 @media screen and (max-width: 520px) {
 
     #sudoku-board {
-    min-width: 100vw - 35px;
-    min-height: 100vw - 35px;
+    min-width: calc(100vw - 35px);
+    min-height: calc(100vw - 35px);
     aspect-ratio: 1/1;
         border-radius: 0;
         gap: 0;
