@@ -4,7 +4,7 @@ async function handleFileSelection(files) {
     if (files.length > 0) {
         console.log('Handling file selection');
         // document.body.classList.toggle('dark-theme');
-        document.getElementById('parser').style.display = 'block';
+        document.getElementById('parser').style.display = 'flex';
         document.getElementById('sudoku-board').style.display = 'none';
         document.getElementById('processedImageContainer').style.display = 'flex';
         document.getElementsByClassName('processingMessage')[0].style.display = 'block';

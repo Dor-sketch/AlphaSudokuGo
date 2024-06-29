@@ -1,15 +1,22 @@
 /* Root Variables for Light Theme */
 :root {
-    --background-color: #FFFFFF;
+    --background-color: #f0f0f0;
     --text-color: #2D2D2D;
     --button-background-color: #F5F5F5;
     --button-hover-background-color: #E0E0E0;
     --footer-text-color: #9E9E9E;
     --primary-color: #1E88E5;
     --focus-color: #1E88E5;
+    --sudoku-board-color: #ffffff;
     --font-stack: 'San Francisco', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
-
+main {
+height: 100vh;
+display: flex;
+flex-direction:
+column;
+align-items: center;
+}
 #imageToCrop {
 margin: 4rem;
 padding: 1rem;
@@ -33,19 +40,25 @@ height: auto;
     --button-background-color: #424242;
     --button-hover-background-color: #535353;
     --footer-text-color: #757575;
+    --primary-color: #1E88E5;
+    --sudoku-board-color: #333333;
 }
 
 /* Body Styling */
-body {
+body,html {
     font-family: var(--font-stack);
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 100vh;
+    height: 100%;
+
+    width: 100%;
     margin: 0;
     background-color: var(--background-color);
     color: var(--text-color);
+    overflow-x: hidden;
 }
+
 
 
 
@@ -53,7 +66,7 @@ body {
 button,
 #input-board {
     padding: 10px 20px;
-    margin: 0.5rem 0;
+    margin: 0.5rem;
     font-size: 16px;
     border: none;
     border-radius: 5px;
@@ -61,9 +74,14 @@ button,
     color: var(--text-color);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
-    z-index: 300000;
+            min-height: 40px; /* Minimum height to start with */
+
 }
 
+#input-board{
+width: 100%;
+font-size: 14px;
+}
 button:hover,
 #input-board:hover {
     background-color: var(--button-hover-background-color);
@@ -76,52 +94,28 @@ button:active,
 
 }
 
-#input-board {
-     width: 80%;
-     margin-left: 1rem;
-}
-
 .solve-button, .reset-button {
     /* background-color: var(--primary-color); */
     color: var(--text-color);
-    padding: 8px 25px;
     border-radius: 5px;
     transition: background-color 0.3s ease;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-left: 0.5rem;
     margin-right: 0.5rem;
+    width: 60px;
+    height: 40px;
 
 }
 
 
 
-/* Footer Styling */
-footer {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    backdrop-filter: blur(2px);
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-    transition: background 0.3s;
-    z-index: 50000;
-}
-
-.footer p {
-    margin: 0;
-    color: var(--text-color);
-}
-
-.footer a {
-    color: #81E6D9;
-    text-decoration: none;
-}
 #parser {
     display: none; /* Changed from none to flex to make it visible and enable flex properties */
     width: 80%;
     height: 80%;
     max-width: 600px;
     max-height: 600px;
-   aspect-ratio: 1;
+   aspect-ratio: 1/1;
     z-index: 2;
     justify-content: center;
     align-items: center;
@@ -130,21 +124,31 @@ footer {
     position: fixed;
 }
 
+#sudoku-board {
+margin-top: 1rem;
+    font-family: 'Roboto Mono', monospace;
+
+ background-color: var(--sudoku-board-color );
+    border: 2px solid #000;
+    border-radius: 0px;
+    max-width: 600px;
+    max-height: 600px;
+    z-index: 1;
+    position: relative;
+}
 
 /* Updated h1 Styling */
 h1 {
-    margin: 0;
-    font-size: 2rem;
+    font-size: 1.5rem;
+    margin: 1rem;
     color: var(--text-color);
-    text-align: left;
-    font-family: var(--font-stack);
-    /* Remove or adjust the left property as needed */
+    text-align: center;
 }
 
 h2 {
     display: none;
 }
-header, footer, .header, .footer {
+header, .header {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -158,6 +162,23 @@ header, footer, .header, .footer {
     text-decoration: none;
     z-index: 4;
 }
+
+        footer {
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            background-color: #4169e1;
+            padding: 10px;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: small;
+            color: #999;
+        }
+
 
 /* Additional Component Styling */
 .theme-toggle {
@@ -200,7 +221,7 @@ display: none;
     left: 50%;
     line-height: 1.5;
     transform: translate(-50%, -50%);
-    background-color: var(--background-color);
+    background-color: var(--sudoku-board-color);
     padding: 20px 10px;
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
@@ -351,11 +372,12 @@ label {
     transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-right: 0.5rem;
+    margin-left: 1rem;
 
 }
 
-.upload-btn:hover {
-ound-color: rgba(0, 123, 255, 0.1);
+.upload-btn:hover, .solve-button:hover {
+background-color: rgba(0, 123, 255, 0.1);
     transform: scale(1.05);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
@@ -383,66 +405,41 @@ ound-color: rgba(0, 123, 255, 0.1);
 }
 
 .cropping-actions {
-    display: flex;
+    display: none;
     flex-direction: row;
     justify-content: center;
     align-items: center;
     margin-top: 1rem;
+    position: absolute;
+    z-index: 5;
+}
+
+#actions {
+display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
     bottom: 0;
     left: 50%;
-}
-
-#sudoku-board::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-size: 100% 100%;
-    z-index: 0;
-    background: linear-gradient(90deg, transparent calc(33.33% - 2px), #e6e6e6 33.33%, #ffffff calc(33.33% + 1px), #d1d1d1 calc(33.33% + 3px), transparent calc(66.66% - 2px), #d1d1d1 66.66%, #ffffff calc(66.66% + 1px), #e6e6e6 calc(66.66% + 3px), transparent),
-                linear-gradient(0deg, transparent calc(33.33% - 2px), #e6e6e6 33.33%, #ffffff calc(33.33% + 1px), #d1d1d1 calc(33.33% + 3px), transparent calc(66.66% - 2px), #d1d1d1 66.66%, #ffffff calc(66.66% + 1px), #e6e6e6 calc(66.66% + 3px), transparent),
-                linear-gradient(0deg, #a3a3a3 100%, transparent 100%);
-    box-shadow: 0 10px 20px 0 rgba(0,0,0,0.15);
-}
-
-body.dark-theme #sudoku-board::before {
-    background: linear-gradient(90deg, transparent calc(33.33% - 2px), #4d4d4d 33.33%, #262626 calc(33.33% + 2px), transparent calc(66.66% - 2px), #262626 66.66%, #4d4d4d calc(66.66% + 2px), transparent),
-                linear-gradient(0deg, transparent calc(33.33% - 2px), #4d4d4d 33.33%, #262626 calc(33.33% + 2px), transparent calc(66.66% - 2px), #262626 66.66%, #4d4d4d calc(66.66% + 2px), transparent),
-                linear-gradient(0deg, #595959 100%, transparent 100%);
-    box-shadow: 0 10px 20px 0 rgba(0,0,0,0.3);
 }
 
 
 td {
     width: 50px;
     height: 50px;
+    aspect-ratio: 1/1;
     text-align: center;
     vertical-align: middle;
     position: relative;
     overflow: hidden;
-    border: 1px solid #ffffff; /* Adjusted to match the metallic theme */
-    /* background: linear-gradient(145deg, #f0f0f0, #bcbcbc); Consistent metallic look */
-    box-shadow:
-        inset 2px 2px 5px #a9a9a9, /* Inner shadow for depth */
-        inset -2px -2px 5px #ffffff, /* Highlight for the curved effect */
-        2px 2px 5px rgba(0,0,0,0.1), /* Soft outer shadow for lifted effect */
-        -2px -2px 5px rgba(255,255,255,0.7); /* Outer highlight for additional depth */
-    /* Removed border-radius to eliminate rounded corners */
+
 }
 
-body.dtark-theme td {
-    border: 1px solid #262626; /* Adjusted to match the metallic theme */
-    /* background: linear-gradient(145deg, #262626, #4d4d4d); Consistent metallic look */
-    box-shadow:
-        inset 2px 2px 5px #1a1a1a, /* Inner shadow for depth */
-        inset -2px -2px 5px #333333, /* Highlight for the curved effect */
-        2px 2px 5px rgba(0,0,0,0.3), /* Soft outer shadow for lifted effect */
-        -2px -2px 5px rgba(255,255,255,0.7); /* Outer highlight for additional depth */
-}
 /* Pseudo-element for the board */
 .spinner {
+    min-width: 35px;
+    min-height: 35px;
+    aspect-ratio: 1/1;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -464,8 +461,9 @@ body.dtark-theme td {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 24px; /* Increased font size */
+    font-size: 40px; /* Increased font size */
     transition: all 0.3s ease; /* Smooth transition for interactivity */
+    color: var(--text-color);
 }
 .number:hover {
     transform: scale(1.1); /* Slightly enlarge digits on hover */
@@ -507,14 +505,63 @@ color: #ffffff !important;
     transition: background-color 0.3s, text-shadow 0.3s;
 }
 
+/* use darker color for the top middle, left middle, right middle, bottom middle  groups of 3x3 cells */
+ #sudoku-board td:nth-child(4), #sudoku-board td:nth-child(7)
+ {
+    border-left: 2px solid var(--text-color);
+}
+
+
+/* Add a bottom border to the rows before the sections */
+.section-border td {
+    border-bottom: 2px solid var(--text-color) /* Adjust color and thickness as needed */
+}
+
+td{
+    border: 0.5px solid var(--text-color);
+}
         /* Responsive Adjustments */
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 520px) {
 
     #sudoku-board {
-        max-width: 100%;
+    min-width: 100vw - 35px;
+    min-height: 100vw - 35px;
+    aspect-ratio: 1/1;
         border-radius: 0;
         gap: 0;
     }
+
+/* use darker color for the top middle, left middle, right middle, bottom middle  groups of 3x3 cells */
+ #sudoku-board td:nth-child(4), #sudoku-board td:nth-child(7)
+ {
+    border-left: 2px solid var(--text-color)
+}
+
+
+/* Add a bottom border to the rows before the sections */
+.section-border td {
+    border-bottom: 2px solid var(--text-color); /* Adjust color and thickness as needed */
+}
+    td {
+        height: calc( (100vw - 35px) / 9);
+        width: calc( (100vw - 35px) / 9);
+        font-size: 0.8rem;
+        border: 0.05px solid var(--text-color);
+    }
+
+    .spinner {
+        min-width: calc( (100vw - 35px) / 9);
+        min-height: calc( (100vw - 35px) / 9);
+    }
+
+    .number {
+        font-size: calc( (100vw - 45px) / 9);
+        height: 50px;
+            color: var(--text-color);
+
+    }
+
+
     .design-info {
     display: flex;
         text-align: left;
@@ -527,15 +574,12 @@ color: #ffffff !important;
         margin-right: 0.2rem;
         margin-left: 0rem;
     }
-
-    .actions {
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(5px);
-        box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+    #actions, .header {
+        align-items: center;
+        justify-content: center;
+        overflow: auto; /* Adjust as needed */
     }
+
 }
 
 
@@ -543,3 +587,58 @@ color: #ffffff !important;
 /* .cropper-hidden {
     display: block !important;
 } */
+
+
+/* ------------------- */
+
+
+#sudoku-board::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: 100% 100%;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.1);
+}
+
+body.dark-theme #sudoku-board::before {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+
+body.dtark-theme td {
+    border: 1px solid #262626; /* Adjusted to match the metallic theme */
+    /* background: linear-gradient(145deg, #262626, #4d4d4d); Consistent metallic look */
+    box-shadow:
+        inset 2px 2px 5px #1a1a1a, /* Inner shadow for depth */
+        inset -2px -2px 5px #333333, /* Highlight for the curved effect */
+        2px 2px 5px rgba(0,0,0,0.3), /* Soft outer shadow for lifted effect */
+        -2px -2px 5px rgba(255,255,255,0.7); /* Outer highlight for additional depth */
+}
+/* Pseudo-element for the board */
+/* ------------------- */
+
+    #input-board, .board-example {
+        font-family: monospace; /* Use a monospace font */
+        width: calc(12ch + 5px); /* 9 characters wide plus a little extra for padding/border */
+        white-space: pre-wrap; /* Allows text to wrap */
+        overflow-wrap: break-word; /* Ensures long words can break and wrap to the next line */
+        resize: none; /* Optional: Prevents resizing */
+        border: 1px solid #000; /* Add a border for contrast */
+        min-height: 150px; /* Adjust as needed */
+        /* add spaces between chars */
+        letter-spacing: 3px;
+        margin:0;
+        padding:0;
+        padding-left: 5px;
+        padding-top: 3px;
+    }
+
+    .actions {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+    }

@@ -2,6 +2,27 @@
 <html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snap & Solve: Turn Puzzle Images into Sudoku Answers</title>
+    <meta name="author" content="Dor Pascal">
+    <meta property="og:title" content="Snap & Solve: Turn Puzzle Images into Sudoku Answers" />
+    <meta property="og:image" content="https://dorpascal.com/AlphaSudokuGo/sudoku-solver.png" />
+    <meta property="og:description" content="Fastest Sudoku solver ever. Enter a board, click solve, and see the magic happen. Built by Dor." />
+    <meta property="og:url" content="https://dorpascal.com/AlphaSudokuGo/" />
+    <meta property="og:type" content="website" />
+    <link rel="canonical" href="https://dorpascal.com/AlphaSudokuGo/" />
+    <meta name="description" content="Fastest Sudoku solver ever. Enter a board, click solve, and see the magic happen. Built by Dor." />
+    <meta name="keywords" content="sudoku, solver, puzzle, game, board, image, recognition, AI, OCR, tesseract">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#368dd9">
+    <link rel="icon" href="./favicon.ico">
+    <link rel="preload" href="./css/styles.css" as="style">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="./css/styles.css">
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-T7HFKFX0PR"></script>
     <script>
@@ -10,35 +31,20 @@
         gtag('js', new Date());
         gtag('config', 'G-T7HFKFX0PR');
     </script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snap & Solve: Turn Puzzle Images into Sudoku Answers</title>
-    <meta name="author" content="Dor Pascal">
-    <meta property="og:title" content="Snap & Solve: Turn Puzzle Images into Sudoku Answers" />
-    <meta property="og:image" content="https://dorpascal.com/AlphaSudokuGo/sudoku-solver.png" />
-    <meta property="og:description"
-        content="Fastest Sudoku solver ever. Enter a board, click solve, and see the magic happen. Built by Dor." />
-    <meta property="og:url" content="https://dorpascal.com/AlphaSudokuGo/" />
-    <meta property="og:type" content="website" />
-    <link rel="icon" href="./favicon.ico">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="./css/styles.css">
 </head>
 
 <body>
     <header>
         <div>
-            <button id="help-btn" class="transparent-btn">
-                <i class="fas fa-question-circle icon-style"></i>
-            </button>
             <input type="file" id="fileInput" accept="image/*" style="display: none;">
             <label for="fileInput" class="upload-btn">
                 <i class="fas fa-camera icon-style"></i>
             </label>
             <button id="home-btn" class="transparent-btn" onclick="window.location.href='https://dorpascal.com/'">
                 <i class="fas fa-home icon-style"></i>
+            </button>
+            <button id="help-btn" class="transparent-btn">
+                <i class="fas fa-question-circle icon-style"></i>
             </button>
         </div>
 
@@ -48,21 +54,21 @@
             </div>
         </div>
     </header>
-    <main style="height: 100vh; display: flex; flex-direction: column; align-items: center;">
+    <main>
         <section id="parser">
             <canvas id="canvas" style="display: block;"></canvas>
             <pre id="result"></pre>
+            <div class="processingMessage">Please crop the Sudoku board and click confirm</div>
             <div id="processedImageContainer">
-                <div class="processingMessage">Please crop the Sudoku board and click confirm</div>
+                <div class="cropping-actions" id="cropping-actions" display="none">
+                    <button id="cancelCrop">Close</button>
+                    <button id="confirmCrop">Confirm Crop</button>
+                    <input type="range" id="rotationSlider" min="0" max="360" value="0">
+                </div>
             </div>
         </section>
-        <div id="sudoku-board" class="sudoku-board"></div>
-        <div class="design-info">
-            <h1>Snap & Solve</h1>
-            <p>Built By Dor ©
-                <script>document.write(new Date().getFullYear());</script>
-            </p>
-        </div>
+        <div id="sudoku-board"></div>
+        <h1>Snap & Solve</h1>
         <div id="tutorial-popup" class="tutorial-popup" role="dialog" aria-labelledby="tutorial-title"
             aria-describedby="tutorial-desc">
             <div class="tutorial-step" data-step="1">
@@ -119,7 +125,8 @@
                 <p>Try to copy and paste the hardest Sudoku puzzle ever (according to <a
                         href="https://www.telegraph.co.uk/news/science/science-news/9359579/Worlds-hardest-sudoku-can-you-crack-it.html"
                         target="_blank">The Telegraph</a>).</p>
-                <span>53..7....6..195....98....6.8...6...34..8.3..17...2...6.6....28....419..5....8..79</span>
+                <textarea class="board-example">8..........36......7..9.2...5...7.......457.....1...3...1....68..85...1..9....4..</textarea>
+                <br>
                 <button class="copy-btn"
                     data-text="8..........36......7..9.2...5...7.......457.....1...3...1....68..85...1..9....4.."
                     aria-label="Copy puzzle">📋 Copy</button>
@@ -129,23 +136,25 @@
                 </div>
             </div>
         </div>
+
+<textarea id="input-board"></textarea>
+<div class="actions">
+            <button class="reset-button" onclick="resetBoard()">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+            <button onclick="solveSudoku()" class="solve-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+            </button>
+            </div>
+        </div>
     </main>
     <footer>
-        <div class="cropping-actions" id="cropping-actions" style="display: none;">
-            <button id="cancelCrop">Close</button>
-            <input type="range" id="rotationSlider" min="0" max="360" value="0">
-            <button id="confirmCrop">Confirm Crop</button>
-        </div>
-        <input id="input-board" type="text" placeholder="Enter board as one line...">
-        <button class="reset-button" onclick="resetBoard()">
-            <i class="fas fa-sync-alt"></i>
-        </button>
-        <button onclick="solveSudoku()" class="solve-button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="5 3 19 12 5 21 5 3"></polygon>
-            </svg>
-        </button>
+        <p>Built By Dor ©
+            <script>document.write(new Date().getFullYear());</script>
+        </p>
     </footer>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js" defer></script>
@@ -189,6 +198,10 @@
 
             document.getElementById('cancelCrop').addEventListener('click', function () {
                 document.getElementById('parser').style.display = 'none';
+                // kill all workers
+                if (typeof worker !== 'undefined') {
+                    worker.terminate();
+                }
                 if (typeof cropper !== 'undefined') {
                     cropper.destroy();
                 }
@@ -243,6 +256,11 @@
         }
 
         function resetBoard() {
+        /* if in the middle of solving or parsing, reset the board */
+            if (document.getElementById('parser').style.display !== 'none') {
+                document.getElementById('cancelCrop').click();
+            }
+
             updateBoard('.................................................................................');
         }
 

@@ -1,29 +1,34 @@
-    const sudokuBoard = document.getElementById('sudoku-board');
-    const initialBoard = '53..7....6..195....98....6.8...6...34..8.3..17...2...6.6....28....419..5....8..79';
+const sudokuBoard = document.getElementById('sudoku-board');
+const initialBoard = '53..7....6..195....98....6.8...6...34..8.3..17...2...6.6....28....419..5....8..79';
 
-    // Initialize empty Sudoku board
-    const board = Array.from({ length: 9 }, () => Array(9).fill('.'));
+// Initialize empty Sudoku board
+const board = Array.from({ length: 9 }, () => Array(9).fill('.'));
 
-    // Create the grid elements with spinners
-    for (let row = 0; row < 9; row++) {
-        const rowElement = document.createElement('tr');
-        for (let col = 0; col < 9; col++) {
-            const cellElement = document.createElement('td');
-            const spinnerElement = document.createElement('div');
-            spinnerElement.className = 'spinner';
-            spinnerElement.dataset.row = row;
-            spinnerElement.dataset.col = col;
-
-            const wheelElement = document.createElement('div');
-            wheelElement.className = 'wheel';
-            wheelElement.innerHTML = Array.from({ length: 9 }, (_, k) => `<div class="number">${k + 1}</div>`).join('');
-
-            spinnerElement.appendChild(wheelElement);
-            cellElement.appendChild(spinnerElement);
-            rowElement.appendChild(cellElement);
-        }
-        sudokuBoard.appendChild(rowElement);
+// Create the grid elements with spinners
+for (let row = 0; row < 9; row++) {
+    const rowElement = document.createElement('tr');
+    // Add a class to the rowElement for the third and sixth rows
+    if (row === 2 || row === 5) {
+        rowElement.classList.add('section-border');
+        console.log('rowElement:', rowElement);
     }
+    for (let col = 0; col < 9; col++) {
+        const cellElement = document.createElement('td');
+        const spinnerElement = document.createElement('div');
+        spinnerElement.className = 'spinner';
+        spinnerElement.dataset.row = row;
+        spinnerElement.dataset.col = col;
+
+        const wheelElement = document.createElement('div');
+        wheelElement.className = 'wheel';
+        wheelElement.innerHTML = Array.from({ length: 9 }, (_, k) => `<div class="number">${k + 1}</div>`).join('');
+
+        spinnerElement.appendChild(wheelElement);
+        cellElement.appendChild(spinnerElement);
+        rowElement.appendChild(cellElement);
+    }
+    sudokuBoard.appendChild(rowElement);
+}
 
     const digitTransforms = { 9: -200, 8: -150, 7: -100, 6: -50, 5: 0, 4: 50, 3: 100, 2: 150, 1: 200, '': -250 };
     let startY = 0;
@@ -296,3 +301,23 @@ document.addEventListener('keydown', function (e) {
         }
     }
 });
+// Debounce function to delay execution
+function debounce(func, wait) {
+    let timeout;
+    return function() {
+        const context = this, args = arguments;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(context, args), wait);
+    };
+}
+
+// Adjusted update logic
+const updateInput = debounce(function() {
+    // Directly use this.value without replacing characters in the textarea
+    // Process the input for updateBoard without altering the textarea's content
+    const boardStr = this.value;
+    // Assume updateBoard can handle the raw input without needing it to be padded with periods
+    updateBoard(boardStr);
+}, 250); // 250 milliseconds delay
+
+document.getElementById('input-board').addEventListener('input', updateInput);
