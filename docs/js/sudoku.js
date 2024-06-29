@@ -1,5 +1,5 @@
 const sudokuBoard = document.getElementById('sudoku-board');
-const initialBoard = '53..7....6..195....98....6.8...6...34..8.3..17...2...6.6....28....419..5....8..79';
+const initialBoard = '.................................................................................';
 
 // Initialize empty Sudoku board
 const board = Array.from({ length: 9 }, () => Array(9).fill('.'));
@@ -10,7 +10,6 @@ for (let row = 0; row < 9; row++) {
     // Add a class to the rowElement for the third and sixth rows
     if (row === 2 || row === 5) {
         rowElement.classList.add('section-border');
-        console.log('rowElement:', rowElement);
     }
     for (let col = 0; col < 9; col++) {
         const cellElement = document.createElement('td');
@@ -261,5 +260,3 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
-
-    
