@@ -20,7 +20,7 @@ const DEBUG = false;
             event.preventDefault();
             handleFileSelection(event.dataTransfer.files);
         });
-        
+
 async function handleFileSelection(files) {
     if (files.length > 0) {
         console.log('Handling file selection');
@@ -93,8 +93,11 @@ let cropper;
         } else {
             document.getElementById('sudoku-board').style.display = 'grid';
             document.getElementById('parser').style.display = 'none';
+            document.getElementById('cancelCrop').style.display = 'none';
+
         }
         document.getElementById('solve-button').style.display = 'block';
+        document.getElementById('input-board').style.display = 'block';
         document.getElementById('rotationSlider').style.display = 'none';
         if (cropper) {
             let croppedCanvas = cropper.getCroppedCanvas();

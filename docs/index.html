@@ -62,13 +62,7 @@
             <canvas id="canvas" style="display: block;"></canvas>
             <pre id="result"></pre>
             <div class="processingMessage">Please crop the Sudoku board and click confirm</div>
-            <div id="processedImageContainer">
-                <div class="cropping-actions" id="cropping-actions" display="none">
-                    <button id="cancelCrop">Close</button>
-                    <button id="confirmCrop">Confirm Crop</button>
-                    <input type="range" id="rotationSlider" min="0" max="360" value="0">
-                </div>
-            </div>
+            <div id="processedImageContainer"></div>
         </section>
         <div id="sudoku-board"></div>
         <h1>Snap & Solve</h1>
@@ -148,6 +142,11 @@
                     <polygon points="5 3 19 12 5 21 5 3"></polygon>
                 </svg>
             </button>
+                            <div class="cropping-actions" id="cropping-actions" display="none">
+                    <button id="cancelCrop">Close</button>
+                    <button id="confirmCrop">Confirm Crop</button>
+                    <input type="range" id="rotationSlider" min="0" max="360" value="0">
+                </div>
         </div>
     </main>
     <footer>

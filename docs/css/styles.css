@@ -110,19 +110,13 @@ button:active,
 
 
 #parser {
-    display: none; /* Changed from none to flex to make it visible and enable flex properties */
-    width: 80%;
-    height: 80%;
-    max-width: 600px;
-    max-height: 600px;
-   aspect-ratio: 1/1;
-    z-index: 2;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    flex-direction: column;
-    position: fixed;
+    display: none;
+    max-height: 60vh;
+    max-width: 90vw;
+    overflow-y: auto;
 }
+
+
 
 #sudoku-board {
 margin-top: 1rem;
@@ -406,12 +400,10 @@ background-color: rgba(0, 123, 255, 0.1);
 
 .cropping-actions {
     display: none;
-    flex-direction: row;
     justify-content: center;
     align-items: center;
+    flex-direction: row;
     margin-top: 1rem;
-    position: absolute;
-    z-index: 5;
 }
 
 #actions {
@@ -555,7 +547,7 @@ td{
     }
 
     .number {
-        font-size: calc( (100vw - 45px) / 9);
+        font-size: calc( (100vw - 54px) / 9);
         height: 50px;
             color: var(--text-color);
 
@@ -579,6 +571,7 @@ td{
         justify-content: center;
         overflow: auto; /* Adjust as needed */
     }
+
 
 }
 
