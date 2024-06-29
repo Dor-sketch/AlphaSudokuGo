@@ -261,43 +261,5 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
-// Handle arrow key navigation and spinning
-document.addEventListener('keydown', function (e) {
-    const { row, col } = getCurrentCellPosition();
-    const cell = document.querySelector(`.spinner[data-row='${row}'][data-col='${col}']`);
 
-    // Check if cell exists
-    if (!cell) {
-        console.error(`No cell found at row ${row}, col ${col}`);
-        return; // Exit the function if no cell is found
-    }
-
-    const wheel = cell.querySelector('.wheel');
-
-    // Check if wheel exists
-    if (!wheel) {
-        console.error(`No wheel found in cell at row ${row}, col ${col}`);
-        return; // Exit the function if no wheel is found
-    }
-
-    let currentTransform = parseInt(wheel.style.transform.split('(')[1].split('px')[0]);
-
-    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-        e.preventDefault();
-        let delta = e.key === 'ArrowUp' ? -50 : 50;
-        let newTransform = currentTransform + delta;
-        let closestDigit = findClosestDigit(newTransform);
-        wheel.style.transform = `translateY(${digitTransforms[closestDigit]}px)`;
-        cell.dataset.value = closestDigit;
-        synchronizeInputBoard();
-    }
-
-    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-        e.preventDefault();
-        if (e.key === 'ArrowLeft') {
-            moveToPreviousCell(row, col);
-        } else if (e.key === 'ArrowRight') {
-            moveToNextCell(row, col);
-        }
-    }
-});
+    

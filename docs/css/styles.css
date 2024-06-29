@@ -620,21 +620,6 @@ body.dtark-theme td {
 /* Pseudo-element for the board */
 /* ------------------- */
 
-    #input-board, .board-example {
-        font-family: monospace; /* Use a monospace font */
-        width: calc(12ch + 5px); /* 9 characters wide plus a little extra for padding/border */
-        white-space: pre-wrap; /* Allows text to wrap */
-        overflow-wrap: break-word; /* Ensures long words can break and wrap to the next line */
-        resize: none; /* Optional: Prevents resizing */
-        border: 1px solid #000; /* Add a border for contrast */
-        min-height: 150px; /* Adjust as needed */
-        /* add spaces between chars */
-        letter-spacing: 3px;
-        margin:0;
-        padding:0;
-        padding-left: 5px;
-        padding-top: 3px;
-    }
 
     .actions {
         display: flex;

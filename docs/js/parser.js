@@ -1,5 +1,26 @@
 // const DEBUG = localStorage.getItem('debug') === 'true' || new URLSearchParams(window.location.search).get('debug') === 'true';
 const DEBUG = false;
+
+   document.getElementById('cancelCrop').addEventListener('click', function () {
+            document.getElementById('parser').style.display = 'none';
+            // kill all workers
+            if (typeof worker !== 'undefined') {
+                worker.terminate();
+            }
+            if (typeof cropper !== 'undefined') {
+                cropper.destroy();
+            }
+            resetUI();
+        });
+        fileInput.addEventListener('change', function () {
+            handleFileSelection(this.files);
+        });
+
+        document.addEventListener('drop', function (event) {
+            event.preventDefault();
+            handleFileSelection(event.dataTransfer.files);
+        });
+        
 async function handleFileSelection(files) {
     if (files.length > 0) {
         console.log('Handling file selection');
@@ -73,7 +94,7 @@ let cropper;
             document.getElementById('sudoku-board').style.display = 'grid';
             document.getElementById('parser').style.display = 'none';
         }
-        document.getElementsByClassName('actions')[0].style.display = 'block';
+        document.getElementById('solve-button').style.display = 'block';
         document.getElementById('rotationSlider').style.display = 'none';
         if (cropper) {
             let croppedCanvas = cropper.getCroppedCanvas();
