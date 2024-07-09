@@ -1,23 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr" prefix="og: http://ogp.me/ns#">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Snap & Solve: Turn Puzzle Images into Sudoku Answers</title>
     <meta name="author" content="Dor Pascal">
-    <meta property="og:title" content="Snap & Solve: Turn Puzzle Images into Sudoku Answers" />
-    <meta property="og:image" content="https://dorpascal.com/AlphaSudokuGo/sudoku-solver.png" />
-    <meta property="og:description"
-        content="Fastest Sudoku solver ever. Enter a board, click solve, and see the magic happen. Built by Dor." />
-    <meta property="og:url" content="https://dorpascal.com/AlphaSudokuGo/" />
-    <meta property="og:type" content="website" />
-    <link rel="canonical" href="https://dorpascal.com/AlphaSudokuGo/" />
-    <meta name="description"
-        content="Fastest Sudoku solver ever. Enter a board, click solve, and see the magic happen. Built by Dor." />
     <meta name="keywords" content="sudoku, solver, puzzle, game, board, image, recognition, AI, OCR, tesseract">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#368dd9">
+    <meta property="og:title" content="Snap & Solve: Turn Puzzle Images into Sudoku Answers" />
+    <meta property="og:description"
+        content="Fastest Sudoku solver ever. Enter a board, click solve, and see the magic happen. Built by Dor." />
+    <meta property="og:image" href="https://dorpascal.com/sudoku-solver/sudoku-solver.png">
+    <meta property="og:image:width" content="714">
+    <meta property="og:image:height" content="647">
+    <meta property="og:url" content="https://dorpascal.com/sudoku-solver/" />
+    <meta property="og:site_name" content="Sudoku Solver - Solution to any puzzle with Snap & Solve" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image:alt" content="Snap & Solve: Turn Puzzle Images into Sudoku Answers" />
+    <meta property="og:type" content="website" />
+    <meta name="description"
+        content="Fastest Sudoku solver ever. Enter a board, click solve, and see the magic happen. Built by Dor." />
+    <link rel="canonical" href="https://dorpascal.com/sudoku-solver/" />
     <link rel="icon" href="./favicon.ico">
     <link rel="preload" href="./css/styles.css" as="style">
     <link
@@ -142,11 +147,11 @@
                     <polygon points="5 3 19 12 5 21 5 3"></polygon>
                 </svg>
             </button>
-                            <div class="cropping-actions" id="cropping-actions" display="none">
-                    <button id="cancelCrop">Close</button>
-                    <button id="confirmCrop">Confirm Crop</button>
-                    <input type="range" id="rotationSlider" min="0" max="360" value="0">
-                </div>
+            <div class="cropping-actions" id="cropping-actions" display="none">
+                <button id="cancelCrop">Close</button>
+                <button id="confirmCrop">Confirm Crop</button>
+                <input type="range" id="rotationSlider" min="0" max="360" value="0">
+            </div>
         </div>
     </main>
     <footer>
