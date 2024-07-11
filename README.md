@@ -11,13 +11,14 @@ AlphaSudokuGo is a C++ program designed to solve Sudoku puzzles using a `Constra
 
 In this video, not only is AlphaSudokuGo training on a Haaretz "hard" puzzle and tackling the hardest sudoku puzzle ever conceived, but you can also enjoy an original piece of music I composed and produced.
 
-**UPDATE**: The project now deployed on the web, and you can try it out yourself!
+**UPDATE**: The project now deployed on the web, and you can try it out yourself! [dorpascal.com/sudoku-solver](https://dorpascal.com/sudoku-solver)
 <p align="center">
-  <a href="https://dor-sketch.github.io/AlphaSudokuGo/">
+  <a href="https://dorpascal.com/sudoku-solver/">
     <img src="images/web-cover.png" alt="Web deployment" width="200" style="padding:10px; margin:10px;">
   </a>
 </p>
-https://github.com/Dor-sketch/AlphaSudokuGo/assets/138825033/8dc277b9-9e62-4ac8-9935-4cb13ed8f5b8
+
+[https://github.com/Dor-sketch/AlphaSudokuGo/assets/138825033/8dc277b9-9e62-4ac8-9935-4cb13ed8f5b8](https://github-production-user-asset-6210df.s3.amazonaws.com/138825033/335815050-8dc277b9-9e62-4ac8-9935-4cb13ed8f5b8.mov?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20240711%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20240711T192743Z&X-Amz-Expires=300&X-Amz-Signature=bb085c874a3eae7e95f4fc65d25d31266d7102d0eee099d7897a311b99a356be&X-Amz-SignedHeaders=host&actor_id=138825033&key_id=0&repo_id=774123758)
 
 <p align = "center">
   <img src="https://github.com/Dor-sketch/AlphaSudokuGo/assets/138825033/b0ef538a-a4d6-4591-bfda-04655f8df33c" alt="Sudoku puzzle" width="600" style="padding:10px; margin:10px;">
@@ -305,7 +306,7 @@ Without the optional `--open`, the program will initiate in a game mode with a r
 Click on the cell you wish to modify, each click will increment the cell value by 1. To erase a cell value, just right-click on the cell. To solve the puzzle in AI mode, press the middle mouse button (scroll wheel), and watch the solution unfold.
 
 <p align = "center">
-  <img src="https://github.com/Dor-sketch/AlphaSudokuGo/assets/138825033/762605a7-b6a3-41e4-b3ec-5b11f4888d95" width="400" style="padding:10px; margin:10px;">
+  <img src="https://github.com/Dor-sketch/sudoku-solver/assets/138825033/762605a7-b6a3-41e4-b3ec-5b11f4888d95" width="400" style="padding:10px; margin:10px;">
   <br>
   <i>Click on the cell you wish to modify and watch the solution unfold </i>
 </p>
